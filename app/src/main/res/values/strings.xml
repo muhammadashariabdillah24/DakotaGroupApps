@@ -1,0 +1,63 @@
+<resources>
+    <string name="app_name">Dakota Group Staff</string>
+    <string name="app_logo">App Logo</string>
+    <string name="name">Nama</string>
+    
+    <!-- Login Screen -->
+    <string name="login_subtitle">Silakan login untuk melanjutkan</string>
+    <string name="pt_company">Pilih Perusahaan</string>
+    <string name="nip">NIP</string>
+    <string name="email">Email</string>
+    <string name="login">Login</string>
+    <string name="google_sign_in">Masuk dengan Google</string>
+    <string name="login_info">IMEI dan SIM ID akan otomatis terdeteksi dari perangkat Anda</string>
+    
+    <!-- PT Options -->
+    <string name="pt_dbs">PT DBS</string>
+    <string name="pt_dlb">PT DLB</string>
+    <string name="pt_logistik">PT Logistik (Dakota Group)</string>
+    
+    <!-- Messages -->
+    <string name="error_empty_nip">NIP tidak boleh kosong</string>
+    <string name="error_empty_email">Email tidak boleh kosong</string>
+    <string name="error_invalid_email">Format email tidak valid</string>
+    <string name="error_select_pt">Pilih perusahaan terlebih dahulu</string>
+    <string name="error_google_sign_in">Anda harus login dengan Google terlebih dahulu</string>
+    <string name="error_google_sign_in_failed">Gagal masuk dengan Google</string>
+    <string name="error_google_sign_in_cancelled">Login dengan Google dibatalkan</string>
+    <string name="login_success">Login berhasil!</string>
+    <string name="login_failed">Login gagal</string>
+    
+    <!-- Dashboard -->
+    <string name="profile_photo">Foto Profil</string>
+    <string name="profile_photo_fullscreen">Foto Profil Fullscreen</string>
+    <string name="close">Tutup</string>
+    <string name="main_menu">Menu Utama</string>
+    <string name="menu_kepegawaian">KEPEGAWAIAN</string>
+    <string name="menu_kepegawaian_desc">Absensi, Cuti, Gaji dan Lainnya</string>
+    <string name="menu_operasional">OPERASIONAL</string>
+    <string name="menu_operasional_desc">Delivery, Agen dan Lainnya</string>
+    <string name="arrow">Panah</string>
+    <string name="logout">Logout</string>
+    <string name="settings">Pengaturan</string>
+    <string name="account_info">Informasi Akun</string>
+    <string name="data_usage">Penggunaan Data</string>
+    <string name="help_center">Pusat Bantuan</string>
+    <string name="work_area">Area Kerja</string>
+    <string name="bpjs_kesehatan">BPJS Kesehatan</string>
+    <string name="jamsostek_label">Jamsostek</string>
+    <string name="npwp_label">NPWP</string>
+    <string name="social_status">Status Sosial</string>
+    <string name="working_hours">Jam Kerja</string>
+    <string name="employment_status">Status Pegawai</string>
+    <string name="expand_collapse_icon">Expand/Collapse Icon</string>
+
+    <string name="attendance_title">Absensi</string>
+    <string name="check_in">Check In</string>
+    <string name="check_out">Check Out</string>
+    <string name="attendance_info">Pastikan lokasi GPS aktif untuk melakukan absensi</string>
+    <string name="attendance_history">Riwayat Absensi</string>
+    <string name="empty_attendance_history">Belum ada riwayat absensi untuk bulan ini</string>
+    <string name="prev_month">Bulan Sebelumnya</string>
+    <string name="next_month">Bulan Selanjutnya</string>
+</resources>

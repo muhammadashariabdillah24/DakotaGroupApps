@@ -1,0 +1,28 @@
+API : /leave/submit?pt=<pt>
+
+RAW API : 
+
+{
+
+  "nip": "0012404003",
+
+  "tgla": "1/1/2026",
+
+  "tgle": "1/3/2026",
+
+  "status": "C",
+
+  "keterangan": "Cuti liburan keluarga",
+
+  "atasan1": "0010807032",
+
+  "atasan2": "0010807032",
+
+  "form": "Y"
+
+}
+
+
+Response With Statuscode 201 Created : 
+
+{"success":true,"message":"Leave request submitted successfully to PT Logistik","data":{"id":"0010126001","status":"C"},"timestamp":"2026-01-02T03:16:54.784Z"}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="background_gray">#F5F5F5</color>
+    <color name="gray">#808080</color>
+    <color name="primary_color">#2e86c7</color>
+    <color name="primary_darker">#256b9f</color>
+    
+    <!-- New Assignment Feature Colors -->
+    <color name="primary">#2e86c7</color>
+    <color name="primary_light">#5aa3d9</color>
+    <color name="primary_dark">#256b9f</color>
+    <color name="secondary">#931a25</color>
+    <color name="secondary_light">#b8212e</color>
+    <color name="secondary_dark">#76151e</color>
+    <color name="background">#F5F5F5</color>
+    <color name="background_light">#F5F5F5</color>
+    <color name="text_primary">#212121</color>
+    <color name="text_secondary">#757575</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+    <color name="info">#2196F3</color>
+    <color name="divider">#BDBDBD</color>
+</resources>

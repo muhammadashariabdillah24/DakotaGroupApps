@@ -1,0 +1,63 @@
+
+bedoel7997@DESKTOP-7GGVCFE MINGW64 /d/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupApps-Backend (main)
+$ npm run start
+
+> cargo-cust-instaff-apps@1.0.0 start
+> node server.js
+
+{"level":30,"time":1766997146109,"pid":10928,"hostname":"DESKTOP-7GGVCFE","msg":"Server listening at http://127.0.0.1:3000"}
+
+🚀 Server running on http://0.0.0.0:3000
+📝 API Documentation: http://0.0.0.0:3000/api/v1
+💓 Health Check: http://0.0.0.0:3000/health
+
+{"level":30,"time":1766997146110,"pid":10928,"hostname":"DESKTOP-7GGVCFE","msg":"Server listening at http://192.168.22.28:3000"}
+{"level":30,"time":1766997148951,"pid":10928,"hostname":"DESKTOP-7GGVCFE","reqId":"req-1","req":{"method":"POST","url":"/api/v1/leave/submit?pt=C","host":"10.0.2.2:3000","remoteAddress":"127.0.0.1","remotePort":54595},"msg":"incoming request"}
+{"level":30,"time":1766997149438,"pid":10928,"hostname":"DESKTOP-7GGVCFE","reqId":"req-1","msg":"Leave submission: NIP=0012404003, Status=DT to PT Logistik from IP: 127.0.0.1"}
+✅ Connected to database: logistik
+Error submitting leave request: RequestError: String or binary data would be truncated.
+    at handleError (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\mssql\lib\tedious\request.js:384:15)
+    at Connection.emit (node:events:524:28)
+    at Connection.emit (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\tedious\lib\connection.js:970:18)
+    at RequestTokenHandler.onErrorMessage (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\tedious\lib\token\handler.js:284:21)
+    at Readable.<anonymous> (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\tedious\lib\token\token-stream-parser.js:19:33)
+    at Readable.emit (node:events:524:28)
+    at addChunk (node:internal/streams/readable:561:12)
+    at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+    at Readable.push (node:internal/streams/readable:393:5)
+    at nextAsync (node:internal/streams/from:194:22) {
+  code: 'EREQUEST',
+  originalError: Error: String or binary data would be truncated.
+      at handleError (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\mssql\lib\tedious\request.js:382:19)
+      at Connection.emit (node:events:524:28)
+      at Connection.emit (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\tedious\lib\connection.js:970:18)
+      at RequestTokenHandler.onErrorMessage (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\tedious\lib\token\handler.js:284:21)
+      at Readable.<anonymous> (D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupApps-Backend\node_modules\tedious\lib\token\token-stream-parser.js:19:33)
+      at Readable.emit (node:events:524:28)
+      at addChunk (node:internal/streams/readable:561:12)
+      at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)
+      at Readable.push (node:internal/streams/readable:393:5)
+      at nextAsync (node:internal/streams/from:194:22) {
+    info: ErrorMessageToken {
+      name: 'ERROR',
+      handlerName: 'onErrorMessage',
+      number: 8152,
+      state: 14,
+      class: 16,
+      message: 'String or binary data would be truncated.',
+      serverName: 'WIN-UBLBIUDJCI3',
+      procName: 'sp_ADDHRD_T_IzinCutiSakit',
+      lineNumber: 28
+    }
+  },
+  number: 8152,
+  lineNumber: 28,
+  state: 14,
+  class: 16,
+  serverName: 'WIN-UBLBIUDJCI3',
+  procName: 'sp_ADDHRD_T_IzinCutiSakit',
+  precedingErrors: []
+}
+{"level":50,"time":1766997149533,"pid":10928,"hostname":"DESKTOP-7GGVCFE","reqId":"req-1","err":{"type":"RequestError","message":"String or binary data would be truncated.","stack":"RequestError: String or binary data would be truncated.\n    at handleError (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\mssql\\lib\\tedious\\request.js:384:15)\n    at Connection.emit (node:events:524:28)\n    at Connection.emit (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\tedious\\lib\\connection.js:970:18)\n    at RequestTokenHandler.onErrorMessage (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\tedious\\lib\\token\\handler.js:284:21)\n    at Readable.<anonymous> (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\tedious\\lib\\token\\token-stream-parser.js:19:33)\n    at Readable.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)\n    at Readable.push (node:internal/streams/readable:393:5)\n    at nextAsync (node:internal/streams/from:194:22)","code":"EREQUEST","originalError":{"type":"Error","message":"String or binary data would be truncated.","stack":"Error: String or binary data would be truncated.\n    at handleError (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\mssql\\lib\\tedious\\request.js:382:19)\n    at Connection.emit (node:events:524:28)\n    at Connection.emit (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\tedious\\lib\\connection.js:970:18)\n    at RequestTokenHandler.onErrorMessage (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\tedious\\lib\\token\\handler.js:284:21)\n    at Readable.<anonymous> (D:\\Documents_Backup\\ProjectsAndroid\\Dakota\\DakotaGroupApps-Backend\\node_modules\\tedious\\lib\\token\\token-stream-parser.js:19:33)\n    at Readable.emit (node:events:524:28)\n    at addChunk (node:internal/streams/readable:561:12)\n    at readableAddChunkPushObjectMode (node:internal/streams/readable:538:3)\n    at Readable.push (node:internal/streams/readable:393:5)\n    at nextAsync (node:internal/streams/from:194:22)","info":{"type":"ErrorMessageToken","message":"String or binary data would be truncated.","stack":"","name":"ERROR","handlerName":"onErrorMessage","number":8152,"state":14,"class":16,"serverName":"WIN-UBLBIUDJCI3","procName":"sp_ADDHRD_T_IzinCutiSakit","lineNumber":28}},"name":"RequestError","number":8152,"lineNumber":28,"state":14,"class":16,"serverName":"WIN-UBLBIUDJCI3","procName":"sp_ADDHRD_T_IzinCutiSakit","precedingErrors":[]},"msg":"String or binary data would be truncated."}
+{"success":false,"error":{"message":"Failed to submit leave request","statusCode":500,"timestamp":"2025-12-29T08:32:29.534Z","details":"String or binary data would be truncated."}}
+{"level":30,"time":1766997149543,"pid":10928,"hostname":"DESKTOP-7GGVCFE","reqId":"req-1","res":{"statusCode":500},"responseTime":590.5333000421524,"msg":"request completed"}
