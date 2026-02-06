@@ -258,6 +258,47 @@ interface ApiService {
     ): com.dakotagroupstaff.data.remote.response.DeliveryListResponse
     
     /**
+     * Check Delivery Status
+     * POST /delivery/check-status?pt=<pt>
+     */
+    @POST("delivery/check-status")
+    suspend fun checkDeliveryStatus(
+        @Query("pt") pt: String,
+        @Body request: com.dakotagroupstaff.data.remote.response.CheckDeliveryStatusRequest
+    ): ApiResponse<com.dakotagroupstaff.data.remote.response.CheckDeliveryStatusData>
+    
+    /**
+     * Upload Delivery Photo (ePOD)
+     * Returns image code for later use
+     * POST /delivery/upload-photo?pt=<pt>
+     */
+    @POST("delivery/upload-photo")
+    suspend fun uploadDeliveryPhoto(
+        @Query("pt") pt: String,
+        @Body request: com.dakotagroupstaff.data.remote.response.UploadPhotoRequest
+    ): ApiResponse<com.dakotagroupstaff.data.remote.response.UploadPhotoData>
+    
+    /**
+     * Update Delivery Photo Reference
+     * POST /delivery/update-photo?pt=<pt>
+     */
+    @POST("delivery/update-photo")
+    suspend fun updateDeliveryPhoto(
+        @Query("pt") pt: String,
+        @Body request: com.dakotagroupstaff.data.remote.response.UpdateDeliveryPhotoRequest
+    ): ApiResponse<com.dakotagroupstaff.data.remote.response.UpdateDeliveryPhotoData>
+    
+    /**
+     * Update Delivery Signature Reference
+     * POST /delivery/update-signature?pt=<pt>
+     */
+    @POST("delivery/update-signature")
+    suspend fun updateDeliverySignature(
+        @Query("pt") pt: String,
+        @Body request: com.dakotagroupstaff.data.remote.response.UpdateDeliverySignatureRequest
+    ): ApiResponse<com.dakotagroupstaff.data.remote.response.UpdateDeliverySignatureData>
+    
+    /**
      * Submit Delivery Data (Photo & Signature)
      * POST /delivery/submit?pt=<pt>
      */

@@ -139,3 +139,152 @@ data class SubmitDeliveryData(
     @SerializedName("noBTT")
     val noBtt: String?
 )
+
+// ==================== NEW GRANULAR DELIVERY ENDPOINTS ====================
+
+/**
+ * Check Delivery Status Request
+ * API: POST /api/v1/delivery/check-status?pt=<pt>
+ */
+data class CheckDeliveryStatusRequest(
+    @SerializedName("noLoper")
+    val noLoper: String,
+    
+    @SerializedName("btt")
+    val btt: String
+)
+
+/**
+ * Check Delivery Status Response
+ */
+data class CheckDeliveryStatusData(
+    @SerializedName("status")
+    val status: String,  // NODATA, FOTO, TTD, DATAEXISTS
+    
+    @SerializedName("message")
+    val message: String,
+    
+    @SerializedName("detail")
+    val detail: String?,
+    
+    @SerializedName("noLoper")
+    val noLoper: String,
+    
+    @SerializedName("btt")
+    val btt: String,
+    
+    @SerializedName("received")
+    val received: Boolean?,
+    
+    @SerializedName("hasPhoto")
+    val hasPhoto: Boolean?,
+    
+    @SerializedName("hasSignature")
+    val hasSignature: Boolean?,
+    
+    @SerializedName("fotoCode")
+    val fotoCode: String?,
+    
+    @SerializedName("ttdCode")
+    val ttdCode: String?
+)
+
+/**
+ * Upload Photo Request
+ * API: POST /api/v1/delivery/upload-photo?pt=<pt>
+ */
+data class UploadPhotoRequest(
+    @SerializedName("base64Image")
+    val base64Image: String
+)
+
+/**
+ * Upload Photo Response
+ */
+data class UploadPhotoData(
+    @SerializedName("result")
+    val result: String,  // "imgdbs"
+    
+    @SerializedName("imageCode")
+    val imageCode: String,
+    
+    @SerializedName("filePath")
+    val filePath: String?,
+    
+    @SerializedName("fileName")
+    val fileName: String?
+)
+
+/**
+ * Update Delivery Photo Request
+ * API: POST /api/v1/delivery/update-photo?pt=<pt>
+ */
+data class UpdateDeliveryPhotoRequest(
+    @SerializedName("noLoper")
+    val noLoper: String,
+    
+    @SerializedName("noBTT")
+    val noBtt: String,
+    
+    @SerializedName("imgCode")
+    val imgCode: String
+)
+
+/**
+ * Update Delivery Photo Response
+ */
+data class UpdateDeliveryPhotoData(
+    @SerializedName("success")
+    val success: String,  // "done"
+    
+    @SerializedName("noLoper")
+    val noLoper: String,
+    
+    @SerializedName("noBTT")
+    val noBtt: String,
+    
+    @SerializedName("imgCode")
+    val imgCode: String,
+    
+    @SerializedName("rowsAffected")
+    val rowsAffected: Int
+)
+
+/**
+ * Update Delivery Signature Request
+ * API: POST /api/v1/delivery/update-signature?pt=<pt>
+ */
+data class UpdateDeliverySignatureRequest(
+    @SerializedName("noLoper")
+    val noLoper: String,
+    
+    @SerializedName("noBTT")
+    val noBtt: String,
+    
+    @SerializedName("imgCode")
+    val imgCode: String
+)
+
+/**
+ * Update Delivery Signature Response
+ */
+data class UpdateDeliverySignatureData(
+    @SerializedName("success")
+    val success: String,  // "done"
+    
+    @SerializedName("noLoper")
+    val noLoper: String,
+    
+    @SerializedName("noBTT")
+    val noBtt: String,
+    
+    @SerializedName("imgCode")
+    val imgCode: String,
+    
+    @SerializedName("type")
+    val type: String,  // "signature"
+    
+    @SerializedName("rowsAffected")
+    val rowsAffected: Int
+)
+
