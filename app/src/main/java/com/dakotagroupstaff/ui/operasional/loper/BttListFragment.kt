@@ -35,8 +35,8 @@ class BttListFragment : Fragment() {
     private lateinit var deliveryAdapter: DeliveryAdapter
 
     private val viewModel: LoperViewModel by activityViewModels {
-        val apiService = ApiConfig.getApiService()
         val userPref = UserPreferences.getInstance(requireContext().dataStore)
+        val apiService = ApiConfig.getApiService(userPreferences = userPref)
         val database = AppDatabase.getDatabase(requireContext())
         val repository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
         ViewModelFactory.getInstance(requireContext(), deliveryRepository = repository)

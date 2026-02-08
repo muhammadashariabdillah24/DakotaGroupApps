@@ -29,8 +29,8 @@ class LoperActivity : AppCompatActivity() {
     private lateinit var userPreferences: UserPreferences
 
     private val viewModel: LoperViewModel by viewModels {
-        val apiService = ApiConfig.getApiService()
         val userPref = UserPreferences.getInstance(dataStore)
+        val apiService = ApiConfig.getApiService(userPreferences = userPref)
         val database = AppDatabase.getDatabase(this)
         val repository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
         ViewModelFactory.getInstance(this, deliveryRepository = repository)

@@ -85,7 +85,8 @@ class AccountInfoActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             try {
-                val apiService = ApiConfig.getApiService()
+                val userPreferences = com.dakotagroupstaff.data.local.preferences.UserPreferences.getInstance(dataStore)
+                val apiService = ApiConfig.getApiService(userPreferences = userPreferences)
                 val response = apiService.getEmployeeBio(pt, EmployeeBioRequest(nip))
                 val data = response.data?.firstOrNull()
                 if (data != null) {

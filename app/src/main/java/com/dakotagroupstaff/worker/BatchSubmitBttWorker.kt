@@ -53,7 +53,7 @@ class BatchSubmitBttWorker(
             
             // Initialize dependencies using local creation (could use Koin if preferred)
             val userPreferences = UserPreferences.getInstance(applicationContext.dataStore)
-            val apiService = ApiConfig.getApiService()
+            val apiService = ApiConfig.getApiService(userPreferences = userPreferences)
             val database = AppDatabase.getDatabase(applicationContext)
             val repository = DeliveryRepository(
                 apiService = apiService,

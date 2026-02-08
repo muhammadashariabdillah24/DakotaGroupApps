@@ -2,6 +2,7 @@ package com.dakotagroupstaff.di
 
 import android.content.Context
 import androidx.room.Room
+import com.dakotagroupstaff.data.local.preferences.dataStore
 import com.dakotagroupstaff.data.local.room.AppDatabase
 import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.data.repository.LeaveRepository
@@ -18,7 +19,8 @@ object Injection {
      * Provide SalaryRepository instance
      */
     fun provideSalaryRepository(context: Context): SalaryRepository {
-        val apiService = ApiConfig.getApiService()
+        val userPreferences = com.dakotagroupstaff.data.local.preferences.UserPreferences.getInstance(context.dataStore)
+        val apiService = ApiConfig.getApiService(userPreferences = userPreferences)
         return SalaryRepository.getInstance(apiService)
     }
     
@@ -26,7 +28,8 @@ object Injection {
      * Provide LeaveRepository instance
      */
     fun provideLeaveRepository(context: Context): LeaveRepository {
-        val apiService = ApiConfig.getApiService()
+        val userPreferences = com.dakotagroupstaff.data.local.preferences.UserPreferences.getInstance(context.dataStore)
+        val apiService = ApiConfig.getApiService(userPreferences = userPreferences)
         val database = Room.databaseBuilder(
             context.applicationContext,
             AppDatabase::class.java,

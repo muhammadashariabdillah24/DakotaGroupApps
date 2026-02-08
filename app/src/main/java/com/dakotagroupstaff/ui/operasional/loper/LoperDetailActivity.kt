@@ -83,7 +83,7 @@ class LoperDetailActivity : AppCompatActivity() {
         
         // Initialize repository and preferences
         userPreferences = UserPreferences.getInstance(dataStore)
-        val apiService = com.dakotagroupstaff.data.remote.retrofit.ApiConfig.getApiService()
+        val apiService = com.dakotagroupstaff.data.remote.retrofit.ApiConfig.getApiService(userPreferences = userPreferences)
         val database = com.dakotagroupstaff.data.local.room.AppDatabase.getDatabase(this)
         repository = DeliveryRepository(
             apiService = apiService,
