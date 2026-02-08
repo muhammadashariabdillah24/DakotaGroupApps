@@ -11,6 +11,8 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.flow.first
 
 /**
  * API Configuration with Security Features
@@ -41,12 +43,33 @@ object ApiConfig {
      * - Proper timeout configuration
      * - Automatic JSON serialization/deserialization
      */
-    fun getApiService(): ApiService {
+    fun getApiService(userPreferences: com.dakotagroupstaff.data.local.preferences.UserPreferences? = null): ApiService {
         // Configure logging - only show body in debug builds for security
         val loggingInterceptor = if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
         } else {
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)
+        }
+        
+        // Authorization header interceptor - inject JWT token
+        val authInterceptor = Interceptor { chain ->
+            val token = if (userPreferences != null) {
+                runBlocking {
+                    userPreferences.getAccessToken().first()
+                }
+            } else {
+                ""
+            }
+            
+            val request = if (token.isNotEmpty()) {
+                chain.request().newBuilder()
+                    .addHeader("Authorization", "Bearer $token")
+                    .build()
+            } else {
+                chain.request()
+            }
+            
+            chain.proceed(request)
         }
         
         // Custom interceptor to log raw response body for debugging
@@ -80,6 +103,7 @@ object ApiConfig {
         
         // Build OkHttp client with security and performance configurations
         val client = OkHttpClient.Builder()
+            .addInterceptor(authInterceptor) // Add auth interceptor first to inject token
             .addInterceptor(responseInterceptor) // Add response interceptor first
             .addInterceptor(loggingInterceptor)
             // Add certificate pinning for security

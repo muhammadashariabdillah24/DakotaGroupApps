@@ -10,6 +10,7 @@ import androidx.core.app.NotificationCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
+import com.dakotagroupstaff.BuildConfig
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.data.local.preferences.dataStore
@@ -40,7 +41,9 @@ class BatchSubmitBttWorker(
     
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {
         try {
-            Log.d(TAG, "Starting BatchSubmitBttWorker")
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Starting BatchSubmitBttWorker")
+            }
             
             // Check network availability (basic check)
             if (!NetworkUtils.isNetworkAvailable(applicationContext)) {
@@ -67,7 +70,9 @@ class BatchSubmitBttWorker(
             
             // Get all sent deliveries from local storage
             val sentDeliveries = repository.getSentDeliveries().first()
-            Log.d(TAG, "Found ${sentDeliveries.size} BTT to process")
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Found ${sentDeliveries.size} BTT to process")
+            }
             
             if (sentDeliveries.isEmpty()) {
                 return@withContext Result.success()
@@ -77,10 +82,14 @@ class BatchSubmitBttWorker(
             // If this fails (app is in foreground), continue without crashing
             try {
                 setForeground(createForegroundInfo(0, sentDeliveries.size))
-                Log.d(TAG, "Foreground service started successfully")
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "Foreground service started successfully")
+                }
             } catch (e: IllegalStateException) {
                 // App is in foreground, foreground service is not needed
-                Log.d(TAG, "App is in foreground, skipping foreground service")
+                if (BuildConfig.DEBUG) {
+                    Log.d(TAG, "App is in foreground, skipping foreground service")
+                }
             } catch (e: Exception) {
                 Log.e(TAG, "Failed to set foreground: ${e.message}")
             }
@@ -91,7 +100,9 @@ class BatchSubmitBttWorker(
             // Process each BTT
             sentDeliveries.forEachIndexed { index, entity ->
                 try {
-                    Log.d(TAG, "Processing BTT ${entity.noBtt} (${index + 1}/${sentDeliveries.size})")
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Processing BTT ${entity.noBtt} (${index + 1}/${sentDeliveries.size})")
+                    }
                     
                     // Update progress notification (only if foreground service is active)
                     try {
@@ -117,7 +128,9 @@ class BatchSubmitBttWorker(
                         ttd = entity.ttdBase64 ?: ""
                     )
                     
-                    Log.d(TAG, "Submitting BTT ${entity.noBtt} - NoLoper: ${entity.noLoper}, Penerima: ${entity.penerima}")
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "Submitting BTT ${entity.noBtt} - NoLoper: ${entity.noLoper}, Penerima: ${entity.penerima}")
+                    }
                     
                     // Submit to API and wait for FINAL result (skip Loading state)
                     // Using last() to get the final emission (Success or Error)
@@ -126,7 +139,9 @@ class BatchSubmitBttWorker(
                     
                     when (result) {
                         is com.dakotagroupstaff.data.Result.Success -> {
-                            Log.d(TAG, "✅ Successfully submitted BTT ${entity.noBtt}")
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "✅ Successfully submitted BTT ${entity.noBtt}")
+                            }
                             // Delete from local storage on success
                             repository.removeSentDelivery(entity.noBtt)
                             successCount++
@@ -148,7 +163,9 @@ class BatchSubmitBttWorker(
                 }
             }
             
-            Log.d(TAG, "Process completed. Success: $successCount, Failed: $failCount")
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "Process completed. Success: $successCount, Failed: $failCount")
+            }
             
             // Show completion notification
             showCompletionNotification(successCount, failCount, sentDeliveries.size)

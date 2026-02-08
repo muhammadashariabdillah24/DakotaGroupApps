@@ -18,7 +18,7 @@ import org.koin.dsl.module
  */
 
 val networkModule = module {
-    single { ApiConfig.getApiService() }
+    single { ApiConfig.getApiService(userPreferences = get()) }
 }
 
 val databaseModule = module {

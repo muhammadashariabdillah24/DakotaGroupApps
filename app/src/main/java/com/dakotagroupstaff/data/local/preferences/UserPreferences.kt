@@ -28,6 +28,7 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     private val TASK_CODE_KEY = stringPreferencesKey("task_code")
     private val TASK_DETAIL_KEY = stringPreferencesKey("task_detail")
     private val TASK_ID_KEY = stringPreferencesKey("task_id")
+    private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
 
     fun getSession(): Flow<UserSession> {
         return dataStore.data.map { preferences ->
@@ -82,6 +83,33 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     fun getPt(): Flow<String> {
         return dataStore.data.map { preferences ->
             preferences[PT_KEY] ?: "C"
+        }
+    }
+    
+    /**
+     * Save JWT access token
+     */
+    suspend fun saveAccessToken(token: String) {
+        dataStore.edit { preferences ->
+            preferences[ACCESS_TOKEN_KEY] = token
+        }
+    }
+    
+    /**
+     * Get JWT access token
+     */
+    fun getAccessToken(): Flow<String> {
+        return dataStore.data.map { preferences ->
+            preferences[ACCESS_TOKEN_KEY] ?: ""
+        }
+    }
+    
+    /**
+     * Clear JWT access token
+     */
+    suspend fun clearAccessToken() {
+        dataStore.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN_KEY)
         }
     }
 

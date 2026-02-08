@@ -32,5 +32,11 @@ data class LoginData(
     val taskId: String? = null,
     
     @SerializedName("Area Kerja")
-    val areaKerja: String? = null
+    val areaKerja: String? = null,
+    
+    @SerializedName("accessToken")
+    val accessToken: String = "",
+    
+    @SerializedName("tokenType")
+    val tokenType: String = "Bearer"
 )

@@ -203,13 +203,15 @@ class LoginActivity : AppCompatActivity() {
 
     private fun performLogin(nip: String, email: String) {
         // Log data yang akan dikirim untuk debugging
-        android.util.Log.d("LoginActivity", "=== LOGIN ATTEMPT ===")
-        android.util.Log.d("LoginActivity", "PT: $selectedPt")
-        android.util.Log.d("LoginActivity", "NIP: $nip")
-        android.util.Log.d("LoginActivity", "Device ID (IMEI): $deviceId")
-        android.util.Log.d("LoginActivity", "Serial Number (SIM): $serialNumber")
-        android.util.Log.d("LoginActivity", "Email: $email")
-        android.util.Log.d("LoginActivity", "====================")
+        if (BuildConfig.DEBUG) {
+            android.util.Log.d("LoginActivity", "=== LOGIN ATTEMPT ===")
+            android.util.Log.d("LoginActivity", "PT: $selectedPt")
+            android.util.Log.d("LoginActivity", "NIP: $nip")
+            android.util.Log.d("LoginActivity", "Device ID (IMEI): $deviceId")
+            android.util.Log.d("LoginActivity", "Serial Number (SIM): $serialNumber")
+            android.util.Log.d("LoginActivity", "Email: $email")
+            android.util.Log.d("LoginActivity", "====================")
+        }
         
         viewModel.login(selectedPt, nip, deviceId, serialNumber, email).observe(this) { result ->
             when (result) {
@@ -269,9 +271,11 @@ class LoginActivity : AppCompatActivity() {
         val logoUrl = ImageUrlHelper.constructLogoUrl()
         
         // Debug log
-        android.util.Log.d("LoginActivity", "=== APP LOGO DEBUG ===")
-        android.util.Log.d("LoginActivity", "Logo URL: $logoUrl")
-        android.util.Log.d("LoginActivity", "=====================")
+        if (BuildConfig.DEBUG) {
+            android.util.Log.d("LoginActivity", "=== APP LOGO DEBUG ===")
+            android.util.Log.d("LoginActivity", "Logo URL: $logoUrl")
+            android.util.Log.d("LoginActivity", "=====================")
+        }
         
         // Load app logo with Glide
         Glide.with(this)
@@ -303,10 +307,12 @@ class LoginActivity : AppCompatActivity() {
                     dataSource: com.bumptech.glide.load.DataSource,
                     isFirstResource: Boolean
                 ): Boolean {
-                    android.util.Log.d("LoginActivity", "=== APP LOGO LOADED SUCCESSFULLY ===")
-                    android.util.Log.d("LoginActivity", "URL: $logoUrl")
-                    android.util.Log.d("LoginActivity", "Data source: $dataSource")
-                    android.util.Log.d("LoginActivity", "===================================")
+                    if (BuildConfig.DEBUG) {
+                        android.util.Log.d("LoginActivity", "=== APP LOGO LOADED SUCCESSFULLY ===")
+                        android.util.Log.d("LoginActivity", "URL: $logoUrl")
+                        android.util.Log.d("LoginActivity", "Data source: $dataSource")
+                        android.util.Log.d("LoginActivity", "===================================")
+                    }
                     return false // Return false to allow Glide to display the image
                 }
             })

@@ -66,6 +66,10 @@ class AuthRepository private constructor(
                 )
                 
                 userPreferences.saveSession(userSession)
+                
+                // Save JWT access token
+                userPreferences.saveAccessToken(loginData.accessToken)
+                
                 emit(Result.Success(loginData))
             } else {
                 emit(Result.Error(response.getResponseMessage()))
@@ -101,6 +105,7 @@ class AuthRepository private constructor(
     }
 
     suspend fun logout() {
+        userPreferences.clearAccessToken()
         userPreferences.logout()
     }
 
