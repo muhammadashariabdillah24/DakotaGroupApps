@@ -96,7 +96,8 @@ class AssignmentActivity : AppCompatActivity() {
                     showAssignmentData(result.data)
                 }
                 is Result.Error -> {
-                    showEmptyState(result.message)
+                    val friendlyMessage = ErrorMessageHelper.parseErrorMessage(result.message)
+                    showEmptyState(friendlyMessage)
                 }
             }
         }
@@ -147,10 +148,9 @@ class AssignmentActivity : AppCompatActivity() {
         binding.cardDriverInfo.isVisible = false
         binding.cardNotes.isVisible = false
         
-        // Optional: show error message in toast
-        if (message.isNotEmpty()) {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
-        }
+        // Empty state layout already has user-friendly static text:
+        // "Tidak ada surat tugas" and "Anda belum memiliki surat tugas aktif saat ini"
+        // No need to set dynamic message
     }
     
     /**
@@ -370,8 +370,8 @@ class AssignmentActivity : AppCompatActivity() {
                         dialogBinding.progressBar.isVisible = false
                         dialogBinding.rvAssignments.isVisible = false
                         dialogBinding.tvEmptyMessage.isVisible = true
-                        dialogBinding.tvEmptyMessage.text = result.message
-                        Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                        val friendlyMessage = ErrorMessageHelper.parseErrorMessage(result.message)
+                        dialogBinding.tvEmptyMessage.text = friendlyMessage
                     }
                 }
             }

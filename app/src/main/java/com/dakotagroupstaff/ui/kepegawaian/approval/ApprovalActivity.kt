@@ -120,7 +120,7 @@ class ApprovalActivity : AppCompatActivity() {
                     displayApprovalList(result.data)
                 }
                 is Result.Error -> {
-                    binding.progressBar.visibility = View.GONE
+                    binding.swipeRefresh.isRefreshing = false
                     Toast.makeText(this, ErrorMessageHelper.getApprovalListLoadError(), Toast.LENGTH_SHORT).show()
                     displayEmptyState()
                 }

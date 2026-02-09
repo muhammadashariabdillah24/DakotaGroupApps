@@ -102,7 +102,7 @@ class AttendanceViewModel(
     fun isWithinRange(): Boolean {
         val nearest = _nearestAgent.value ?: return false
         val (agent, distance) = nearest
-        val rangeMeters = agent.range.toDoubleOrNull() ?: 100.0
+        val rangeMeters = agent.range.toDoubleOrNull() ?: 30.0
         
         return distance <= rangeMeters
     }
@@ -139,7 +139,7 @@ class AttendanceViewModel(
         }
         
         val (agent, distance) = nearest
-        val rangeMeters = agent.range.toDoubleOrNull() ?: 100.0
+        val rangeMeters = agent.range.toDoubleOrNull() ?: 30.0
         
         if (distance > rangeMeters) {
             _errorMessage.value = "Anda berada di luar jangkauan cabang/agen (${distance.toInt()}m dari ${agent.namaAgen})"

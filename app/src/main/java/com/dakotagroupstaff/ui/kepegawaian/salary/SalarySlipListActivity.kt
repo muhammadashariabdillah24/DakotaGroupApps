@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.pref.SessionManager
-import com.dakotagroupstaff.data.remote.response.SalarySlipItem
+import com.dakotagroupstaff.data.remote.response.SalarySlipData
 import com.dakotagroupstaff.databinding.ActivitySalarySlipListBinding
 import com.dakotagroupstaff.databinding.DialogYearFilterBinding
 import com.dakotagroupstaff.di.Injection

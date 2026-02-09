@@ -12,10 +12,7 @@ import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.remote.response.LeaveType
 import com.dakotagroupstaff.databinding.ActivityLeaveSubmissionBinding
 import com.dakotagroupstaff.data.local.pref.SessionManager
-import com.dakotagroupstaff.data.local.preferences.dataStore
-import com.dakotagroupstaff.data.remote.response.SuperAtasanItem
 import com.dakotagroupstaff.util.ErrorMessageHelper
-import com.google.android.material.datepicker.MaterialDatePickerssionManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
