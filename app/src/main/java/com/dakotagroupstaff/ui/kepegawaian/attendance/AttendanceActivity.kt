@@ -15,6 +15,7 @@ import com.dakotagroupstaff.R
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.databinding.ActivityAttendanceBinding
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.google.android.gms.location.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
@@ -33,6 +34,7 @@ class AttendanceActivity : AppCompatActivity() {
     
     private var currentNip: String? = null
     private var currentPt: String? = null
+    private var isCheckingIn: Boolean = true // Track if user is checking in or out
     
     // Location permission launcher
     private val locationPermissionLauncher = registerForActivityResult(
@@ -162,7 +164,8 @@ class AttendanceActivity : AppCompatActivity() {
                 }
                 is Result.Success -> {
                     binding.loadingOverlay.visibility = View.GONE
-                    Toast.makeText(this, "Absensi berhasil dicatat", Toast.LENGTH_SHORT).show()
+                    val successMessage = ErrorMessageHelper.getAttendanceSuccessMessage(isCheckingIn)
+                    Toast.makeText(this, successMessage, Toast.LENGTH_SHORT).show()
                     
                     // Reload attendance history
                     currentNip?.let { nip ->
@@ -175,7 +178,8 @@ class AttendanceActivity : AppCompatActivity() {
                 }
                 is Result.Error -> {
                     binding.loadingOverlay.visibility = View.GONE
-                    showErrorDialog(result.message)
+                    val errorMessage = ErrorMessageHelper.getAttendanceErrorMessage(isCheckingIn)
+                    showErrorDialog(errorMessage)
                     viewModel.resetSubmitResult()
                 }
                 null -> {
@@ -215,6 +219,7 @@ class AttendanceActivity : AppCompatActivity() {
         
         // Check in button
         binding.btnCheckIn.setOnClickListener {
+            isCheckingIn = true
             showAttendanceConfirmation("Masuk") {
 
                 submitAttendance("M")
@@ -223,6 +228,7 @@ class AttendanceActivity : AppCompatActivity() {
         
         // Check out button
         binding.btnCheckOut.setOnClickListener {
+            isCheckingIn = false
             showAttendanceConfirmation("Pulang") {
                 submitAttendance("K")
             }

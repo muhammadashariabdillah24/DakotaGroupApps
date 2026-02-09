@@ -10,10 +10,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.pref.SessionManager
-import com.dakotagroupstaff.data.remote.response.SalarySlipData
+import com.dakotagroupstaff.data.remote.response.SalarySlipItem
 import com.dakotagroupstaff.databinding.ActivitySalarySlipListBinding
 import com.dakotagroupstaff.databinding.DialogYearFilterBinding
 import com.dakotagroupstaff.di.Injection
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.dakotagroupstaff.utils.SalaryDataHelper
 import java.util.Calendar
 
@@ -87,8 +88,8 @@ class SalarySlipListActivity : AppCompatActivity() {
                     processData()
                 }
                 is Result.Error -> {
-                    showLoading(false)
-                    showError(result.message)
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, ErrorMessageHelper.getSalaryListLoadError(), Toast.LENGTH_LONG).show()
                 }
             }
         }

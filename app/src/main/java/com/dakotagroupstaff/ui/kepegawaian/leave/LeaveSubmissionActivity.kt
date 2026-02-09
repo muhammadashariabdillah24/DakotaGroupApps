@@ -12,6 +12,10 @@ import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.remote.response.LeaveType
 import com.dakotagroupstaff.databinding.ActivityLeaveSubmissionBinding
 import com.dakotagroupstaff.data.local.pref.SessionManager
+import com.dakotagroupstaff.data.local.preferences.dataStore
+import com.dakotagroupstaff.data.remote.response.SuperAtasanItem
+import com.dakotagroupstaff.util.ErrorMessageHelper
+import com.google.android.material.datepicker.MaterialDatePickerssionManager
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
@@ -105,13 +109,13 @@ class LeaveSubmissionActivity : AppCompatActivity() {
                 is Result.Success -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnSubmit.isEnabled = true
-                    Toast.makeText(this, "Pengajuan berhasil dikirim", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getLeaveSubmitSuccess(), Toast.LENGTH_SHORT).show()
                     finish()
                 }
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnSubmit.isEnabled = true
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getLeaveSubmitError(), Toast.LENGTH_LONG).show()
                 }
                 null -> {
                     // Reset state - no action needed

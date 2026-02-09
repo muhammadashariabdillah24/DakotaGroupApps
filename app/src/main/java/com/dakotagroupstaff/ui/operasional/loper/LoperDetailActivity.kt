@@ -36,6 +36,7 @@ import com.dakotagroupstaff.databinding.ActivityLoperDetailBinding
 import com.dakotagroupstaff.databinding.DialogSignatureBinding
 import com.dakotagroupstaff.utils.ImageCompressor
 import com.dakotagroupstaff.utils.ViewModelFactory
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
@@ -921,11 +922,9 @@ class LoperDetailActivity : AppCompatActivity() {
                             }
                             
                             withContext(Dispatchers.Main) {
-                                binding.progressBar.visibility = View.GONE
-                                binding.btnSave.isEnabled = true
                                 Toast.makeText(
                                     this@LoperDetailActivity,
-                                    "Data berhasil dikirim ke server",
+                                    ErrorMessageHelper.getDeliverySubmitSuccess(),
                                     Toast.LENGTH_SHORT
                                 ).show()
                                 finish()
@@ -933,11 +932,9 @@ class LoperDetailActivity : AppCompatActivity() {
                         }
                         is Result.Error -> {
                             withContext(Dispatchers.Main) {
-                                binding.progressBar.visibility = View.GONE
-                                binding.btnSave.isEnabled = true
                                 Toast.makeText(
                                     this@LoperDetailActivity,
-                                    "Gagal mengirim data: ${result.message}",
+                                    ErrorMessageHelper.getDeliverySubmitError(),
                                     Toast.LENGTH_SHORT
                                 ).show()
                             }

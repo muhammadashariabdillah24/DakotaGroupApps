@@ -14,6 +14,7 @@ import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.data.local.preferences.dataStore
 import com.dakotagroupstaff.databinding.ActivityApprovalBinding
 import com.dakotagroupstaff.di.Injection
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
@@ -119,8 +120,8 @@ class ApprovalActivity : AppCompatActivity() {
                     displayApprovalList(result.data)
                 }
                 is Result.Error -> {
-                    binding.swipeRefresh.isRefreshing = false
-                    showError(result.message)
+                    binding.progressBar.visibility = View.GONE
+                    Toast.makeText(this, ErrorMessageHelper.getApprovalListLoadError(), Toast.LENGTH_SHORT).show()
                     displayEmptyState()
                 }
             }

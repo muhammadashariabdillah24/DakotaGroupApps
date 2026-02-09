@@ -15,6 +15,7 @@ import com.dakotagroupstaff.databinding.ActivityAssignmentBinding
 import com.dakotagroupstaff.databinding.DialogQrCodeBinding
 import com.dakotagroupstaff.databinding.DialogSelectAssignmentBinding
 import com.dakotagroupstaff.databinding.DialogOperationalCostBinding
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.tabs.TabLayoutMediator
 import com.google.zxing.BarcodeFormat
@@ -112,11 +113,11 @@ class AssignmentActivity : AppCompatActivity() {
                     // Show loading in dialog
                 }
                 is Result.Success -> {
-                    Toast.makeText(this, "Biaya berhasil disimpan", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getAssignmentCostSaveSuccess(), Toast.LENGTH_SHORT).show()
                     viewModel.resetSaveResult()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getAssignmentCostSaveError(), Toast.LENGTH_SHORT).show()
                     viewModel.resetSaveResult()
                 }
             }

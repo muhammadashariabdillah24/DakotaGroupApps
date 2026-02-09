@@ -10,6 +10,7 @@ import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.entity.LeaveDetailsEntity
 import com.dakotagroupstaff.data.local.pref.SessionManager
 import com.dakotagroupstaff.databinding.ActivityLeaveHistoryBinding
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
@@ -87,8 +88,7 @@ class LeaveHistoryActivity : AppCompatActivity() {
                 }
                 is Result.Error -> {
                     binding.swipeRefresh.isRefreshing = false
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, result.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getLeaveBalanceLoadError(), Toast.LENGTH_SHORT).show()
                 }
             }
         }

@@ -21,6 +21,7 @@ import com.dakotagroupstaff.BuildConfig
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.databinding.ActivityLoginBinding
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.dakotagroupstaff.util.ImageUrlHelper
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount

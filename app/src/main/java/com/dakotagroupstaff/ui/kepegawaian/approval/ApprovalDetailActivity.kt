@@ -13,6 +13,7 @@ import com.dakotagroupstaff.data.local.preferences.dataStore
 import com.dakotagroupstaff.data.remote.response.LeaveStatusHelper
 import com.dakotagroupstaff.databinding.ActivityApprovalDetailBinding
 import com.dakotagroupstaff.di.Injection
+import com.dakotagroupstaff.util.ErrorMessageHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -167,13 +168,13 @@ class ApprovalDetailActivity : AppCompatActivity() {
                 }
                 is Result.Success -> {
                     showLoading(false)
-                    Toast.makeText(this, "Berhasil menyetujui", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getApprovalSubmitSuccess(), Toast.LENGTH_SHORT).show()
                     setResult(RESULT_OK)
                     finish()
                 }
                 is Result.Error -> {
                     showLoading(false)
-                    Toast.makeText(this, "Gagal menyetujui: ${result.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, ErrorMessageHelper.getApprovalSubmitError(), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -186,13 +187,13 @@ class ApprovalDetailActivity : AppCompatActivity() {
                 }
                 is Result.Success -> {
                     showLoading(false)
-                    Toast.makeText(this, "Berhasil menolak", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, ErrorMessageHelper.getApprovalSubmitSuccess(), Toast.LENGTH_SHORT).show()
                     setResult(RESULT_OK)
                     finish()
                 }
                 is Result.Error -> {
                     showLoading(false)
-                    Toast.makeText(this, "Gagal menolak: ${result.message}", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, ErrorMessageHelper.getApprovalSubmitError(), Toast.LENGTH_LONG).show()
                 }
             }
         }
