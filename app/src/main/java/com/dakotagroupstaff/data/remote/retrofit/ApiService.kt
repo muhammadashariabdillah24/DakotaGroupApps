@@ -33,6 +33,26 @@ interface ApiService {
     ): ApiResponse<List<LoginData>>
     
     /**
+     * Refresh Access Token
+     * POST /auth/refresh-token?pt=<pt>
+     */
+    @POST("auth/refresh-token")
+    suspend fun refreshAccessToken(
+        @Query("pt") pt: String,
+        @Body request: RefreshTokenRequest
+    ): ApiResponse<com.dakotagroupstaff.data.remote.response.RefreshTokenData>
+    
+    /**
+     * Logout and revoke refresh token
+     * POST /auth/logout?pt=<pt>
+     */
+    @POST("auth/logout")
+    suspend fun logout(
+        @Query("pt") pt: String,
+        @Body request: LogoutRequest
+    ): ApiResponse<Any>
+    
+    /**
      * Get Agent Locations
      * GET /agent/locations?pt=<pt>
      */

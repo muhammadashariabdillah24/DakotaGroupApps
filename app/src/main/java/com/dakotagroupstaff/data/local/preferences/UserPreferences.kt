@@ -29,6 +29,8 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     private val TASK_DETAIL_KEY = stringPreferencesKey("task_detail")
     private val TASK_ID_KEY = stringPreferencesKey("task_id")
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
+    private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
+    private val TOKEN_EXPIRY_KEY = stringPreferencesKey("token_expiry")
 
     fun getSession(): Flow<UserSession> {
         return dataStore.data.map { preferences ->
@@ -110,6 +112,56 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     suspend fun clearAccessToken() {
         dataStore.edit { preferences ->
             preferences.remove(ACCESS_TOKEN_KEY)
+        }
+    }
+    
+    /**
+     * Save refresh token
+     */
+    suspend fun saveRefreshToken(refreshToken: String) {
+        dataStore.edit { preferences ->
+            preferences[REFRESH_TOKEN_KEY] = refreshToken
+        }
+    }
+    
+    /**
+     * Get refresh token
+     */
+    fun getRefreshToken(): Flow<String> {
+        return dataStore.data.map { preferences ->
+            preferences[REFRESH_TOKEN_KEY] ?: ""
+        }
+    }
+    
+    /**
+     * Save token expiry time
+     */
+    suspend fun saveTokenExpiry(expiresIn: Int) {
+        val expiryTime = System.currentTimeMillis() + (expiresIn * 1000L)
+        dataStore.edit { preferences ->
+            preferences[TOKEN_EXPIRY_KEY] = expiryTime.toString()
+        }
+    }
+    
+    /**
+     * Check if token is expiring soon (within 5 minutes)
+     */
+    fun isTokenExpiringSoon(): Flow<Boolean> {
+        return dataStore.data.map { preferences ->
+            val expiryStr = preferences[TOKEN_EXPIRY_KEY] ?: return@map true
+            val expiryTime = expiryStr.toLongOrNull() ?: return@map true
+            val now = System.currentTimeMillis()
+            val fiveMinutes = 5 * 60 * 1000L
+            (expiryTime - now) < fiveMinutes
+        }
+    }
+    
+    /**
+     * Get IMEI
+     */
+    fun getImei(): Flow<String> {
+        return dataStore.data.map { preferences ->
+            preferences[IMEI_KEY] ?: ""
         }
     }
 

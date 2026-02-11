@@ -44,6 +44,13 @@ object ApiConfig {
      * - Automatic JSON serialization/deserialization
      */
     fun getApiService(userPreferences: com.dakotagroupstaff.data.local.preferences.UserPreferences? = null): ApiService {
+        // Create separate ApiService for token refresh (no authenticator to avoid loops)
+        val refreshApiService = if (userPreferences != null) {
+            createRefreshApiService()
+        } else {
+            null
+        }
+        
         // Configure logging - only show body in debug builds for security
         val loggingInterceptor = if (BuildConfig.DEBUG) {
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
@@ -102,7 +109,7 @@ object ApiConfig {
         val certificatePinner = CertificatePinnerHelper.getCertificatePinnerForUrl(BuildConfig.BASE_URL)
         
         // Build OkHttp client with security and performance configurations
-        val client = OkHttpClient.Builder()
+        val clientBuilder = OkHttpClient.Builder()
             .addInterceptor(authInterceptor) // Add auth interceptor first to inject token
             .addInterceptor(responseInterceptor) // Add response interceptor first
             .addInterceptor(loggingInterceptor)
@@ -112,7 +119,13 @@ object ApiConfig {
             .connectTimeout(30, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
             .writeTimeout(30, TimeUnit.SECONDS)
-            .build()
+        
+        // Add TokenAuthenticator for auto-refresh on 401 (if userPreferences provided)
+        if (userPreferences != null && refreshApiService != null) {
+            clientBuilder.authenticator(TokenAuthenticator(userPreferences, refreshApiService))
+        }
+        
+        val client = clientBuilder.build()
         
         // Configure Gson with lenient parsing to handle edge cases
         val gson = GsonBuilder()
@@ -130,6 +143,38 @@ object ApiConfig {
             .addConverterFactory(GsonConverterFactory.create(gson)) // For request bodies
             .addConverterFactory(StringResponseConverterFactory(gson)) // For response bodies
 
+            .client(client)
+            .build()
+        
+        return retrofit.create(ApiService::class.java)
+    }
+    
+    /**
+     * Create separate ApiService for token refresh (no authenticator)
+     * This prevents infinite loops when refresh token endpoint returns 401
+     */
+    private fun createRefreshApiService(): ApiService {
+        val loggingInterceptor = if (BuildConfig.DEBUG) {
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+        } else {
+            HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)
+        }
+        
+        val client = OkHttpClient.Builder()
+            .addInterceptor(loggingInterceptor)
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+        
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+        
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BuildConfig.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .addConverterFactory(StringResponseConverterFactory(gson))
             .client(client)
             .build()
         

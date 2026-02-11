@@ -37,6 +37,12 @@ data class LoginData(
     @SerializedName("accessToken")
     val accessToken: String = "",
     
+    @SerializedName("refreshToken")
+    val refreshToken: String = "",
+    
     @SerializedName("tokenType")
-    val tokenType: String = "Bearer"
+    val tokenType: String = "Bearer",
+    
+    @SerializedName("expiresIn")
+    val expiresIn: Int = 3600  // 1 hour in seconds
 )

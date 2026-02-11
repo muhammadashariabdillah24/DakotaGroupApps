@@ -10,8 +10,10 @@ import com.dakotagroupstaff.data.remote.response.ApiResponse
 import com.dakotagroupstaff.data.remote.response.LoginData
 import com.dakotagroupstaff.data.remote.retrofit.ApiService
 import com.dakotagroupstaff.data.remote.retrofit.LoginRequest
+import com.dakotagroupstaff.data.remote.retrofit.LogoutRequest
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import retrofit2.HttpException
 
 class AuthRepository private constructor(
@@ -70,6 +72,10 @@ class AuthRepository private constructor(
                 // Save JWT access token
                 userPreferences.saveAccessToken(loginData.accessToken)
                 
+                // Save refresh token and token expiry
+                userPreferences.saveRefreshToken(loginData.refreshToken)
+                userPreferences.saveTokenExpiry(loginData.expiresIn)
+                
                 emit(Result.Success(loginData))
             } else {
                 emit(Result.Error(response.getResponseMessage()))
@@ -104,9 +110,37 @@ class AuthRepository private constructor(
         return userPreferences.getSession()
     }
 
-    suspend fun logout() {
-        userPreferences.clearAccessToken()
-        userPreferences.logout()
+    fun logout(): LiveData<Result<Boolean>> = liveData {
+        emit(Result.Loading)
+        try {
+            val refreshToken = userPreferences.getRefreshToken().first()
+            val nip = userPreferences.getNip().first()
+            val pt = userPreferences.getPt().first()
+            
+            if (refreshToken.isNotEmpty() && nip.isNotEmpty()) {
+                try {
+                    // Call logout API to revoke refresh token
+                    val logoutRequest = LogoutRequest(refreshToken, nip)
+                    val response = apiService.logout(pt, logoutRequest)
+                    
+                    Log.d("AuthRepository", "Logout API response: ${response.message}")
+                } catch (e: Exception) {
+                    // Log but don't fail - still clear local session
+                    Log.e("AuthRepository", "Error calling logout API", e)
+                }
+            }
+            
+            // Clear local session regardless of API call result
+            userPreferences.clearAccessToken()
+            userPreferences.logout()
+            
+            emit(Result.Success(true))
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "Logout error", e)
+            // Still clear local session even if exception occurs
+            userPreferences.logout()
+            emit(Result.Success(true))
+        }
     }
 
     companion object {
