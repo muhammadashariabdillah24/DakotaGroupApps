@@ -67,7 +67,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_clock" />
+                        android:src="@drawable/ic_menu_absensi" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -126,7 +126,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_calendar" />
+                        android:src="@drawable/ic_menu_cuti" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -185,7 +185,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_money" />
+                        android:src="@drawable/ic_menu_gaji" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -244,7 +244,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:layout_marginEnd="16dp"
-                        android:src="@drawable/ic_check" />
+                        android:src="@drawable/ic_menu_approval" />
 
                     <LinearLayout
                         android:layout_width="0dp"

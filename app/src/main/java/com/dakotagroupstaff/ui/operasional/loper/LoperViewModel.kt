@@ -11,7 +11,10 @@ import com.dakotagroupstaff.data.remote.response.DeliveryListResponse
 import com.dakotagroupstaff.data.repository.DeliveryRepository
 import kotlinx.coroutines.launch
 
-class LoperViewModel(private val deliveryRepository: DeliveryRepository) : ViewModel() {
+class LoperViewModel(
+    private val deliveryRepository: DeliveryRepository,
+    private val loperRepository: com.dakotagroupstaff.data.repository.LoperRepository
+) : ViewModel() {
     
     private val _deliveryList = MutableLiveData<com.dakotagroupstaff.data.Result<DeliveryListResponse>>()
     val deliveryList: LiveData<com.dakotagroupstaff.data.Result<DeliveryListResponse>> = _deliveryList
@@ -51,5 +54,12 @@ class LoperViewModel(private val deliveryRepository: DeliveryRepository) : ViewM
     
     suspend fun isDeliverySent(noBtt: String): Boolean {
         return deliveryRepository.isDeliverySent(noBtt)
+    }
+    
+    /**
+     * Check barcode against server
+     */
+    fun checkBarcode(barcode: String): kotlinx.coroutines.flow.Flow<com.dakotagroupstaff.data.Result<com.dakotagroupstaff.data.remote.response.CheckBarcodeData>> {
+        return loperRepository.checkBarcode(barcode)
     }
 }

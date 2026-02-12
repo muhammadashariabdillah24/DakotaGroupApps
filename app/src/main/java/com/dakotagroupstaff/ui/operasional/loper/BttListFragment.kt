@@ -38,8 +38,13 @@ class BttListFragment : Fragment() {
         val userPref = UserPreferences.getInstance(requireContext().dataStore)
         val apiService = ApiConfig.getApiService(userPreferences = userPref)
         val database = AppDatabase.getDatabase(requireContext())
-        val repository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
-        ViewModelFactory.getInstance(requireContext(), deliveryRepository = repository)
+        val deliveryRepository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
+        val loperRepository = com.dakotagroupstaff.data.repository.LoperRepository.getInstance(apiService, userPref)
+        ViewModelFactory.getInstance(
+            requireContext(), 
+            deliveryRepository = deliveryRepository,
+            loperRepository = loperRepository
+        )
     }
 
     private val tabType: BttTabType

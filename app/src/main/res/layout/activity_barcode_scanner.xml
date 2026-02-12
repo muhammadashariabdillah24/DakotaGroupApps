@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/black">
+
+    <!-- ZXing Barcode Scanner -->
+    <com.journeyapps.barcodescanner.DecoratedBarcodeView
+        android:id="@+id/barcode_scanner"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:zxing_scanner_layout="@layout/custom_barcode_scanner" />
+
+    <!-- Custom Overlay with Corner Borders -->
+    <com.dakotagroupstaff.ui.custom.BarcodeScannerOverlay
+        android:id="@+id/scanner_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- Top Controls -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="end">
+
+        <!-- Flashlight Toggle -->
+        <ImageButton
+            android:id="@+id/btn_flash"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="12dp"
+            android:background="@drawable/bg_button_circle"
+            android:src="@drawable/ic_flash_off"
+            android:contentDescription="Toggle flashlight"
+            android:tint="@android:color/white" />
+
+        <!-- Close Button -->
+        <ImageButton
+            android:id="@+id/btn_close"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:background="@drawable/bg_button_circle"
+            android:src="@drawable/ic_close"
+            android:contentDescription="Close scanner"
+            android:tint="@android:color/white" />
+    </LinearLayout>
+
+    <!-- Bottom Status Text -->
+    <TextView
+        android:id="@+id/tv_scan_status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="48dp"
+        android:text="Arahkan kamera ke barcode"
+        android:textColor="@android:color/white"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:background="#80000000"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="12dp"
+        android:elevation="4dp" />
+
+</FrameLayout>

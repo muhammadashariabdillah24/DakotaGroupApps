@@ -39,7 +39,7 @@ class KepegawaianMenuActivity : AppCompatActivity() {
             mainViewModel.saveMenuToHistory(
                 "attendance",
                 getString(R.string.attendance_title),
-                R.drawable.ic_kepegawaian,
+                R.drawable.ic_menu_absensi,
                 AttendanceActivity::class.java.name
             )
             val intent = Intent(this, AttendanceActivity::class.java)
@@ -51,7 +51,7 @@ class KepegawaianMenuActivity : AppCompatActivity() {
             mainViewModel.saveMenuToHistory(
                 "leave",
                 "Cuti/Izin",
-                R.drawable.ic_kepegawaian,
+                R.drawable.ic_menu_cuti,
                 LeaveHistoryActivity::class.java.name
             )
             val intent = Intent(this, LeaveHistoryActivity::class.java)
@@ -63,7 +63,7 @@ class KepegawaianMenuActivity : AppCompatActivity() {
             mainViewModel.saveMenuToHistory(
                 "salary",
                 "Gaji",
-                R.drawable.ic_kepegawaian,
+                R.drawable.ic_menu_gaji,
                 SalarySlipListActivity::class.java.name
             )
             val intent = Intent(this, SalarySlipListActivity::class.java)
@@ -75,7 +75,7 @@ class KepegawaianMenuActivity : AppCompatActivity() {
             mainViewModel.saveMenuToHistory(
                 "approval",
                 "Approval",
-                R.drawable.ic_kepegawaian,
+                R.drawable.ic_menu_approval,
                 ApprovalActivity::class.java.name
             )
             val intent = Intent(this, ApprovalActivity::class.java)

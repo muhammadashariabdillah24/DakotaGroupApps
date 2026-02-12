@@ -327,7 +327,18 @@ interface ApiService {
         @Query("pt") pt: String,
         @Body request: com.dakotagroupstaff.data.remote.response.SubmitDeliveryRequest
     ): ApiResponse<com.dakotagroupstaff.data.remote.response.SubmitDeliveryData>
+    
+    /**
+     * Check Barcode BTT
+     * POST /delivery/check-barcode-btt?pt=<pt>
+     */
+    @POST("delivery/check-barcode-btt")
+    suspend fun checkBarcodeBTT(
+        @Query("pt") pt: String,
+        @Body request: CheckBarcodeRequest
+    ): ApiResponse<com.dakotagroupstaff.data.remote.response.CheckBarcodeData>
 }
+
 
 data class LoginRequest(
     @SerializedName("nip")

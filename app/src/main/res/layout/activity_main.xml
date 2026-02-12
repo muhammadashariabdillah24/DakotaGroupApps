@@ -167,7 +167,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:contentDescription="@string/menu_kepegawaian"
-                        android:src="@drawable/ic_kepegawaian"
+                        android:src="@drawable/ic_category_kepegawaian"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 
@@ -233,7 +233,7 @@
                         android:layout_width="48dp"
                         android:layout_height="48dp"
                         android:contentDescription="@string/menu_operasional"
-                        android:src="@drawable/ic_operasional"
+                        android:src="@drawable/ic_category_operasional"
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent" />
 

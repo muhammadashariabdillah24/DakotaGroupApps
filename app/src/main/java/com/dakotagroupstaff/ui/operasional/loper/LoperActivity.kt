@@ -13,6 +13,7 @@ import com.dakotagroupstaff.data.local.preferences.dataStore
 import com.dakotagroupstaff.data.local.room.AppDatabase
 import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.data.repository.DeliveryRepository
+import com.dakotagroupstaff.data.repository.LoperRepository
 import com.dakotagroupstaff.databinding.ActivityLoperBinding
 import com.dakotagroupstaff.utils.ViewModelFactory
 import androidx.fragment.app.Fragment
@@ -28,12 +29,18 @@ class LoperActivity : AppCompatActivity() {
     private lateinit var deliveryAdapter: DeliveryAdapter
     private lateinit var userPreferences: UserPreferences
 
+
     private val viewModel: LoperViewModel by viewModels {
         val userPref = UserPreferences.getInstance(dataStore)
         val apiService = ApiConfig.getApiService(userPreferences = userPref)
         val database = AppDatabase.getDatabase(this)
-        val repository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
-        ViewModelFactory.getInstance(this, deliveryRepository = repository)
+        val deliveryRepository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
+        val loperRepository = LoperRepository.getInstance(apiService, userPref)
+        ViewModelFactory.getInstance(
+            this, 
+            deliveryRepository = deliveryRepository,
+            loperRepository = loperRepository
+        )
     }
     
     private val requestNotificationPermissionLauncher = registerForActivityResult(

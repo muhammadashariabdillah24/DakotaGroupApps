@@ -64,9 +64,7 @@
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:layout_marginEnd="16dp"
-                            android:src="@drawable/ic_document"
-                            android:tint="@color/primary"
-                            app:tint="@color/primary" />
+                            android:src="@drawable/ic_menu_surat_tugas" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -125,9 +123,7 @@
                             android:layout_width="48dp"
                             android:layout_height="48dp"
                             android:layout_marginEnd="16dp"
-                            android:src="@drawable/ic_delivery"
-                            android:tint="@color/primary"
-                            app:tint="@color/primary" />
+                            android:src="@drawable/ic_menu_loper" />
 
                         <LinearLayout
                             android:layout_width="0dp"

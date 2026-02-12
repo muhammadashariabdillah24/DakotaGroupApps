@@ -13,7 +13,8 @@ import com.dakotagroupstaff.ui.operasional.loper.LoperViewModel
  */
 class ViewModelFactory private constructor(
     private val assignmentRepository: AssignmentRepository? = null,
-    private val deliveryRepository: DeliveryRepository? = null
+    private val deliveryRepository: DeliveryRepository? = null,
+    private val loperRepository: com.dakotagroupstaff.data.repository.LoperRepository? = null
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -25,7 +26,8 @@ class ViewModelFactory private constructor(
             }
             modelClass.isAssignableFrom(LoperViewModel::class.java) -> {
                 requireNotNull(deliveryRepository) { "DeliveryRepository is required for LoperViewModel" }
-                LoperViewModel(deliveryRepository) as T
+                requireNotNull(loperRepository) { "LoperRepository is required for LoperViewModel" }
+                LoperViewModel(deliveryRepository, loperRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
@@ -38,11 +40,13 @@ class ViewModelFactory private constructor(
         fun getInstance(
             context: Context,
             assignmentRepository: AssignmentRepository? = null,
-            deliveryRepository: DeliveryRepository? = null
+            deliveryRepository: DeliveryRepository? = null,
+            loperRepository: com.dakotagroupstaff.data.repository.LoperRepository? = null
         ): ViewModelFactory {
             return ViewModelFactory(
                 assignmentRepository = assignmentRepository,
-                deliveryRepository = deliveryRepository
+                deliveryRepository = deliveryRepository,
+                loperRepository = loperRepository
             )
         }
     }

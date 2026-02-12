@@ -40,7 +40,7 @@ class OperasionalMenuActivity : AppCompatActivity() {
             mainViewModel.saveMenuToHistory(
                 "assignment",
                 "Surat Tugas",
-                R.drawable.ic_operasional,
+                R.drawable.ic_menu_surat_tugas,
                 AssignmentActivity::class.java.name
             )
             val intent = Intent(this, AssignmentActivity::class.java)
@@ -52,7 +52,7 @@ class OperasionalMenuActivity : AppCompatActivity() {
             mainViewModel.saveMenuToHistory(
                 "loper",
                 "Loper",
-                R.drawable.ic_operasional,
+                R.drawable.ic_menu_loper,
                 LoperActivity::class.java.name
             )
             val intent = Intent(this, LoperActivity::class.java)

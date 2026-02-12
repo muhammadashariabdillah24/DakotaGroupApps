@@ -141,6 +141,14 @@
             android:label="Detail BTT"
             android:parentActivityName=".ui.operasional.loper.LoperActivity" />
         
+        <!-- Barcode Scanner Activity -->
+        <activity
+            android:name=".ui.operasional.loper.BarcodeScannerActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:parentActivityName=".ui.operasional.loper.LoperActivity" />
+        
         <activity
             android:name=".ui.settings.SettingsActivity"
             android:exported="false"
