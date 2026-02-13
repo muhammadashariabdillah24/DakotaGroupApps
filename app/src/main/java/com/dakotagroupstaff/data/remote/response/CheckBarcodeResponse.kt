@@ -18,6 +18,9 @@ data class CheckBarcodeData(
     @SerializedName("bttId")
     val bttId: String? = null,
     
+    @SerializedName("totalKoli")
+    val totalKoli: Int? = null,
+
     @SerializedName("message")
     val message: String? = null
 )

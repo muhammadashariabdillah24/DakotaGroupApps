@@ -38,6 +38,7 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     // Barcode scanner BTT collection
     private val SCANNED_BTT_IDS = stringSetPreferencesKey("scanned_btt_ids")
     private val CURRENT_BTT_TOTAL_KOLI = intPreferencesKey("current_btt_total_koli")
+    private val CURRENT_BTT_NUMBER = stringPreferencesKey("current_btt_number")
 
     fun getSession(): Flow<UserSession> {
         return dataStore.data.map { preferences ->
@@ -193,12 +194,13 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     }
     
     /**
-     * Clear all scanned BTT IDs
+     * Clear all scanned BTT IDs and session data
      */
     suspend fun clearScannedBttIds() {
         dataStore.edit { preferences ->
             preferences.remove(SCANNED_BTT_IDS)
             preferences.remove(CURRENT_BTT_TOTAL_KOLI)
+            preferences.remove(CURRENT_BTT_NUMBER)
         }
     }
     
@@ -216,6 +218,23 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
      */
     suspend fun getCurrentBttTotalKoli(): Int {
         val preferences = dataStore.data.map { it[CURRENT_BTT_TOTAL_KOLI] ?: 0 }
+        return preferences.first()
+    }
+    
+    /**
+     * Set current BTT number being scanned
+     */
+    suspend fun setCurrentBttNumber(bttNumber: String) {
+        dataStore.edit { preferences ->
+            preferences[CURRENT_BTT_NUMBER] = bttNumber
+        }
+    }
+    
+    /**
+     * Get current BTT number
+     */
+    suspend fun getCurrentBttNumber(): String {
+        val preferences = dataStore.data.map { it[CURRENT_BTT_NUMBER] ?: "" }
         return preferences.first()
     }
 

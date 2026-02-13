@@ -8,8 +8,12 @@ import android.media.MediaPlayer
 import android.media.AudioManager
 import android.media.ToneGenerator
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -152,19 +156,46 @@ class BarcodeScannerActivity : AppCompatActivity() {
                     }
                     is com.dakotagroupstaff.data.Result.Success -> {
                         val bttId = result.data.bttId ?: ""
+                        val scannedValue = result.data.value
+                        
                         if (bttId.isNotEmpty()) {
-                            lifecycleScope.launch {
-                                // Save to DataStore
-                                val prefs = UserPreferences.getInstance(dataStore)
-                                prefs.addScannedBttId(bttId)
-                                
-                                // Update counter display
-                                updateCounterDisplay()
-                                
-                               // Show success feedback
-                                showSuccessFeedback(result.data.value)
-                                
-                                // Allow continuous scanning
+                            // Parse BTT number from barcode
+                            val scannedBttNumber = parseBttNumberFromBarcode(barcode)
+                            
+                            if (scannedBttNumber != null) {
+                                lifecycleScope.launch {
+                                    val prefs = UserPreferences.getInstance(dataStore)
+                                    val currentBtt = prefs.getCurrentBttNumber()
+                                    
+                                    when {
+                                        currentBtt.isEmpty() -> {
+                                            // First scan - set current BTT
+                                            val totalKoli = result.data.totalKoli ?: 0
+                                            val koliIdToStore = result.data.koliId ?: scannedValue
+                                            
+                                            prefs.setCurrentBttNumber(scannedBttNumber)
+                                            // Update total koli if available
+                                            if (totalKoli > 0) {
+                                                prefs.setCurrentBttTotalKoli(totalKoli)
+                                            }
+                                            
+                                            saveScanAndUpdateCounter(koliIdToStore, scannedValue)
+                                        }
+                                        currentBtt == scannedBttNumber -> {
+                                            // Same BTT - continue normally
+                                            val koliIdToStore = result.data.koliId ?: scannedValue
+                                            saveScanAndUpdateCounter(koliIdToStore, scannedValue)
+                                        }
+                                        else -> {
+                                            // DIFFERENT BTT - show warning dialog
+                                            val totalKoli = result.data.totalKoli ?: 0
+                                            showBttMismatchDialog(scannedBttNumber, currentBtt, bttId, scannedValue, totalKoli, result.data.koliId ?: scannedValue)
+                                        }
+                                    }
+                                }
+                            } else {
+                                // Invalid barcode format
+                                showError("Format barcode tidak valid")
                                 isScanning = true
                             }
                         } else {
@@ -196,7 +227,7 @@ class BarcodeScannerActivity : AppCompatActivity() {
         binding.btnSimpan.visibility = View.VISIBLE
     }
 
-    private fun showSuccessFeedback(value: String) {
+    private fun showSuccessFeedback(value: String, message: String = "Scan berhasil! BTT disimpan.") {
         // Green flash animation
         binding.scannerOverlay.showSuccess()
 
@@ -204,7 +235,7 @@ class BarcodeScannerActivity : AppCompatActivity() {
         playBeepSound()
 
         // Show success message briefly
-        binding.tvScanStatus.text = "Scan berhasil! BTT disimpan."
+        binding.tvScanStatus.text = message
         binding.tvScanStatus.setTextColor(getColor(android.R.color.holo_green_dark))
         
         // Reset status text after delay
@@ -245,6 +276,142 @@ class BarcodeScannerActivity : AppCompatActivity() {
     override fun onPause() {
         super.onPause()
         binding.barcodeScanner.pause()
+    }
+
+    override fun onDestroy() {
+        // toneGenerator?.release() // Assuming toneGenerator is a member variable
+        // toneGenerator = null
+        super.onDestroy()
+    }
+    
+    // === BTT Validation Helper Functions ===
+    
+    /**
+     * Parse BTT number from barcode
+     * Format: [16 chars BTT][4 chars Koli]
+     * Example: 001122025C0000010001
+     */
+    private fun parseBttNumberFromBarcode(barcode: String): String? {
+        return if (barcode.length >= 16) {
+            barcode.substring(0, 16)
+        } else {
+            null
+        }
+    }
+    
+    /**
+     * Save scan and update counter - extracted for reuse
+     */
+    private suspend fun saveScanAndUpdateCounter(koliId: String, value: String) {
+        val prefs = UserPreferences.getInstance(dataStore)
+        val currentScanned = prefs.getScannedBttIds()
+        val currentTotal = prefs.getCurrentBttTotalKoli()
+        
+        // Check if already scanned
+        if (currentScanned.contains(koliId)) {
+             showSuccessFeedback(value, "Barcode sudah discan")
+             isScanning = true
+             return
+        }
+        
+        // Check cap limit
+        if (currentTotal > 0 && currentScanned.size >= currentTotal) {
+             showSuccessFeedback(value, "Semua koli sudah discan")
+             isScanning = true
+             return
+        }
+        
+        prefs.addScannedBttId(koliId)
+        updateCounterDisplay()
+        showSuccessFeedback(value)
+        isScanning = true
+    }
+    
+    /**
+     * Show BTT mismatch warning dialog
+     */
+    private fun showBttMismatchDialog(
+        scannedBtt: String,
+        currentBtt: String,
+        newBttId: String,
+        newValue: String,
+        newTotalKoli: Int,
+        newKoliId: String
+    ) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("⚠️ Peringatan")
+           .setMessage(buildWarningMessage(scannedBtt, currentBtt))
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+                // Allow scanning again
+                isScanning = true
+            }
+            .setPositiveButton("Oke, Saya Mengerti") { dialog, _ ->
+                // Clear DataStore and start new BTT
+                lifecycleScope.launch {
+                    clearAndStartNewBtt(scannedBtt, newBttId, newValue, newTotalKoli, newKoliId)
+                }
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .create()
+        
+        dialog.show()
+    }
+    
+    /**
+     * Build warning message with red text for important warning
+     */
+    private fun buildWarningMessage(scannedBtt: String, currentBtt: String): SpannableString {
+        val message = """
+Ini bukan barang dari BTT ini ($currentBtt)!
+Apakah anda tetap ingin menggunakan barcode BTT ini?
+
+Jika anda menekan tombol Oke, Saya Mengerti maka semua hasil scan barcode koli dari BTT ini ($currentBtt) akan dihapus.
+        """.trimIndent()
+        
+        val spannable = SpannableString(message)
+        
+        // Find position of warning text
+        val warningStart = message.indexOf("Jika anda")
+        if (warningStart >= 0) {
+            // Apply red color to warning text
+            spannable.setSpan(
+                ForegroundColorSpan(android.graphics.Color.RED),
+                warningStart,
+                message.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+        
+        return spannable
+    }
+    
+    /**
+     * Clear previous BTT data and start with new BTT
+     */
+    private suspend fun clearAndStartNewBtt(scannedBtt: String, bttId: String, value: String, newTotalKoli: Int, koliId: String) {
+        val prefs = UserPreferences.getInstance(dataStore)
+        
+        // Clear all previous data
+        prefs.clearScannedBttIds()
+        
+        // Set new current BTT
+        prefs.setCurrentBttNumber(scannedBtt)
+        
+        // Save first scan of new BTT
+        if (newTotalKoli > 0) {
+            prefs.setCurrentBttTotalKoli(newTotalKoli)
+        }
+        
+        prefs.addScannedBttId(koliId)
+        
+        // Update UI
+        updateCounterDisplay()
+        showSuccessFeedback(value)
+        
+        // Allow scanning again
+        isScanning = true
     }
 
     companion object {
