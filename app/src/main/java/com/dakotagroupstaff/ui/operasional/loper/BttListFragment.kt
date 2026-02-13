@@ -1,11 +1,13 @@
 package com.dakotagroupstaff.ui.operasional.loper
 
+import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -33,6 +35,22 @@ class BttListFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var deliveryAdapter: DeliveryAdapter
+    private var pendingDeliveryItem: DeliveryItem? = null
+    
+    private val scannerLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val action = result.data?.getStringExtra("ACTION")
+            
+            if (action == "NAVIGATE_TO_DETAIL") {
+                // User pressed Simpan button - navigate to detail
+                pendingDeliveryItem?.let { navigateToDetail(it) }
+            }
+            // If no action or other cases, just dismiss scanner
+        }
+        pendingDeliveryItem = null
+    }
 
     private val viewModel: LoperViewModel by activityViewModels {
         val userPref = UserPreferences.getInstance(requireContext().dataStore)
@@ -73,7 +91,12 @@ class BttListFragment : Fragment() {
     private fun setupRecyclerView() {
         deliveryAdapter = DeliveryAdapter(
             onItemClick = { deliveryItem ->
-                navigateToDetail(deliveryItem)
+                // Show scanner modal for PENDING tab, direct navigation for SENT tab
+                if (tabType == BttTabType.PENDING) {
+                    showBarcodeScanner(deliveryItem)
+                } else {
+                    navigateToDetail(deliveryItem)
+                }
             },
             onItemLongClick = if (tabType == BttTabType.SENT) {
                 { deliveryItem ->
@@ -230,12 +253,23 @@ class BttListFragment : Fragment() {
         binding.rvDeliveryList.isVisible = false
     }
 
+    
+    
     private fun navigateToDetail(deliveryItem: DeliveryItem) {
         val intent = Intent(requireContext(), LoperDetailActivity::class.java).apply {
             putExtra(LoperDetailActivity.EXTRA_DELIVERY_ITEM, deliveryItem)
             putExtra(LoperDetailActivity.EXTRA_IS_FROM_SENT_TAB, tabType == BttTabType.SENT)
         }
         startActivity(intent)
+    }
+    
+    private fun showBarcodeScanner(deliveryItem: DeliveryItem) {
+        pendingDeliveryItem = deliveryItem
+        val intent = Intent(requireContext(), BarcodeScannerActivity::class.java).apply {
+            putExtra("TOTAL_KOLI", deliveryItem.jumlahKoli)
+            putExtra("BTT_NO", deliveryItem.noBtt)
+        }
+        scannerLauncher.launch(intent)
     }
     
     private fun setupProcessAllButton() {

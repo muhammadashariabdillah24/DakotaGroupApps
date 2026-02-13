@@ -1,30 +1,53 @@
 package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
+import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.ToneGenerator
+import android.media.MediaPlayer
 import android.media.AudioManager
+import android.media.ToneGenerator
 import android.os.Bundle
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.R
+import com.dakotagroupstaff.data.local.preferences.UserPreferences
+import com.dakotagroupstaff.data.local.preferences.dataStore
+import com.dakotagroupstaff.data.local.room.AppDatabase
+import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
+import com.dakotagroupstaff.data.repository.DeliveryRepository
+import com.dakotagroupstaff.data.repository.LoperRepository
 import com.dakotagroupstaff.databinding.ActivityBarcodeScannerBinding
+import com.dakotagroupstaff.utils.ViewModelFactory
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class BarcodeScannerActivity : AppCompatActivity() {
 
-private lateinit var binding: ActivityBarcodeScannerBinding
-    private lateinit var viewModel: LoperViewModel
+    private lateinit var binding: ActivityBarcodeScannerBinding
     private var isScanning = true
     private var isFlashOn = false
+    
+    private val viewModel: LoperViewModel by viewModels {
+        val userPref = UserPreferences.getInstance(dataStore)
+        val apiService = ApiConfig.getApiService(userPreferences = userPref)
+        val database = AppDatabase.getDatabase(this)
+        val deliveryRepository = DeliveryRepository(apiService, userPref, database.deliveryListDao())
+        val loperRepository = LoperRepository.getInstance(apiService, userPref)
+        ViewModelFactory.getInstance(
+            this,
+            deliveryRepository = deliveryRepository,
+            loperRepository = loperRepository
+        )
+    }
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -42,8 +65,13 @@ private lateinit var binding: ActivityBarcodeScannerBinding
         binding = ActivityBarcodeScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get ViewModel from LoperActivity's factory
-        viewModel = ViewModelProvider(this)[LoperViewModel::class.java]
+        // Get total koli from intent
+        val totalKoli = intent.getIntExtra("TOTAL_KOLI", 0)
+        lifecycleScope.launch {
+            val prefs = UserPreferences.getInstance(dataStore)
+            prefs.setCurrentBttTotalKoli(totalKoli)
+            updateCounterDisplay()
+        }
 
         setupUI()
         checkCameraPermission()
@@ -52,6 +80,17 @@ private lateinit var binding: ActivityBarcodeScannerBinding
     private fun setupUI() {
         // Close button
         binding.btnClose.setOnClickListener {
+            finish()
+        }
+        
+        // Simpan button
+        binding.btnSimpan.setOnClickListener {
+            // Return to fragment with navigate action
+            val resultIntent = Intent().apply {
+                putExtra("SUCCESS", true)
+                putExtra("ACTION", "NAVIGATE_TO_DETAIL")
+            }
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
 
@@ -112,44 +151,67 @@ private lateinit var binding: ActivityBarcodeScannerBinding
                         binding.tvScanStatus.text = "Memvalidasi..."
                     }
                     is com.dakotagroupstaff.data.Result.Success -> {
-                        if (result.data.found) {
-                            // Success - green flash + beep
-                            showSuccess(result.data.value)
+                        val bttId = result.data.bttId ?: ""
+                        if (bttId.isNotEmpty()) {
+                            lifecycleScope.launch {
+                                // Save to DataStore
+                                val prefs = UserPreferences.getInstance(dataStore)
+                                prefs.addScannedBttId(bttId)
+                                
+                                // Update counter display
+                                updateCounterDisplay()
+                                
+                               // Show success feedback
+                                showSuccessFeedback(result.data.value)
+                                
+                                // Allow continuous scanning
+                                isScanning = true
+                            }
                         } else {
-                            // Not found
+                            // Not found or bttId is empty
                             showError(result.data.message ?: "Barcode tidak ditemukan")
+                            // Allow scanning again
+                            isScanning = true
                         }
                     }
                     is com.dakotagroupstaff.data.Result.Error -> {
                         showError(result.message)
+                        // Allow scanning again
+                        isScanning = true
                     }
                 }
             }
         }
     }
+    
+    private suspend fun updateCounterDisplay() {
+        val prefs = UserPreferences.getInstance(dataStore)
+        val scannedIds = prefs.getScannedBttIds()
+        val totalKoli = prefs.getCurrentBttTotalKoli()
+        
+        binding.tvBttCounter.apply {
+            text = "${scannedIds.size} / $totalKoli"
+            visibility = View.VISIBLE
+        }
+        binding.btnSimpan.visibility = View.VISIBLE
+    }
 
-    private fun showSuccess(value: String) {
+    private fun showSuccessFeedback(value: String) {
         // Green flash animation
         binding.scannerOverlay.showSuccess()
 
         // Play beep sound
         playBeepSound()
 
-        // Show success message
-        binding.tvScanStatus.text = "Scan berhasil!"
+        // Show success message briefly
+        binding.tvScanStatus.text = "Scan berhasil! BTT disimpan."
         binding.tvScanStatus.setTextColor(getColor(android.R.color.holo_green_dark))
-
-        // Return result
-        val resultIntent = Intent().apply {
-            putExtra("SCANNED_VALUE", value)
-            putExtra("SUCCESS", true)
-        }
-        setResult(RESULT_OK, resultIntent)
-
-        // Close after delay
+        
+        // Reset status text after delay
         binding.root.postDelayed({
-            finish()
-        }, 1000)
+            binding.tvScanStatus.text = "Arahkan kamera ke barcode"
+            binding.tvScanStatus.setTextColor(getColor(android.R.color.white))
+        }, 1500)
     }
 
     private fun showError(message: String) {

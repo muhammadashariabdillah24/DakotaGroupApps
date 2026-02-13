@@ -5,10 +5,13 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.dakotagroupstaff.data.local.model.UserSession
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "user_preferences")
@@ -31,6 +34,10 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
     private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     private val TOKEN_EXPIRY_KEY = stringPreferencesKey("token_expiry")
+    
+    // Barcode scanner BTT collection
+    private val SCANNED_BTT_IDS = stringSetPreferencesKey("scanned_btt_ids")
+    private val CURRENT_BTT_TOTAL_KOLI = intPreferencesKey("current_btt_total_koli")
 
     fun getSession(): Flow<UserSession> {
         return dataStore.data.map { preferences ->
@@ -163,6 +170,53 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         return dataStore.data.map { preferences ->
             preferences[IMEI_KEY] ?: ""
         }
+    }
+
+    // === Scanned BTT Collection Functions ===
+    
+    /**
+     * Add scanned BTT ID to collection
+     */
+    suspend fun addScannedBttId(bttId: String) {
+        dataStore.edit { preferences ->
+            val current = preferences[SCANNED_BTT_IDS] ?: emptySet()
+            preferences[SCANNED_BTT_IDS] = current + bttId
+        }
+    }
+    
+    /**
+     * Get all scanned BTT IDs
+     */
+    suspend fun getScannedBttIds(): Set<String> {
+        val preferences = dataStore.data.map { it[SCANNED_BTT_IDS] ?: emptySet() }
+        return preferences.first()
+    }
+    
+    /**
+     * Clear all scanned BTT IDs
+     */
+    suspend fun clearScannedBttIds() {
+        dataStore.edit { preferences ->
+            preferences.remove(SCANNED_BTT_IDS)
+            preferences.remove(CURRENT_BTT_TOTAL_KOLI)
+        }
+    }
+    
+    /**
+     * Set total koli for current BTT
+     */
+    suspend fun setCurrentBttTotalKoli(total: Int) {
+        dataStore.edit { preferences ->
+            preferences[CURRENT_BTT_TOTAL_KOLI] = total
+        }
+    }
+    
+    /**
+     * Get total koli for current BTT
+     */
+    suspend fun getCurrentBttTotalKoli(): Int {
+        val preferences = dataStore.data.map { it[CURRENT_BTT_TOTAL_KOLI] ?: 0 }
+        return preferences.first()
     }
 
     companion object {
