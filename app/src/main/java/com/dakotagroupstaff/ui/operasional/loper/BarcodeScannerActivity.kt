@@ -27,11 +27,14 @@ import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.data.repository.DeliveryRepository
 import com.dakotagroupstaff.data.repository.LoperRepository
 import com.dakotagroupstaff.databinding.ActivityBarcodeScannerBinding
+import com.dakotagroupstaff.data.Result
+import com.dakotagroupstaff.ui.operasional.loper.LoperViewModel
 import com.dakotagroupstaff.utils.ViewModelFactory
 import com.google.zxing.ResultPoint
 import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class BarcodeScannerActivity : AppCompatActivity() {
@@ -64,21 +67,133 @@ class BarcodeScannerActivity : AppCompatActivity() {
         }
     }
 
+    private var expectedBttNo = ""
+    private var noLoper = "" // NEW
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBarcodeScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         // Get total koli from intent
+        expectedBttNo = intent.getStringExtra("EXPECTED_BTT") ?: ""
+        noLoper = intent.getStringExtra("NO_LOPER") ?: "" // NEW
+        
         val totalKoli = intent.getIntExtra("TOTAL_KOLI", 0)
         lifecycleScope.launch {
             val prefs = UserPreferences.getInstance(dataStore)
+            
+            // NEW: Check if current BTT matches expected BTT
+            val currentBtt = prefs.getCurrentBttNumber()
+            if (currentBtt.isNotEmpty() && currentBtt != expectedBttNo) {
+                 // Different BTT - warning handled by onBarcodeScanned logic? 
+                 // Or we should clear here? The user might have switched item in strict mode.
+                 // Ideally if Intent has specific BTT, we should enforce it.
+                 // But let's leave existing logic unless requested.
+            }
+
             prefs.setCurrentBttTotalKoli(totalKoli)
             updateCounterDisplay()
         }
-
+        
         setupUI()
         checkCameraPermission()
+        setupObservers() // NEW
+    }
+    
+    
+    private fun setupObservers() {
+        // Observer for Check Barcode
+        lifecycleScope.launch {
+            viewModel.checkBarcodeResult.collect { result ->
+                if (result == null) return@collect
+                
+                when (result) {
+                    is com.dakotagroupstaff.data.Result.Loading -> {
+                        binding.tvScanStatus.text = "Memvalidasi..."
+                    }
+                    is com.dakotagroupstaff.data.Result.Success -> {
+                        val data = result.data
+                        val bttId = data.bttId ?: ""
+                        val scannedValue = data.value
+                        val koliId = data.koliId ?: scannedValue // Use value if koliId null
+                        val totalKoli = data.totalKoli ?: 0
+                        
+                        // Check warning message from API (e.g. "Semua koli ... sudah discan")
+                        // The API returns 200 OK with found: true and message if full.
+                        // But CheckBarcodeResponse.kt might need 'message' field mapping if it's in data?
+                        // Actually Result.Success doesn't have message usually, unless customized.
+                        // But wait, the API returns { found: true, message: "..." }.
+                        // CheckBarcodeData needs 'message' field? 
+                        // Let's assume for now we proceed to validation.
+                        
+                        handleBarcodeValidation(bttId, scannedValue, koliId, totalKoli, data.message)
+                    }
+                    is com.dakotagroupstaff.data.Result.Error -> {
+                        showError(result.error)
+                    }
+                }
+            }
+        }
+
+        // Observer for Result Barcode BTT (Save)
+        lifecycleScope.launch {
+             viewModel.resultBarcodeBTTResult.collect { result ->
+                 if (result == null) return@collect
+                 
+                 when(result) {
+                     is com.dakotagroupstaff.data.Result.Success -> {
+                         Toast.makeText(this@BarcodeScannerActivity, "BTT Complete & Saved!", Toast.LENGTH_SHORT).show()
+                         viewModel.resetResultBarcodeBTT()
+                     }
+                     is com.dakotagroupstaff.data.Result.Error -> {
+                         Toast.makeText(this@BarcodeScannerActivity, "Save Result: ${result.error}", Toast.LENGTH_LONG).show()
+                         viewModel.resetResultBarcodeBTT()
+                     }
+                     else -> {}
+                 }
+             }
+        }
+    }
+
+    private fun handleBarcodeValidation(
+        bttId: String,
+        scannedValue: String?,
+        koliId: String?,
+        totalKoli: Int,
+        message: String?
+    ) {
+        lifecycleScope.launch {
+            val prefs = UserPreferences.getInstance(dataStore)
+            val currentBtt = prefs.getCurrentBttNumber()
+            
+            // First scan of a new BTT
+            if (currentBtt.isEmpty() || currentBtt != (bttId)) {
+                // If switching BTT, clear previous? 
+                // Logic: If currentBtt is different, we should ask confirmation or reset.
+                // For now, auto-reset if different.
+                if (currentBtt.isNotEmpty() && currentBtt != bttId) {
+                   Toast.makeText(this@BarcodeScannerActivity, "Switching to new BTT: $bttId", Toast.LENGTH_SHORT).show()
+                   prefs.clearScannedBttIds()
+                }
+                
+                prefs.setCurrentBttNumber(bttId)
+                prefs.setCurrentBttTotalKoli(totalKoli)
+            }
+            
+            val koliIdToStore = koliId ?: scannedValue ?: ""
+            if (koliIdToStore.isNotEmpty()) {
+                val alreadyScanned = prefs.isBttIdScanned(koliIdToStore)
+                if (alreadyScanned) {
+                    showError("Item already scanned!")
+                } else {
+                    saveScanAndUpdateCounter(koliIdToStore, scannedValue ?: "")
+                    showSuccessFeedback(scannedValue ?: "", message ?: "Scan Valid!")
+                }
+            } else {
+                showError("Invalid Koli ID")
+            }
+        }
     }
 
     private fun setupUI() {

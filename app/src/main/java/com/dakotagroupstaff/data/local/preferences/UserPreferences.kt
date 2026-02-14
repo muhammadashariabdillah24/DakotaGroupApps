@@ -96,8 +96,55 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         }
     }
     
-    /**
-     * Save JWT access token
+    suspend fun addScannedBttId(koliId: String) {
+        dataStore.edit { preferences ->
+            val currentSet = preferences[SCANNED_BTT_IDS] ?: emptySet()
+            preferences[SCANNED_BTT_IDS] = currentSet + koliId
+        }
+    }
+
+    suspend fun clearScannedBttIds() {
+        dataStore.edit { preferences ->
+            preferences.remove(SCANNED_BTT_IDS)
+            preferences.remove(CURRENT_BTT_TOTAL_KOLI)
+            preferences.remove(CURRENT_BTT_NUMBER)
+        }
+    }
+
+    fun getScannedBttIds(): Flow<Set<String>> {
+        return dataStore.data.map { preferences ->
+            preferences[SCANNED_BTT_IDS] ?: emptySet()
+        }
+    }
+    
+    suspend fun isBttIdScanned(koliId: String): Boolean {
+        return getScannedBttIds().first().contains(koliId)
+    }
+
+    suspend fun setCurrentBttTotalKoli(total: Int) {
+        dataStore.edit { preferences ->
+            preferences[CURRENT_BTT_TOTAL_KOLI] = total
+        }
+    }
+
+    suspend fun getCurrentBttTotalKoli(): Int {
+        return dataStore.data.map { preferences ->
+            preferences[CURRENT_BTT_TOTAL_KOLI] ?: 0
+        }.first()
+    }
+    
+    suspend fun setCurrentBttNumber(bttId: String) {
+        dataStore.edit { preferences ->
+            preferences[CURRENT_BTT_NUMBER] = bttId
+        }
+    }
+    
+    suspend fun getCurrentBttNumber(): String {
+        return dataStore.data.map { preferences ->
+            preferences[CURRENT_BTT_NUMBER] ?: ""
+        }.first()
+    }
+}
      */
     suspend fun saveAccessToken(token: String) {
         dataStore.edit { preferences ->

@@ -337,6 +337,11 @@ interface ApiService {
         @Query("pt") pt: String,
         @Body request: CheckBarcodeRequest
     ): ApiResponse<com.dakotagroupstaff.data.remote.response.CheckBarcodeData>
+    @POST("delivery/result-barcode-btt")
+    suspend fun resultBarcodeBTT(
+        @Query("pt") pt: String,
+        @Body payload: Map<String, @JvmSuppressWildcards Any>
+    ): ApiResponse<Any>
 }
 
 

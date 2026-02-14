@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
 import com.dakotagroupstaff.data.local.entity.DeliveryListEntity
+import com.dakotagroupstaff.data.remote.response.CheckBarcodeData
 import com.dakotagroupstaff.data.remote.response.DeliveryItem
 import com.dakotagroupstaff.data.remote.response.DeliveryListResponse
 import com.dakotagroupstaff.data.repository.DeliveryRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class LoperViewModel(
@@ -21,6 +24,12 @@ class LoperViewModel(
     
     val sentDeliveries: LiveData<List<DeliveryListEntity>> = 
         deliveryRepository.getSentDeliveries().asLiveData()
+
+    private val _checkBarcodeResult = MutableStateFlow<com.dakotagroupstaff.data.Result<CheckBarcodeData>?>(null)
+    val checkBarcodeResult: StateFlow<com.dakotagroupstaff.data.Result<CheckBarcodeData>?> = _checkBarcodeResult
+
+    private val _resultBarcodeBTTResult = MutableStateFlow<com.dakotagroupstaff.data.Result<Any>?>(null)
+    val resultBarcodeBTTResult: StateFlow<com.dakotagroupstaff.data.Result<Any>?> = _resultBarcodeBTTResult
     
     fun getDeliveryList(nip: String) {
         viewModelScope.launch {
@@ -28,6 +37,26 @@ class LoperViewModel(
                 _deliveryList.postValue(result)
             }
         }
+    }
+    
+    fun checkBarcode(barcode: String) {
+        viewModelScope.launch {
+            loperRepository.checkBarcode(barcode).collect {
+                _checkBarcodeResult.value = it
+            }
+        }
+    }
+    
+    fun resultBarcodeBTT(bttId: String, koliData: List<Any>, noLoper: String) {
+        viewModelScope.launch {
+            loperRepository.resultBarcodeBTT(bttId, koliData, noLoper).collect {
+                _resultBarcodeBTTResult.value = it
+            }
+        }
+    }
+    
+    fun resetResultBarcodeBTT() {
+        _resultBarcodeBTTResult.value = null
     }
     
     suspend fun markAsSent(
@@ -59,7 +88,4 @@ class LoperViewModel(
     /**
      * Check barcode against server
      */
-    fun checkBarcode(barcode: String): kotlinx.coroutines.flow.Flow<com.dakotagroupstaff.data.Result<com.dakotagroupstaff.data.remote.response.CheckBarcodeData>> {
-        return loperRepository.checkBarcode(barcode)
-    }
 }
