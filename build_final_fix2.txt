@@ -1,0 +1,23 @@
+> Task :app:clean FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:clean'.
+> java.io.IOException: Unable to delete directory 'D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupStaff\app\build'
+    Failed to delete some children. This might happen because a process has files open or has its working directory set in the target directory.
+    - D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupStaff\app\build\intermediates
+    New files were found. This might happen because a process is still writing to the target directory.
+    - D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupStaff\app\build\intermediates\dex
+    - D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupStaff\app\build\intermediates\dex\debug
+    - D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupStaff\app\build\intermediates\dex\debug\mergeExtDexDebug
+    - D:\Documents_Backup\ProjectsAndroid\Dakota\DakotaGroupStaff\app\build\intermediates\dex\debug\mergeExtDexDebug\classes2.dex
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights.
+> Get more help at https://help.gradle.org.
+
+BUILD FAILED in 14s
+1 actionable task: 1 executed

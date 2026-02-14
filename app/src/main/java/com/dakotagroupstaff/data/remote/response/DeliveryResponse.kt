@@ -123,7 +123,18 @@ data class SubmitDeliveryRequest(
     val foto: String,  // Base64 photo
     
     @SerializedName("ttd")
-    val ttd: String  // Base64 signature
+    val ttd: String,  // Base64 signature
+    
+    @SerializedName("koliData")
+    val koliData: List<Map<String, String>> = emptyList()  // List of scanned koli barcodes
+)
+
+/**
+ * Koli Data Item for barcode submission
+ */
+data class KoliDataItem(
+    @SerializedName("koliId")
+    val koliId: String
 )
 
 /**

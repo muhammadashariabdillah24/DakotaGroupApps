@@ -264,12 +264,80 @@ class BttListFragment : Fragment() {
     }
     
     private fun showBarcodeScanner(deliveryItem: DeliveryItem) {
-        pendingDeliveryItem = deliveryItem
-        val intent = Intent(requireContext(), BarcodeScannerActivity::class.java).apply {
-            putExtra("TOTAL_KOLI", deliveryItem.jumlahKoli)
-            putExtra("BTT_NO", deliveryItem.noBtt)
+        lifecycleScope.launch {
+            val prefs = UserPreferences.getInstance(requireContext().dataStore)
+            val currentBtt = prefs.getCurrentBttNumber()
+            val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
+            
+            // Check if there's existing scan data for a different BTT
+            if (currentBtt.isNotEmpty() && currentBtt != deliveryItem.noBtt && scannedCount > 0) {
+                // Show warning dialog
+                showDifferentBttWarningDialog(currentBtt, deliveryItem)
+            } else {
+                // Open scanner directly - load existing scan data if any
+                launchBarcodeScanner(deliveryItem)
+            }
         }
-        scannerLauncher.launch(intent)
+    }
+    
+    /**
+     * Show warning dialog when user selects different BTT while having scan data
+     */
+    private fun showDifferentBttWarningDialog(currentBtt: String, deliveryItem: DeliveryItem) {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("⚠️ Peringatan")
+            .setMessage(
+                """
+Apakah anda yakin ingin melakukan scan kode barcode koli BTT ${deliveryItem.noBtt} padahal saat ini anda sedang melakukan scan kode barcode koli BTT $currentBtt.
+
+Data scan untuk kedua BTT akan tetap tersimpan dan dapat diproses nanti.
+                """.trimIndent()
+            )
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+                // User cancelled - don't open scanner
+            }
+            .setPositiveButton("Oke") { dialog, _ ->
+                dialog.dismiss()
+                // Open scanner for new BTT without clearing previous BTT data
+                lifecycleScope.launch {
+                    launchBarcodeScanner(deliveryItem)
+                }
+            }
+            .setCancelable(false)
+            .show()
+    }
+    
+    /**
+     * Launch barcode scanner activity
+     * Loads existing scan data for the BTT if available
+     */
+    private fun launchBarcodeScanner(deliveryItem: DeliveryItem) {
+        lifecycleScope.launch {
+            val prefs = UserPreferences.getInstance(requireContext().dataStore)
+            
+            // Check if this BTT already has scanned koli data
+            val existingKoliCount = prefs.getScannedKoliCountForBtt(deliveryItem.noBtt)
+            
+            if (existingKoliCount > 0) {
+                // BTT already has scan data - load it
+                prefs.setCurrentBttNumber(deliveryItem.noBtt)
+                prefs.setCurrentBttTotalKoli(deliveryItem.jumlahKoli)
+                // Data is already stored per-BTT, no need to do anything else
+            } else {
+                // New BTT - set current BTT
+                prefs.setCurrentBttNumber(deliveryItem.noBtt)
+                prefs.setCurrentBttTotalKoli(deliveryItem.jumlahKoli)
+            }
+            
+            pendingDeliveryItem = deliveryItem
+            val intent = Intent(requireContext(), BarcodeScannerActivity::class.java).apply {
+                putExtra(BarcodeScannerActivity.EXTRA_TOTAL_KOLI, deliveryItem.jumlahKoli)
+                putExtra(BarcodeScannerActivity.EXTRA_EXPECTED_BTT, deliveryItem.noBtt)
+                putExtra(BarcodeScannerActivity.EXTRA_NO_LOPER, deliveryItem.noLoper)
+            }
+            scannerLauncher.launch(intent)
+        }
     }
     
     private fun setupProcessAllButton() {

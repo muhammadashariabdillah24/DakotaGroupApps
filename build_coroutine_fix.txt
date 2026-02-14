@@ -1,0 +1,113 @@
+> Task :app:preBuild UP-TO-DATE
+> Task :app:preDebugBuild UP-TO-DATE
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :app:dataBindingMergeDependencyArtifactsDebug UP-TO-DATE
+> Task :app:generateDebugResValues UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:processDebugNavigationResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
+> Task :app:dataBindingGenBaseClassesDebug UP-TO-DATE
+> Task :app:generateDebugBuildConfig UP-TO-DATE
+> Task :app:generateSafeArgsDebug UP-TO-DATE
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+> Task :app:compileDebugNavigationResources UP-TO-DATE
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
+> Task :app:processDebugManifest UP-TO-DATE
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+> Task :app:processDebugResources UP-TO-DATE
+> Task :app:javaPreCompileDebug UP-TO-DATE
+> Task :app:mergeDebugShaders UP-TO-DATE
+> Task :app:compileDebugShaders NO-SOURCE
+> Task :app:generateDebugAssets UP-TO-DATE
+> Task :app:mergeDebugAssets UP-TO-DATE
+> Task :app:compressDebugAssets UP-TO-DATE
+> Task :app:desugarDebugFileDependencies UP-TO-DATE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
+> Task :app:kspDebugKotlin
+
+> Task :app:compileDebugKotlin
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/dialog/PhotoViewerDialog.kt:45:44 'static field FLAG_FULLSCREEN: Int' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/dialog/PhotoViewerDialog.kt:46:44 'static field FLAG_FULLSCREEN: Int' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/approval/ApprovalAdapter.kt:40:72 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/approval/ApprovalDetailActivity.kt:95:59 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/attendance/AttendanceHistoryActivity.kt:28:65 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/attendance/AttendanceHistoryActivity.kt:289:62 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/attendance/AttendanceHistoryAdapter.kt:40:66 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/attendance/AttendanceHistoryAdapter.kt:41:63 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/leave/LeaveHistoryActivity.kt:156:9 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/leave/LeaveHistoryAdapter.kt:60:68 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/leave/LeaveSubmissionActivity.kt:69:66 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/leave/LeaveSubmissionActivity.kt:79:66 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/leave/LeaveSubmissionActivity.kt:337:9 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/kepegawaian/salary/SalarySlipDetailActivity.kt:90:62 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:26:8 'class GoogleSignIn : Any' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:27:8 'class GoogleSignInAccount : AbstractSafeParcelable, ReflectedParcelable' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:28:8 'class GoogleSignInClient : GoogleApi<GoogleSignInOptions!>' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:29:8 'class GoogleSignInOptions : AbstractSafeParcelable, Api.ApiOptions.Optional, ReflectedParcelable' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:45:46 'class GoogleSignInClient : GoogleApi<GoogleSignInOptions!>' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:72:19 'class GoogleSignInOptions : AbstractSafeParcelable, Api.ApiOptions.Optional, ReflectedParcelable' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:72:47 'class GoogleSignInOptions : AbstractSafeParcelable, Api.ApiOptions.Optional, ReflectedParcelable' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:79:30 'class GoogleSignIn : Any' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:86:28 'class GoogleSignIn : Any' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:99:23 'class GoogleSignIn : Any' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:110:56 'class GoogleSignInAccount : AbstractSafeParcelable, ReflectedParcelable' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/login/LoginActivity.kt:133:52 'class GoogleSignInAccount : AbstractSafeParcelable, ReflectedParcelable' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/OperasionalMenuActivity.kt:69:17 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/QuickAccessActivity.kt:29:9 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/QuickAccessActivity.kt:75:9 'fun overridePendingTransition(p0: Int, p1: Int): Unit' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AdditionalCostFragment.kt:225:82 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentActivity.kt:509:65 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentActivity.kt:522:72 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentActivity.kt:529:69 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentActivity.kt:541:62 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentActivity.kt:558:18 This declaration overrides a deprecated member but is not marked as deprecated itself. Please add the '@Deprecated' annotation or suppress the diagnostic.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentActivity.kt:559:15 'fun onBackPressed(): Unit' is deprecated. This method has been deprecated in favor of using the
+      {@link OnBackPressedDispatcher} via {@link #getOnBackPressedDispatcher()}.
+      The OnBackPressedDispatcher controls how back button events are dispatched
+      to one or more {@link OnBackPressedCallback} objects.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentListAdapter.kt:45:73 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/AssignmentListAdapter.kt:52:77 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/assignment/DownPaymentFragment.kt:154:82 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/loper/LoperDetailActivity.kt:373:27 'fun onReceivedError(p0: WebView!, p1: Int, p2: String!, p3: String!): Unit' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/loper/LoperDetailActivity.kt:391:17 'var databaseEnabled: Boolean' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/loper/LoperDetailActivity.kt:403:65 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/operasional/loper/LoperDetailActivity.kt:555:38 'fun getFromLocation(p0: Double, p1: Double, p2: Int): (MutableList<Address!>?..List<Address!>?)' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/settings/DataUsageActivity.kt:61:58 'constructor(p0: String!, p1: String!): Locale' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/settings/DataUsageActivity.kt:98:45 'static field TYPE_MOBILE: Int' is deprecated. Deprecated in Java.
+w: file:///D:/Documents_Backup/ProjectsAndroid/Dakota/DakotaGroupStaff/app/src/main/java/com/dakotagroupstaff/ui/settings/DataUsageActivity.kt:120:41 'static field TYPE_WIFI: Int' is deprecated. Deprecated in Java.
+
+> Task :app:compileDebugJavaWithJavac
+> Task :app:dexBuilderDebug
+> Task :app:mergeDebugGlobalSynthetics
+> Task :app:processDebugJavaRes
+> Task :app:mergeProjectDexDebug
+> Task :app:mergeDebugJavaResource
+> Task :app:packageDebug
+> Task :app:createDebugApkListingFileRedirect
+> Task :app:assembleDebug
+
+BUILD SUCCESSFUL in 56s
+43 actionable tasks: 10 executed, 33 up-to-date

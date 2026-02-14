@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -35,9 +36,20 @@ import com.journeyapps.barcodescanner.BarcodeCallback
 import com.journeyapps.barcodescanner.BarcodeResult
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class BarcodeScannerActivity : AppCompatActivity() {
+
+    companion object {
+        private const val TAG = "BarcodeScannerActivity"
+        const val REQUEST_SCAN_BARCODE = 100
+        const val EXTRA_EXPECTED_BTT = "EXPECTED_BTT"
+        const val EXTRA_NO_LOPER = "NO_LOPER"
+        const val EXTRA_TOTAL_KOLI = "TOTAL_KOLI"
+    }
 
     private lateinit var binding: ActivityBarcodeScannerBinding
     private var isScanning = true
@@ -75,11 +87,11 @@ class BarcodeScannerActivity : AppCompatActivity() {
         binding = ActivityBarcodeScannerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Get total koli from intent
-        expectedBttNo = intent.getStringExtra("EXPECTED_BTT") ?: ""
-        noLoper = intent.getStringExtra("NO_LOPER") ?: "" // NEW
+        // Get data from intent using constants
+        expectedBttNo = intent.getStringExtra(EXTRA_EXPECTED_BTT) ?: ""
+        noLoper = intent.getStringExtra(EXTRA_NO_LOPER) ?: ""
         
-        val totalKoli = intent.getIntExtra("TOTAL_KOLI", 0)
+        val totalKoli = intent.getIntExtra(EXTRA_TOTAL_KOLI, 0)
         lifecycleScope.launch {
             val prefs = UserPreferences.getInstance(dataStore)
             
@@ -130,7 +142,7 @@ class BarcodeScannerActivity : AppCompatActivity() {
                         handleBarcodeValidation(bttId, scannedValue, koliId, totalKoli, data.message)
                     }
                     is com.dakotagroupstaff.data.Result.Error -> {
-                        showError(result.error)
+                        showError(result.message)
                     }
                 }
             }
@@ -147,7 +159,7 @@ class BarcodeScannerActivity : AppCompatActivity() {
                          viewModel.resetResultBarcodeBTT()
                      }
                      is com.dakotagroupstaff.data.Result.Error -> {
-                         Toast.makeText(this@BarcodeScannerActivity, "Save Result: ${result.error}", Toast.LENGTH_LONG).show()
+                         Toast.makeText(this@BarcodeScannerActivity, "Save Result: ${result.message}", Toast.LENGTH_LONG).show()
                          viewModel.resetResultBarcodeBTT()
                      }
                      else -> {}
@@ -169,12 +181,10 @@ class BarcodeScannerActivity : AppCompatActivity() {
             
             // First scan of a new BTT
             if (currentBtt.isEmpty() || currentBtt != (bttId)) {
-                // If switching BTT, clear previous? 
-                // Logic: If currentBtt is different, we should ask confirmation or reset.
-                // For now, auto-reset if different.
+                // If switching BTT, just show toast - don't clear previous data
+                // Each BTT keeps its own scan data in DataStore
                 if (currentBtt.isNotEmpty() && currentBtt != bttId) {
                    Toast.makeText(this@BarcodeScannerActivity, "Switching to new BTT: $bttId", Toast.LENGTH_SHORT).show()
-                   prefs.clearScannedBttIds()
                 }
                 
                 prefs.setCurrentBttNumber(bttId)
@@ -183,12 +193,11 @@ class BarcodeScannerActivity : AppCompatActivity() {
             
             val koliIdToStore = koliId ?: scannedValue ?: ""
             if (koliIdToStore.isNotEmpty()) {
-                val alreadyScanned = prefs.isBttIdScanned(koliIdToStore)
+                val alreadyScanned = prefs.isKoliScannedForBtt(bttId, koliIdToStore)
                 if (alreadyScanned) {
                     showError("Item already scanned!")
                 } else {
-                    saveScanAndUpdateCounter(koliIdToStore, scannedValue ?: "")
-                    showSuccessFeedback(scannedValue ?: "", message ?: "Scan Valid!")
+                    saveScanAndUpdateCounterWithAutoSubmit(koliIdToStore, scannedValue ?: "")
                 }
             } else {
                 showError("Invalid Koli ID")
@@ -202,15 +211,9 @@ class BarcodeScannerActivity : AppCompatActivity() {
             finish()
         }
         
-        // Simpan button
+        // Simpan button - Now submits to API
         binding.btnSimpan.setOnClickListener {
-            // Return to fragment with navigate action
-            val resultIntent = Intent().apply {
-                putExtra("SUCCESS", true)
-                putExtra("ACTION", "NAVIGATE_TO_DETAIL")
-            }
-            setResult(RESULT_OK, resultIntent)
-            finish()
+            submitToApiAndFinish()
         }
 
         // Flashlight toggle
@@ -294,12 +297,12 @@ class BarcodeScannerActivity : AppCompatActivity() {
                                                 prefs.setCurrentBttTotalKoli(totalKoli)
                                             }
                                             
-                                            saveScanAndUpdateCounter(koliIdToStore, scannedValue)
+                                            saveScanAndUpdateCounterWithAutoSubmit(koliIdToStore, scannedValue)
                                         }
                                         currentBtt == scannedBttNumber -> {
                                             // Same BTT - continue normally
                                             val koliIdToStore = result.data.koliId ?: scannedValue
-                                            saveScanAndUpdateCounter(koliIdToStore, scannedValue)
+                                            saveScanAndUpdateCounterWithAutoSubmit(koliIdToStore, scannedValue)
                                         }
                                         else -> {
                                             // DIFFERENT BTT - show warning dialog
@@ -332,11 +335,12 @@ class BarcodeScannerActivity : AppCompatActivity() {
     
     private suspend fun updateCounterDisplay() {
         val prefs = UserPreferences.getInstance(dataStore)
-        val scannedIds = prefs.getScannedBttIds()
+        val currentBtt = prefs.getCurrentBttNumber()
+        val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
         val totalKoli = prefs.getCurrentBttTotalKoli()
         
         binding.tvBttCounter.apply {
-            text = "${scannedIds.size} / $totalKoli"
+            text = "$scannedCount / $totalKoli"
             visibility = View.VISIBLE
         }
         binding.btnSimpan.visibility = View.VISIBLE
@@ -416,27 +420,30 @@ class BarcodeScannerActivity : AppCompatActivity() {
     
     /**
      * Save scan and update counter - extracted for reuse
+     * Uses per-BTT storage in DataStore
      */
     private suspend fun saveScanAndUpdateCounter(koliId: String, value: String) {
         val prefs = UserPreferences.getInstance(dataStore)
-        val currentScanned = prefs.getScannedBttIds()
+        val currentBtt = prefs.getCurrentBttNumber()
         val currentTotal = prefs.getCurrentBttTotalKoli()
         
-        // Check if already scanned
-        if (currentScanned.contains(koliId)) {
+        // Check if already scanned for this BTT
+        if (prefs.isKoliScannedForBtt(currentBtt, koliId)) {
              showSuccessFeedback(value, "Barcode sudah discan")
              isScanning = true
              return
         }
         
         // Check cap limit
-        if (currentTotal > 0 && currentScanned.size >= currentTotal) {
+        val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
+        if (currentTotal > 0 && scannedCount >= currentTotal) {
              showSuccessFeedback(value, "Semua koli sudah discan")
              isScanning = true
              return
         }
         
-        prefs.addScannedBttId(koliId)
+        // Save using per-BTT function
+        prefs.addScannedKoliForBtt(currentBtt, koliId)
         updateCounterDisplay()
         showSuccessFeedback(value)
         isScanning = true
@@ -482,13 +489,13 @@ class BarcodeScannerActivity : AppCompatActivity() {
 Ini bukan barang dari BTT ini ($currentBtt)!
 Apakah anda tetap ingin menggunakan barcode BTT ini?
 
-Jika anda menekan tombol Oke, Saya Mengerti maka semua hasil scan barcode koli dari BTT ini ($currentBtt) akan dihapus.
+Data scan untuk BTT $currentBtt akan tetap tersimpan dan dapat diproses nanti.
         """.trimIndent()
         
         val spannable = SpannableString(message)
         
         // Find position of warning text
-        val warningStart = message.indexOf("Jika anda")
+        val warningStart = message.indexOf("Data scan")
         if (warningStart >= 0) {
             // Apply red color to warning text
             spannable.setSpan(
@@ -503,13 +510,14 @@ Jika anda menekan tombol Oke, Saya Mengerti maka semua hasil scan barcode koli d
     }
     
     /**
-     * Clear previous BTT data and start with new BTT
+     * Start with new BTT without clearing previous BTT data
+     * Uses per-BTT storage - each BTT keeps its own scan data
      */
     private suspend fun clearAndStartNewBtt(scannedBtt: String, bttId: String, value: String, newTotalKoli: Int, koliId: String) {
         val prefs = UserPreferences.getInstance(dataStore)
         
-        // Clear all previous data
-        prefs.clearScannedBttIds()
+        // Note: We don't clear previous BTT data anymore
+        // Each BTT keeps its own scan data in DataStore
         
         // Set new current BTT
         prefs.setCurrentBttNumber(scannedBtt)
@@ -519,7 +527,8 @@ Jika anda menekan tombol Oke, Saya Mengerti maka semua hasil scan barcode koli d
             prefs.setCurrentBttTotalKoli(newTotalKoli)
         }
         
-        prefs.addScannedBttId(koliId)
+        // Save using per-BTT function
+        prefs.addScannedKoliForBtt(scannedBtt, koliId)
         
         // Update UI
         updateCounterDisplay()
@@ -529,7 +538,141 @@ Jika anda menekan tombol Oke, Saya Mengerti maka semua hasil scan barcode koli d
         isScanning = true
     }
 
-    companion object {
-        const val REQUEST_SCAN_BARCODE = 100
+    /**
+     * Save scanned koli to DataStore and navigate to BTT Detail
+     * Note: API submission is done later in LoperDetailActivity
+     */
+    private fun submitToApiAndFinish() {
+        lifecycleScope.launch {
+            val prefs = UserPreferences.getInstance(dataStore)
+            val currentBtt = prefs.getCurrentBttNumber()
+            val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
+            val totalKoli = prefs.getCurrentBttTotalKoli()
+            
+            if (scannedCount == 0) {
+                Toast.makeText(this@BarcodeScannerActivity, "Tidak ada data yang perlu disimpan", Toast.LENGTH_SHORT).show()
+                finishWithResult()
+                return@launch
+            }
+            
+            // Show toast with scan result
+            val toastMessage = if (scannedCount >= totalKoli && totalKoli > 0) {
+                "Semua koli ($scannedCount) berhasil discan"
+            } else {
+                "$scannedCount dari $totalKoli koli berhasil discan"
+            }
+            Toast.makeText(this@BarcodeScannerActivity, toastMessage, Toast.LENGTH_LONG).show()
+            
+            // Show loading dialog briefly
+            showLoadingDialog("Mohon Tunggu...")
+            
+            // Data is already saved in DataStore per-BTT
+            // No need to submit to API here - that will be done in LoperDetailActivity
+            
+            // Hide loading dialog
+            hideLoadingDialog()
+            
+            // Navigate to BTT Detail Activity
+            navigateToBttDetail(currentBtt)
+        }
+    }
+    
+
+    private suspend fun checkAndAutoSubmitIfComplete() {
+        val prefs = UserPreferences.getInstance(dataStore)
+        val currentBtt = prefs.getCurrentBttNumber()
+        val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
+        val totalKoli = prefs.getCurrentBttTotalKoli()
+        
+        if (totalKoli > 0 && scannedCount >= totalKoli) {
+            // All koli scanned - auto submit after short delay
+            binding.root.postDelayed({
+                submitToApiAndFinish()
+            }, 1000) // 1 second delay to show completion
+        }
+    }
+    
+    /**
+     * Show loading dialog with progress
+     */
+    private var loadingDialog: AlertDialog? = null
+    
+    private fun showLoadingDialog(message: String) {
+        runOnUiThread {
+            loadingDialog = AlertDialog.Builder(this)
+                .setTitle("Mohon Tunggu")
+                .setMessage(message)
+                .setCancelable(false)
+                .create()
+            loadingDialog?.show()
+        }
+    }
+    
+    private fun hideLoadingDialog() {
+        runOnUiThread {
+            loadingDialog?.dismiss()
+            loadingDialog = null
+        }
+    }
+    
+    /**
+     * Finish activity with result
+     */
+    private fun finishWithResult() {
+        val resultIntent = Intent().apply {
+            putExtra("SUCCESS", true)
+            putExtra("ACTION", "NAVIGATE_TO_DETAIL")
+        }
+        setResult(RESULT_OK, resultIntent)
+        finish()
+    }
+    
+    /**
+     * Navigate to BTT Detail Activity
+     */
+    private fun navigateToBttDetail(bttNumber: String) {
+        // Return to previous activity with success flag
+        // The previous activity (BttListFragment) will handle navigation to detail
+        val resultIntent = Intent().apply {
+            putExtra("SUCCESS", true)
+            putExtra("ACTION", "NAVIGATE_TO_DETAIL")
+            putExtra("BTT_NUMBER", bttNumber)
+        }
+        setResult(RESULT_OK, resultIntent)
+        finish()
+    }
+    
+    /**
+     * Update saveScanAndUpdateCounter to check for auto-submit
+     * Uses per-BTT storage in DataStore
+     */
+    private suspend fun saveScanAndUpdateCounterWithAutoSubmit(koliId: String, value: String) {
+        val prefs = UserPreferences.getInstance(dataStore)
+        val currentBtt = prefs.getCurrentBttNumber()
+        val currentTotal = prefs.getCurrentBttTotalKoli()
+        
+        // Check if already scanned for this BTT
+        if (prefs.isKoliScannedForBtt(currentBtt, koliId)) {
+             showSuccessFeedback(value, "Barcode sudah discan")
+             isScanning = true
+             return
+        }
+        
+        // Check cap limit
+        val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
+        if (currentTotal > 0 && scannedCount >= currentTotal) {
+             showSuccessFeedback(value, "Semua koli sudah discan")
+             isScanning = true
+             return
+        }
+        
+        // Save using per-BTT function
+        prefs.addScannedKoliForBtt(currentBtt, koliId)
+        updateCounterDisplay()
+        showSuccessFeedback(value)
+        isScanning = true
+        
+        // Check if all koli are scanned and auto-submit
+        checkAndAutoSubmitIfComplete()
     }
 }

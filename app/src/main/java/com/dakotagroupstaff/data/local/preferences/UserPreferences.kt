@@ -96,56 +96,16 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         }
     }
     
-    suspend fun addScannedBttId(koliId: String) {
-        dataStore.edit { preferences ->
-            val currentSet = preferences[SCANNED_BTT_IDS] ?: emptySet()
-            preferences[SCANNED_BTT_IDS] = currentSet + koliId
-        }
-    }
-
-    suspend fun clearScannedBttIds() {
-        dataStore.edit { preferences ->
-            preferences.remove(SCANNED_BTT_IDS)
-            preferences.remove(CURRENT_BTT_TOTAL_KOLI)
-            preferences.remove(CURRENT_BTT_NUMBER)
-        }
-    }
-
-    fun getScannedBttIds(): Flow<Set<String>> {
-        return dataStore.data.map { preferences ->
-            preferences[SCANNED_BTT_IDS] ?: emptySet()
-        }
-    }
-    
     suspend fun isBttIdScanned(koliId: String): Boolean {
-        return getScannedBttIds().first().contains(koliId)
-    }
-
-    suspend fun setCurrentBttTotalKoli(total: Int) {
-        dataStore.edit { preferences ->
-            preferences[CURRENT_BTT_TOTAL_KOLI] = total
+        // Get current BTT and check if koli is scanned for it
+        val currentBtt = getCurrentBttNumber()
+        return if (currentBtt.isNotEmpty()) {
+            isKoliScannedForBtt(currentBtt, koliId)
+        } else {
+            false
         }
     }
 
-    suspend fun getCurrentBttTotalKoli(): Int {
-        return dataStore.data.map { preferences ->
-            preferences[CURRENT_BTT_TOTAL_KOLI] ?: 0
-        }.first()
-    }
-    
-    suspend fun setCurrentBttNumber(bttId: String) {
-        dataStore.edit { preferences ->
-            preferences[CURRENT_BTT_NUMBER] = bttId
-        }
-    }
-    
-    suspend fun getCurrentBttNumber(): String {
-        return dataStore.data.map { preferences ->
-            preferences[CURRENT_BTT_NUMBER] ?: ""
-        }.first()
-    }
-}
-     */
     suspend fun saveAccessToken(token: String) {
         dataStore.edit { preferences ->
             preferences[ACCESS_TOKEN_KEY] = token
@@ -283,6 +243,70 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     suspend fun getCurrentBttNumber(): String {
         val preferences = dataStore.data.map { it[CURRENT_BTT_NUMBER] ?: "" }
         return preferences.first()
+    }
+    
+    // === Per-BTT Scanned Koli Functions ===
+    
+    /**
+     * Add scanned koli ID for a specific BTT
+     */
+    suspend fun addScannedKoliForBtt(noBtt: String, koliId: String) {
+        val key = stringSetPreferencesKey("scanned_koli_$noBtt")
+        dataStore.edit { preferences ->
+            val current = preferences[key] ?: emptySet()
+            preferences[key] = current + koliId
+        }
+    }
+    
+    /**
+     * Get all scanned koli IDs for a specific BTT
+     */
+    suspend fun getScannedKoliForBtt(noBtt: String): Set<String> {
+        val key = stringSetPreferencesKey("scanned_koli_$noBtt")
+        val preferences = dataStore.data.map { it[key] ?: emptySet() }
+        return preferences.first()
+    }
+    
+    /**
+     * Check if a koli ID is already scanned for a specific BTT
+     */
+    suspend fun isKoliScannedForBtt(noBtt: String, koliId: String): Boolean {
+        return getScannedKoliForBtt(noBtt).contains(koliId)
+    }
+    
+    /**
+     * Clear all scanned koli IDs for a specific BTT
+     */
+    suspend fun clearScannedKoliForBtt(noBtt: String) {
+        val key = stringSetPreferencesKey("scanned_koli_$noBtt")
+        dataStore.edit { preferences ->
+            preferences.remove(key)
+        }
+    }
+    
+    /**
+     * Get count of scanned koli for a specific BTT
+     */
+    suspend fun getScannedKoliCountForBtt(noBtt: String): Int {
+        return getScannedKoliForBtt(noBtt).size
+    }
+    
+    /**
+     * Check if a BTT has any scanned koli
+     */
+    suspend fun hasScannedKoliForBtt(noBtt: String): Boolean {
+        return getScannedKoliForBtt(noBtt).isNotEmpty()
+    }
+    
+    /**
+     * Get all BTT numbers that have scanned koli data
+     */
+    suspend fun getAllBttWithScannedKoli(): Set<String> {
+        val preferences = dataStore.data.first()
+        return preferences.asMap().keys
+            .filter { it.name.startsWith("scanned_koli_") }
+            .map { it.name.removePrefix("scanned_koli_") }
+            .toSet()
     }
 
     companion object {

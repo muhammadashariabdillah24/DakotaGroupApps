@@ -109,15 +109,37 @@ class DeliveryRepository(
     }
     
     /**
-     * Submit delivery data with photo and signature
+     * Submit delivery data with photo, signature, and koli barcode data
+     * Automatically loads koliData from DataStore for the given BTT
      */
-    fun submitDeliveryData(request: SubmitDeliveryRequest): Flow<com.dakotagroupstaff.data.Result<SubmitDeliveryData>> = flow {
+    fun submitDeliveryDataWithKoli(
+        request: SubmitDeliveryRequest,
+        noBtt: String
+    ): Flow<com.dakotagroupstaff.data.Result<SubmitDeliveryData>> = flow {
         emit(com.dakotagroupstaff.data.Result.Loading)
         try {
             val pt = userPreferences.getPt().first()
-            val response = apiService.submitDeliveryData(pt = pt, request = request)
+            
+            // Load koli data from DataStore for this BTT
+            val scannedKoliIds = userPreferences.getScannedKoliForBtt(noBtt)
+            
+            // Build koliData list if there are scanned koli
+            val koliData = if (scannedKoliIds.isNotEmpty()) {
+                scannedKoliIds.map { koliId ->
+                    mapOf("koliId" to koliId)
+                }
+            } else {
+                emptyList()
+            }
+            
+            // Create request with koli data
+            val requestWithKoli = request.copy(koliData = koliData)
+            
+            val response = apiService.submitDeliveryData(pt = pt, request = requestWithKoli)
             
             if (response.success && response.data != null) {
+                // Clear koli data from DataStore on success
+                userPreferences.clearScannedKoliForBtt(noBtt)
                 emit(com.dakotagroupstaff.data.Result.Success(response.data))
             } else {
                 emit(com.dakotagroupstaff.data.Result.Error(response.message ?: "Gagal mengirim data"))
@@ -125,5 +147,19 @@ class DeliveryRepository(
         } catch (e: Exception) {
             emit(com.dakotagroupstaff.data.Result.Error(e.message ?: "Gagal mengirim data"))
         }
+    }
+    
+    /**
+     * Get scanned koli barcodes for a specific BTT from DataStore
+     */
+    suspend fun getScannedKoliForBtt(noBtt: String): Set<String> {
+        return userPreferences.getScannedKoliForBtt(noBtt)
+    }
+    
+    /**
+     * Clear scanned koli data for a specific BTT from DataStore
+     */
+    suspend fun clearScannedKoliForBtt(noBtt: String) {
+        userPreferences.clearScannedKoliForBtt(noBtt)
     }
 }

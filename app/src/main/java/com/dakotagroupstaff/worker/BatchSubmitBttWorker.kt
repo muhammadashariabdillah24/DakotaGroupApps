@@ -132,9 +132,8 @@ class BatchSubmitBttWorker(
                         Log.d(TAG, "Submitting BTT ${entity.noBtt} - NoLoper: ${entity.noLoper}, Penerima: ${entity.penerima}")
                     }
                     
-                    // Submit to API and wait for FINAL result (skip Loading state)
-                    // Using last() to get the final emission (Success or Error)
-                    val result = repository.submitDeliveryData(request)
+                    // Submit to API with koli barcode data and wait for FINAL result
+                    val result = repository.submitDeliveryDataWithKoli(request, entity.noBtt)
                         .last() // Wait for the final emission
                     
                     when (result) {

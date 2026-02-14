@@ -10,6 +10,7 @@ import com.dakotagroupstaff.data.remote.response.CheckBarcodeData
 import com.dakotagroupstaff.data.remote.response.DeliveryItem
 import com.dakotagroupstaff.data.remote.response.DeliveryListResponse
 import com.dakotagroupstaff.data.repository.DeliveryRepository
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -39,12 +40,8 @@ class LoperViewModel(
         }
     }
     
-    fun checkBarcode(barcode: String) {
-        viewModelScope.launch {
-            loperRepository.checkBarcode(barcode).collect {
-                _checkBarcodeResult.value = it
-            }
-        }
+    fun checkBarcode(barcode: String): Flow<com.dakotagroupstaff.data.Result<CheckBarcodeData>> {
+        return loperRepository.checkBarcode(barcode)
     }
     
     fun resultBarcodeBTT(bttId: String, koliData: List<Any>, noLoper: String) {

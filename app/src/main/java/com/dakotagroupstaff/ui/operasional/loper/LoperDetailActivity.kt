@@ -901,9 +901,9 @@ class LoperDetailActivity : AppCompatActivity() {
                 ttd = signatureBase64
             )
             
-            // Submit data to API
+            // Submit data to API with koli barcode data
             try {
-                repository.submitDeliveryData(request).collect { result ->
+                repository.submitDeliveryDataWithKoli(request, item.noBtt).collect { result ->
                     when (result) {
                         is Result.Loading -> {
                             withContext(Dispatchers.Main) {
