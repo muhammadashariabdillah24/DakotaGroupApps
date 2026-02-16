@@ -128,6 +128,13 @@
             android:label="Surat Tugas"
             android:parentActivityName=".ui.operasional.OperasionalMenuActivity" />
         
+        <!-- Letter of Assign Activity (PT DBS and PT DLB only) -->
+        <activity
+            android:name=".ui.operasional.letterofassign.LetterOfAssignActivity"
+            android:exported="false"
+            android:label="Surat Tugas"
+            android:parentActivityName=".ui.operasional.OperasionalMenuActivity" />
+        
         <!-- Loper (Delivery) Activities -->
         <activity
             android:name=".ui.operasional.loper.LoperActivity"

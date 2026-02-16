@@ -62,6 +62,12 @@ val repositoryModule = module {
             apiService = get()
         )
     }
+    single {
+        com.dakotagroupstaff.data.repository.LetterOfAssignRepository(
+            apiService = get(),
+            userPreferences = get()
+        )
+    }
     single { com.dakotagroupstaff.data.repository.MenuRepository.getInstance(get()) }
 }
 
@@ -78,6 +84,9 @@ val viewModelModule = module {
     }
     viewModel {
         com.dakotagroupstaff.ui.operasional.assignment.AssignmentViewModel(get())
+    }
+    viewModel {
+        com.dakotagroupstaff.ui.operasional.letterofassign.LetterOfAssignViewModel(get())
     }
     viewModel { com.dakotagroupstaff.ui.main.MainViewModel(get()) }
 }

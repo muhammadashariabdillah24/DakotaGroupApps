@@ -3,12 +3,18 @@ package com.dakotagroupstaff.data.remote.retrofit
 import com.dakotagroupstaff.data.remote.response.AgentLocationData
 import com.dakotagroupstaff.data.remote.response.ApiResponse
 import com.dakotagroupstaff.data.remote.response.AttendanceHistoryData
+import com.dakotagroupstaff.data.remote.response.CheckLocationResponse
+import com.dakotagroupstaff.data.remote.response.CheckpointResponse
+import com.dakotagroupstaff.data.remote.response.CompleteAssignmentResponse
 import com.dakotagroupstaff.data.remote.response.EmployeeBioData
 import com.dakotagroupstaff.data.remote.response.EmployeeBioRequest
 import com.dakotagroupstaff.data.remote.response.LeaveBalanceData
 import com.dakotagroupstaff.data.remote.response.LeaveDetailsData
 import com.dakotagroupstaff.data.remote.response.LeaveSubmissionData
+import com.dakotagroupstaff.data.remote.response.LetterOfAssignResponse
+import com.dakotagroupstaff.data.remote.response.LoadingDataResponse
 import com.dakotagroupstaff.data.remote.response.LoginData
+import com.dakotagroupstaff.data.remote.response.NextPointResponse
 import com.dakotagroupstaff.data.remote.response.PendingApprovalData
 import com.dakotagroupstaff.data.remote.response.SalarySlipData
 import com.dakotagroupstaff.data.remote.response.SalarySlipsRequest
@@ -192,6 +198,65 @@ interface ApiService {
     suspend fun getSuperAtasan(
         @Query("pt") pt: String
     ): ApiResponse<List<com.dakotagroupstaff.data.remote.response.SuperAtasanData>>
+    
+    // ========== Letter of Assign Endpoints (PT DBS and PT DLB only) ==========
+    
+    /**
+     * Get Letter of Assign (Surat Tugas)
+     * GET /letter-of-assign/tugas?nip=<nip>&pt=<pt>
+     */
+    @GET("letter-of-assign/tugas")
+    suspend fun getLetterOfAssign(
+        @Query("nip") nip: String,
+        @Query("pt") pt: String
+    ): LetterOfAssignResponse
+    
+    /**
+     * Check/Update GPS Location
+     * POST /letter-of-assign/check-location
+     */
+    @POST("letter-of-assign/check-location")
+    suspend fun checkLocation(
+        @Body request: CheckLocationRequest
+    ): CheckLocationResponse
+    
+    /**
+     * Submit Checkpoint (Check-in at branch)
+     * POST /letter-of-assign/checkpoint
+     */
+    @POST("letter-of-assign/checkpoint")
+    suspend fun submitCheckpoint(
+        @Body request: CheckpointRequest
+    ): CheckpointResponse
+    
+    /**
+     * Get Next Point Information
+     * GET /letter-of-assign/next-point?sID=<sID>&pt=<pt>
+     */
+    @GET("letter-of-assign/next-point")
+    suspend fun getNextPoint(
+        @Query("sID") sID: String,
+        @Query("pt") pt: String
+    ): NextPointResponse
+    
+    /**
+     * Complete Letter of Assign
+     * GET /letter-of-assign/complete?sID=<sID>&pt=<pt>
+     */
+    @GET("letter-of-assign/complete")
+    suspend fun completeLetterOfAssign(
+        @Query("sID") sID: String,
+        @Query("pt") pt: String
+    ): CompleteAssignmentResponse
+    
+    /**
+     * Get Loading/Muat Data
+     * POST /letter-of-assign/muat
+     */
+    @POST("letter-of-assign/muat")
+    suspend fun getLoadingData(
+        @Body request: GetMuatRequest
+    ): LoadingDataResponse
     
     // ==================== LETTER OF ASSIGNMENT (SURAT TUGAS) ====================
     
@@ -422,4 +487,49 @@ data class RejectionRequest(
     val leaveId: String,
     @SerializedName("activeStatus")
     val activeStatus: String  // "Y" or "N"
+)
+
+// Letter of Assign Request Models (PT DBS and PT DLB only)
+
+data class CheckLocationRequest(
+    @SerializedName("sID")
+    val sID: String,
+    @SerializedName("lat")
+    val lat: String,
+    @SerializedName("lon")
+    val lon: String,
+    @SerializedName("pt")
+    val pt: String
+)
+
+data class CheckpointRequest(
+    @SerializedName("sID")
+    val sID: String,
+    @SerializedName("agenID")
+    val agenID: String,
+    @SerializedName("tglUpdate")
+    val tglUpdate: String,
+    @SerializedName("km")
+    val km: String,
+    @SerializedName("lat")
+    val lat: String,
+    @SerializedName("lon")
+    val lon: String,
+    @SerializedName("urlpic")
+    val urlpic: String,
+    @SerializedName("nip")
+    val nip: String,
+    @SerializedName("urut")
+    val urut: String,
+    @SerializedName("pt")
+    val pt: String
+)
+
+data class GetMuatRequest(
+    @SerializedName("sID")
+    val sID: String,
+    @SerializedName("agenid")
+    val agenid: String,
+    @SerializedName("pt")
+    val pt: String
 )
