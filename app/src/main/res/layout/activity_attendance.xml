@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_light"
+    android:background="?attr/android:colorBackground"
     tools:context=".ui.kepegawaian.attendance.AttendanceActivity">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -60,7 +60,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Status Lokasi"
-                        android:textColor="@android:color/black"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -85,7 +85,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="8dp"
                             android:text="Mengecek lokasi Anda..."
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="14sp" />
 
                     </LinearLayout>
@@ -118,7 +118,7 @@
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 android:textSize="14sp"
                                 tools:text="SEMARANG DBS CABANG" />
 
@@ -130,7 +130,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginStart="28dp"
                             android:layout_marginTop="4dp"
-                            android:textColor="@android:color/darker_gray"
+                            android:textColor="?attr/colorOnSurfaceVariant"
                             android:textSize="12sp"
                             tools:text="Jarak: 25m dari cabang" />
 
@@ -196,7 +196,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginBottom="16dp"
                         android:text="Absensi Hari Ini"
-                        android:textColor="@android:color/black"
+                        android:textColor="?attr/colorOnSurface"
                         android:textSize="16sp"
                         android:textStyle="bold" />
 
@@ -251,7 +251,7 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:layout_marginTop="12dp"
-                        android:textColor="@android:color/darker_gray"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:textSize="12sp"
                         android:visibility="gone"
                         tools:text="Terakhir absen masuk: 08:15 WIB"

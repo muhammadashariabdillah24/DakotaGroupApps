@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_gray"
+    android:background="?attr/android:colorBackground"
     tools:context=".ui.kepegawaian.salary.SalarySlipDetailActivity">
 
     <!-- Toolbar -->
@@ -44,7 +44,7 @@
                 app:cardCornerRadius="4dp"
                 app:cardElevation="0dp"
                 app:strokeWidth="1dp"
-                app:strokeColor="@android:color/black">
+                app:strokeColor="?attr/colorOnSurface">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -72,7 +72,7 @@
                                 android:text="Nip"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:id="@+id/tvNip"
@@ -82,7 +82,7 @@
                                 android:layout_marginStart="8dp"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text=": 0012404003" />
                         </LinearLayout>
 
@@ -99,7 +99,7 @@
                                 android:text="Periode Gaji"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:id="@+id/tvPeriod"
@@ -109,7 +109,7 @@
                                 android:layout_marginStart="8dp"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text=": 06/2025" />
                         </LinearLayout>
                     </LinearLayout>
@@ -134,7 +134,7 @@
                                 android:text="Nama"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:id="@+id/tvName"
@@ -144,7 +144,7 @@
                                 android:layout_marginStart="8dp"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text=": MUHAMMAD ASHARI" />
                         </LinearLayout>
 
@@ -161,7 +161,7 @@
                                 android:text="Divisi"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:id="@+id/tvDivision"
@@ -171,7 +171,7 @@
                                 android:layout_marginStart="8dp"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text=": Sistem Informasi" />
                         </LinearLayout>
                     </LinearLayout>
@@ -195,7 +195,7 @@
                                 android:text="Jabatan"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:id="@+id/tvPosition"
@@ -205,7 +205,7 @@
                                 android:layout_marginStart="8dp"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text=": Staf" />
                         </LinearLayout>
 
@@ -222,7 +222,7 @@
                                 android:text="Area Kerja"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black" />
+                                android:textColor="?attr/colorOnSurface" />
 
                             <TextView
                                 android:id="@+id/tvArea"
@@ -232,7 +232,7 @@
                                 android:layout_marginStart="8dp"
                                 android:textSize="12sp"
                                 android:textStyle="bold"
-                                android:textColor="@android:color/black"
+                                android:textColor="?attr/colorOnSurface"
                                 tools:text=": DLI PUSAT" />
                         </LinearLayout>
                     </LinearLayout>

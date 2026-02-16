@@ -153,7 +153,7 @@
             android:name=".ui.operasional.loper.BarcodeScannerActivity"
             android:exported="false"
             android:screenOrientation="portrait"
-            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:theme="@style/Theme.DakotaGroupStaff.NoActionBar"
             android:parentActivityName=".ui.operasional.loper.LoperActivity" />
         
         <activity

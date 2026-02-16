@@ -28,7 +28,7 @@
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/white"
+                android:textColor="@color/white"
                 android:background="@drawable/bg_rounded_badge"
                 android:paddingHorizontal="12dp"
                 android:paddingVertical="4dp"
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="28 Januari 2026" />
 
         </LinearLayout>
@@ -81,7 +81,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="14sp"
-                android:textColor="@android:color/black"
+                android:textColor="?attr/colorOnSurface"
                 tools:text="20:38:30" />
 
         </LinearLayout>

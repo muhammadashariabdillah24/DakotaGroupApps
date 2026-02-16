@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/background_light">
+        android:background="?attr/android:colorBackground">
 
         <!-- Swipe Refresh Layout -->
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -176,7 +176,7 @@
                                 android:id="@+id/layoutTotal"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:background="@color/background_light"
+                                android:background="?attr/colorSurfaceVariant"
                                 android:gravity="center_vertical"
                                 android:orientation="horizontal"
                                 android:padding="12dp">

@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Base Theme for DakotaGroupStaff - DayNight to follow system theme -->
     <style name="Base.Theme.DakotaGroupStaff" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Brand color palette mapping -->
         <item name="colorPrimary">@color/primary</item>
@@ -14,8 +14,9 @@
 
         <!-- Background & surface -->
         <item name="android:colorBackground">@color/background</item>
-        <item name="colorSurface">@color/white</item>
+        <item name="colorSurface">@color/surface_light</item>
         <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
 
         <!-- System bars -->
         <item name="android:statusBarColor">@color/primary_dark</item>
@@ -24,6 +25,9 @@
         <!-- Text colors -->
         <item name="android:textColorPrimary">@color/text_primary</item>
         <item name="android:textColorSecondary">@color/text_secondary</item>
+        
+        <!-- Surface colors -->
+        <item name="colorSurfaceVariant">@color/background_gray</item>
     </style>
 
     <style name="Theme.DakotaGroupStaff" parent="Base.Theme.DakotaGroupStaff" />
@@ -42,8 +46,8 @@
     <style name="Theme.DakotaGroupStaff.FullScreen" parent="Theme.DakotaGroupStaff">
         <item name="android:windowFullscreen">false</item>
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@android:color/white</item>
-        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
         <item name="android:windowLightStatusBar" tools:targetApi="m">true</item>
     </style>
     
@@ -51,5 +55,11 @@
     <style name="CircleImageView">
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
+    </style>
+    
+    <!-- No ActionBar Theme for Barcode Scanner -->
+    <style name="Theme.DakotaGroupStaff.NoActionBar" parent="Theme.DakotaGroupStaff">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>

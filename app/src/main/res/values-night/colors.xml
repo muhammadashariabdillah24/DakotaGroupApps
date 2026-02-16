@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark Theme Colors -->
+    <color name="background_dark">#121212</color>
+    <color name="surface_dark">#1E1E1E</color>
+    <color name="surface_variant_dark">#2C2C2C</color>
+    
+    <!-- Aliases for theme compatibility -->
+    <color name="background">#121212</color>
+    <color name="background_light">#121212</color>
+    <color name="background_gray">#2C2C2C</color>
+    
+    <!-- Text colors for dark mode -->
+    <color name="text_primary_dark">#FFFFFF</color>
+    <color name="text_secondary_dark">#B3B3B3</color>
+    
+    <!-- Aliases for theme compatibility -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B3B3B3</color>
+    
+    <!-- Keep the same brand colors -->
+    <color name="primary">#2e86c7</color>
+    <color name="primary_light">#5aa3d9</color>
+    <color name="primary_dark">#256b9f</color>
+    <color name="secondary">#931a25</color>
+    <color name="secondary_light">#b8212e</color>
+    <color name="secondary_dark">#76151e</color>
+    
+    <!-- Utility colors -->
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="success">#4CAF50</color>
+    <color name="warning">#FF9800</color>
+    <color name="error">#F44336</color>
+    <color name="info">#2196F3</color>
+    <color name="divider">#424242</color>
+</resources>

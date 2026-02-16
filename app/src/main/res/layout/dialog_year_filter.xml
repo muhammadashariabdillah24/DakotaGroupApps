@@ -12,7 +12,7 @@
         android:text="Pilih Tahun"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:textColor="@android:color/black"
+        android:textColor="?attr/colorOnSurface"
         android:layout_marginBottom="16dp" />
 
     <androidx.recyclerview.widget.RecyclerView

@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.DakotaGroupStaff" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Dark theme brand palette -->
+    <!-- Dark Theme for DakotaGroupStaff - inherits from Base defined in values -->
+    <style name="Theme.DakotaGroupStaff" parent="Base.Theme.DakotaGroupStaff">
+        <!-- Brand color palette mapping -->
         <item name="colorPrimary">@color/primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">@color/primary</item>
@@ -12,17 +12,47 @@
         <item name="colorSecondaryContainer">@color/secondary</item>
         <item name="colorOnSecondaryContainer">@color/white</item>
 
-        <!-- Background & surface -->
-        <item name="android:colorBackground">@color/background</item>
-        <item name="colorSurface">@color/background</item>
-        <item name="colorOnSurface">@color/text_primary</item>
+        <!-- Background & surface - Dark Mode -->
+        <item name="android:colorBackground">@color/background_dark</item>
+        <item name="colorSurface">@color/surface_dark</item>
+        <item name="colorOnSurface">@color/text_primary_dark</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary_dark</item>
 
         <!-- System bars -->
         <item name="android:statusBarColor">@color/primary_dark</item>
         <item name="android:navigationBarColor">@color/primary_dark</item>
 
         <!-- Text colors -->
-        <item name="android:textColorPrimary">@color/text_primary</item>
-        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/text_primary_dark</item>
+        <item name="android:textColorSecondary">@color/text_secondary_dark</item>
+        
+        <!-- Surface colors for cards, dialogs, etc -->
+        <item name="colorSurfaceVariant">@color/surface_variant_dark</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary_dark</item>
+    </style>
+    
+    <!-- Transparent Theme for Modal Activity -->
+    <style name="Theme.DakotaGroupStaff.Transparent" parent="Theme.DakotaGroupStaff">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:backgroundDimEnabled">true</item>
+    </style>
+    
+    <!-- Full Screen Theme for Quick Access Modal -->
+    <style name="Theme.DakotaGroupStaff.FullScreen" parent="Theme.DakotaGroupStaff">
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">?attr/colorSurface</item>
+        <item name="android:statusBarColor">?attr/colorSurface</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="m">false</item>
+    </style>
+    
+    <!-- No ActionBar Theme for Barcode Scanner -->
+    <style name="Theme.DakotaGroupStaff.NoActionBar" parent="Theme.DakotaGroupStaff">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
     </style>
 </resources>

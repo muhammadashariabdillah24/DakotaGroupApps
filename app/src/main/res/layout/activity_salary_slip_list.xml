@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background_gray"
+    android:background="?attr/android:colorBackground"
     tools:context=".ui.kepegawaian.salary.SalarySlipListActivity">
 
     <!-- Toolbar -->
@@ -45,7 +45,7 @@
                 android:text="TAHUN - "
                 android:textSize="16sp"
                 android:textStyle="bold"
-                android:textColor="@android:color/black" />
+                android:textColor="?attr/colorOnSurface" />
 
             <TextView
                 android:id="@+id/tvSelectedYear"

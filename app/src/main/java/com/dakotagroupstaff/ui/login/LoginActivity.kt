@@ -149,9 +149,10 @@ class LoginActivity : AppCompatActivity() {
             "DLI" to "C"
         )
         
+        // Use Material3 dropdown item layout for proper dark/light mode support
         val adapter = ArrayAdapter(
             this,
-            android.R.layout.simple_dropdown_item_1line,
+            R.layout.item_dropdown_pt,
             ptOptions.keys.toList()
         )
         

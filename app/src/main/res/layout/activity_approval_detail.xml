@@ -44,7 +44,7 @@
                         android:text="Nama Karyawan"
                         android:textSize="18sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black" />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <ImageButton
                         android:id="@+id/btnClose"
@@ -86,7 +86,7 @@
                         android:text="01/01/2025"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black" />
+                        android:textColor="?attr/colorOnSurface" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -102,7 +102,7 @@
                         android:text="03/01/2025"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSurface"
                         android:gravity="end" />
                 </LinearLayout>
 
@@ -132,7 +132,7 @@
                             android:layout_height="wrap_content"
                             android:text="Pengaju"
                             android:textStyle="bold"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/tvPengajuInfo"
@@ -140,7 +140,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="123456 - John Doe"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
 
                     <!-- Keterangan -->
@@ -155,7 +155,7 @@
                             android:layout_height="wrap_content"
                             android:text="Keterangan"
                             android:textStyle="bold"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/tvKeterangan"
@@ -163,7 +163,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="Cuti tahunan"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
 
                     <!-- Total Hari -->
@@ -178,7 +178,7 @@
                             android:layout_height="wrap_content"
                             android:text="Total Hari"
                             android:textStyle="bold"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/tvTotalDays"
@@ -186,7 +186,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="3"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
 
                     <!-- Sisa Saldo Cuti -->
@@ -201,7 +201,7 @@
                             android:layout_height="wrap_content"
                             android:text="Sisa Saldo Cuti"
                             android:textStyle="bold"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/tvSaldoCuti"
@@ -209,7 +209,7 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:text="12"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
                     </LinearLayout>
 
                     <!-- Bukti Foto -->
@@ -223,7 +223,7 @@
                             android:layout_height="wrap_content"
                             android:text="Bukti Foto"
                             android:textStyle="bold"
-                            android:textColor="@color/black" />
+                            android:textColor="?attr/colorOnSurface" />
 
                         <TextView
                             android:id="@+id/tvBuktiFoto"
@@ -266,7 +266,7 @@
                         android:text="Pilih Jenis Potongan"
                         android:textSize="14sp"
                         android:textStyle="bold"
-                        android:textColor="@color/black"
+                        android:textColor="?attr/colorOnSurface"
                         android:layout_marginBottom="8dp" />
 
                     <TextView
@@ -274,7 +274,7 @@
                         android:layout_height="wrap_content"
                         android:text="Pilih salah satu jenis potongan untuk pengajuan ini"
                         android:textSize="12sp"
-                        android:textColor="@color/gray"
+                        android:textColor="?attr/colorOnSurfaceVariant"
                         android:layout_marginBottom="12dp" />
 
                     <!-- Deduction Options RadioGroup -->
@@ -291,7 +291,7 @@
                             android:layout_height="wrap_content"
                             android:text="Potong Gaji"
                             android:textSize="14sp"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorOnSurface"
                             android:padding="8dp"
                             android:checked="true" />
 
@@ -302,7 +302,7 @@
                             android:layout_height="wrap_content"
                             android:text="Potong Cuti"
                             android:textSize="14sp"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorOnSurface"
                             android:padding="8dp" />
 
                         <!-- Dispensasi -->
@@ -312,7 +312,7 @@
                             android:layout_height="wrap_content"
                             android:text="Dispensasi"
                             android:textSize="14sp"
-                            android:textColor="@color/black"
+                            android:textColor="?attr/colorOnSurface"
                             android:padding="8dp" />
                     </RadioGroup>
 
