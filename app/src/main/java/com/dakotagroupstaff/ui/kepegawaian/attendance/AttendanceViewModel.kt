@@ -128,13 +128,16 @@ class AttendanceViewModel(
         val location = _userLocation.value
         val nearest = _nearestAgent.value
         
+        // Comprehensive validation before submission
         if (location == null) {
             _errorMessage.value = "Lokasi tidak tersedia. Mohon aktifkan GPS"
+            _submitResult.value = Result.Error("Lokasi GPS tidak tersedia")
             return
         }
         
         if (nearest == null) {
             _errorMessage.value = "Lokasi cabang/agen tidak ditemukan"
+            _submitResult.value = Result.Error("Data lokasi cabang tidak tersedia")
             return
         }
         
@@ -147,11 +150,13 @@ class AttendanceViewModel(
         }
         
         // Get MD5 code from agent (CRITICAL: Backend validates against Agen_md5)
-        val kodeCabang = agent.md5Code.ifBlank {
-            // Fallback: if MD5 is empty, show error
+        // Check if MD5 code is blank before proceeding
+        if (agent.md5Code.isBlank()) {
             _errorMessage.value = "Kode cabang tidak valid. Data lokasi perlu diperbarui"
+            _submitResult.value = Result.Error("Kode cabang tidak valid")
             return
         }
+        val kodeCabang = agent.md5Code
         
         viewModelScope.launch {
             attendanceRepository.submitAttendance(

@@ -549,9 +549,15 @@ Data scan untuk BTT $currentBtt akan tetap tersimpan dan dapat diproses nanti.
             val scannedCount = prefs.getScannedKoliCountForBtt(currentBtt)
             val totalKoli = prefs.getCurrentBttTotalKoli()
             
+            // Check if no koli has been scanned
             if (scannedCount == 0) {
-                Toast.makeText(this@BarcodeScannerActivity, "Tidak ada data yang perlu disimpan", Toast.LENGTH_SHORT).show()
-                finishWithResult()
+                AlertDialog.Builder(this@BarcodeScannerActivity)
+                    .setMessage("Tidak bisa menyimpan karena tidak ada kode barcode koli pada btt ini yang terscan!")
+                    .setPositiveButton("Oke") { dialog, _ ->
+                        dialog.dismiss()
+                    }
+                    .setCancelable(false)
+                    .show()
                 return@launch
             }
             

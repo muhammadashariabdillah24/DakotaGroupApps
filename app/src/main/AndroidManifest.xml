@@ -22,9 +22,7 @@
 
     <application
         android:name=".DakotaGroupStaffApp"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
+        android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -56,23 +54,7 @@
             android:name=".ui.kepegawaian.attendance.AttendanceHistoryActivity"
             android:exported="false" />
         
-        <activity
-            android:name=".ui.kepegawaian.salary.SalaryActivity"
-            android:exported="false" />
-        
-        <activity
-            android:name=".ui.kepegawaian.salary.SalaryDetailActivity"
-            android:exported="false" />
-        
-        <activity
-            android:name=".ui.kepegawaian.salary.SalaryMonthPickerActivity"
-            android:exported="false" />
-        
-        <activity
-            android:name=".ui.kepegawaian.salary.SalaryYearViewActivity"
-            android:exported="false" />
-        
-        <!-- New Salary Slip Activities -->
+        <!-- Salary Slip Activities -->
         <activity
             android:name=".ui.kepegawaian.salary.SalarySlipListActivity"
             android:exported="false" />

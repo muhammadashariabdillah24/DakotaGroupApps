@@ -311,6 +311,19 @@ class AttendanceActivity : AppCompatActivity() {
             locationCallback,
             Looper.getMainLooper()
         )
+        
+        // Add timeout handler to prevent infinite loading
+        binding.root.postDelayed({
+            if (binding.layoutLocationLoading.visibility == View.VISIBLE) {
+                binding.layoutLocationLoading.visibility = View.GONE
+                binding.layoutLocationInfo.visibility = View.VISIBLE
+                Toast.makeText(
+                    this,
+                    "Gagal mendapatkan lokasi. Mohon coba lagi atau periksa GPS Anda",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }, 15000) // 15 seconds timeout
     }
     
     private fun submitAttendance(schedule: String) {

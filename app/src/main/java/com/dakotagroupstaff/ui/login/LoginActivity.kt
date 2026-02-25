@@ -188,8 +188,20 @@ class LoginActivity : AppCompatActivity() {
                     Manifest.permission.READ_PHONE_STATE
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
-                deviceId = telephonyManager.imei ?: "UNKNOWN_IMEI_${System.currentTimeMillis()}"
-                serialNumber = telephonyManager.simSerialNumber ?: "UNKNOWN_SIM_${System.currentTimeMillis()}"
+                try {
+                    @Suppress("MissingPermission")
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                        deviceId = telephonyManager.imei ?: "UNKNOWN_IMEI_${System.currentTimeMillis()}"
+                    } else {
+                        @Suppress("DEPRECATION", "MissingPermission")
+                        deviceId = telephonyManager.deviceId ?: "UNKNOWN_IMEI_${System.currentTimeMillis()}"
+                    }
+                    @Suppress("MissingPermission")
+                    serialNumber = telephonyManager.simSerialNumber ?: "UNKNOWN_SIM_${System.currentTimeMillis()}"
+                } catch (e: SecurityException) {
+                    deviceId = "UNKNOWN_IMEI_${System.currentTimeMillis()}"
+                    serialNumber = "UNKNOWN_SIM_${System.currentTimeMillis()}"
+                }
             } else {
                 // Fallback jika permission tidak diberikan
                 deviceId = "UNKNOWN_IMEI_${System.currentTimeMillis()}"

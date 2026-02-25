@@ -7,6 +7,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -178,6 +179,18 @@ class LetterOfAssignActivity : AppCompatActivity() {
         // For now, just submit with dummy data
         
         lifecycleScope.launch {
+            if (ActivityCompat.checkSelfPermission(
+                    this@LetterOfAssignActivity,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this@LetterOfAssignActivity,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                Toast.makeText(this@LetterOfAssignActivity, "Izin lokasi diperlukan", Toast.LENGTH_SHORT).show()
+                return@launch
+            }
+            
             val currentLocation = fusedLocationClient.lastLocation
             currentLocation.addOnSuccessListener { location ->
                 location?.let {
@@ -256,7 +269,7 @@ class LetterOfAssignActivity : AppCompatActivity() {
     }
     
     override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
+        finish()
         return true
     }
 }

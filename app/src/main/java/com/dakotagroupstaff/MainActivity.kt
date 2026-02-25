@@ -59,15 +59,42 @@ class MainActivity : AppCompatActivity() {
     
     private fun checkSessionAndSetupUI() {
         loginViewModel.getSession().observe(this) { session ->
-            if (!session.isLoggedIn) {
-                // User belum login, redirect ke LoginActivity
+            if (!session.isLoggedIn || !isValidSession(session)) {
+                // User belum login atau session tidak valid, redirect ke LoginActivity
                 navigateToLogin()
             } else {
-                // User sudah login, tampilkan dashboard
+                // User sudah login dengan session valid, tampilkan dashboard
                 showDashboard()
                 setupDashboard(session)
             }
         }
+    }
+    
+    /**
+     * Validate session to ensure all required fields are present
+     * This prevents access with incomplete/stale session data
+     */
+    private fun isValidSession(session: com.dakotagroupstaff.data.local.model.UserSession): Boolean {
+        // Check if NIP is not empty
+        if (session.nip.isBlank()) {
+            android.util.Log.w("MainActivity", "Session invalid: NIP is blank")
+            return false
+        }
+        
+        // Check if PT is valid
+        if (session.pt.isBlank() || session.pt !in listOf("A", "B", "C")) {
+            android.util.Log.w("MainActivity", "Session invalid: PT is invalid (${session.pt})")
+            return false
+        }
+        
+        // Check if nama is not empty
+        if (session.nama.isBlank()) {
+            android.util.Log.w("MainActivity", "Session invalid: Nama is blank")
+            return false
+        }
+        
+        android.util.Log.d("MainActivity", "Session valid for NIP: ${session.nip}")
+        return true
     }
     
     private fun showDashboard() {

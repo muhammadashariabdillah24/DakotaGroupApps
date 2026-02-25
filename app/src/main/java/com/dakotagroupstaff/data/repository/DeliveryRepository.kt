@@ -77,10 +77,17 @@ class DeliveryRepository(
     }
     
     /**
-     * Remove BTT from sent list (delete from local storage)
+     * Remove BTT from sent list (delete from local storage and DataStore)
+     * This will clear:
+     * - Room database entry (receiver name, photo, signature)
+     * - Scanned koli data from DataStore
      */
     suspend fun removeSentDelivery(noBtt: String) {
+        // Delete from Room database
         deliveryListDao.deleteByBtt(noBtt)
+        
+        // Clear scanned koli data from DataStore
+        userPreferences.clearScannedKoliForBtt(noBtt)
     }
     
     /**

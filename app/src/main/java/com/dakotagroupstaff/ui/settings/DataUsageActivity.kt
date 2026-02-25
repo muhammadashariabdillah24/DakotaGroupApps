@@ -92,24 +92,23 @@ class DataUsageActivity : AppCompatActivity() {
             
             // Mobile data
             try {
-                val subscriberId = (getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager).subscriberId
-                if (subscriberId != null) {
-                    val mobileStats = networkStatsManager.querySummary(
-                        ConnectivityManager.TYPE_MOBILE,
-                        subscriberId,
-                        startTime,
-                        endTime
-                    )
+                // Use empty string instead of subscriberId for Android 10+
+                val subscriberId = ""
+                val mobileStats = networkStatsManager.querySummary(
+                    ConnectivityManager.TYPE_MOBILE,
+                    subscriberId,
+                    startTime,
+                    endTime
+                )
                     
-                    val bucket = NetworkStats.Bucket()
-                    while (mobileStats.hasNextBucket()) {
-                        mobileStats.getNextBucket(bucket)
-                        if (bucket.uid == uid) {
-                            totalBytes += bucket.rxBytes + bucket.txBytes
-                        }
+                val bucket = NetworkStats.Bucket()
+                while (mobileStats.hasNextBucket()) {
+                    mobileStats.getNextBucket(bucket)
+                    if (bucket.uid == uid) {
+                        totalBytes += bucket.rxBytes + bucket.txBytes
                     }
-                    mobileStats.close()
                 }
+                mobileStats.close()
             } catch (e: Exception) {
                 e.printStackTrace()
             }

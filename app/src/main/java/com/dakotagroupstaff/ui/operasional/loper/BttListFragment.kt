@@ -114,9 +114,8 @@ class BttListFragment : Fragment() {
     
     private fun showDeleteConfirmationDialog(deliveryItem: DeliveryItem) {
         androidx.appcompat.app.AlertDialog.Builder(requireContext())
-            .setTitle("Hapus Data Terkirim?")
-            .setMessage("BTT ${deliveryItem.noBtt} akan dipindahkan kembali ke Daftar BTT Tertunda. Data foto dan tanda tangan akan dihapus dari penyimpanan lokal.")
-            .setPositiveButton("Hapus") { _, _ ->
+            .setMessage("Apakah anda ingin menghapus BTT ini dari Daftar BTT Terkirim?")
+            .setPositiveButton("Iya, Hapus") { _, _ ->
                 lifecycleScope.launch {
                     viewModel.removeSent(deliveryItem.noBtt)
                     Toast.makeText(requireContext(), "BTT dipindahkan ke Daftar BTT Tertunda", Toast.LENGTH_SHORT).show()

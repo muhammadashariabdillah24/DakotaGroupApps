@@ -554,9 +554,4 @@ class AssignmentActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
-    
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
-    }
 }

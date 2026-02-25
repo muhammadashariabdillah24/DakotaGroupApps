@@ -28,7 +28,6 @@
         
         <!-- Surface colors for cards, dialogs, etc -->
         <item name="colorSurfaceVariant">@color/surface_variant_dark</item>
-        <item name="colorOnSurfaceVariant">@color/text_secondary_dark</item>
     </style>
     
     <!-- Transparent Theme for Modal Activity -->
