@@ -462,7 +462,7 @@ class AssignmentActivity : AppCompatActivity() {
                 // Show dialog with QR Code
                 val dialogBinding = DialogQrCodeBinding.inflate(layoutInflater)
                 dialogBinding.ivQRCode.setImageBitmap(qrCodeBitmap)
-                dialogBinding.tvAssignmentIdQR.text = sID
+                dialogBinding.tvQRContent.text = "SID: $sID"
                 
                 val dialog = MaterialAlertDialogBuilder(this)
                     .setView(dialogBinding.root)

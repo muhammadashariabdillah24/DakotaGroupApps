@@ -55,6 +55,9 @@ zxing = "3.5.3"
 # WorkManager
 workManager = "2.10.0"
 
+# Security - Root Detection
+rootbeer = "0.1.0"
+
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -125,6 +128,9 @@ zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embe
 
 # WorkManager
 androidx-work-runtime-ktx = { group = "androidx.work", name = "work-runtime-ktx", version.ref = "workManager" }
+
+# Security - Root Detection
+rootbeer-lib = { group = "com.scottyab", name = "rootbeer-lib", version.ref = "rootbeer" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

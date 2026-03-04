@@ -163,6 +163,9 @@ dependencies {
     // WorkManager for background processing
     implementation(libs.androidx.work.runtime.ktx)
     
+    // Root Detection
+    implementation(libs.rootbeer.lib)
+    
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

@@ -174,15 +174,18 @@ data class SalarySlipData(
      */
     fun getTotalIncome(): Int {
         val thrAmount = thr.replace(".", "").toIntOrNull() ?: 0
+        val bpjspAmount = bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
         return gapok + insentif + pengembalianPo + insentifPph + 
-               thrAmount + transport + kesehatan + keluarga + jabatan
+               thrAmount + bpjspAmount + transport + kesehatan + keluarga + jabatan + asuransi
     }
     
     /**
      * Calculate total deductions (potongan)
      */
     fun getTotalDeductions(): Int {
-        return asuransi + jamsostek + koperasi + klaim + pph21 + absensi + lain + iuranPaguyuban
+        val bpjskAmount = bpjsk?.replace(".", "")?.toIntOrNull() ?: 0
+        val bpjspAmount = bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
+        return jamsostek + koperasi + klaim + pph21 + absensi + lain + iuranPaguyuban + bpjskAmount + bpjspAmount
     }
     
     /**

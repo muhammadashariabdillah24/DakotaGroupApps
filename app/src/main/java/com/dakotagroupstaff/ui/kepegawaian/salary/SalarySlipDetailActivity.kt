@@ -121,7 +121,9 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         addIncomeItem(layout, "Insentif", slip.insentif)
         
         val thrAmount = slip.thr.replace(".", "").toIntOrNull() ?: 0
-        addIncomeItem(layout, "THR / Bonus", thrAmount)
+        if (thrAmount > 0) {
+            addIncomeItem(layout, "THR / Bonus", thrAmount)
+        }
         
         addIncomeItem(layout, "Insentif PPH21", slip.insentifPph)
         addIncomeItem(layout, "Pot Pengembalian", slip.pengembalianPo)
@@ -129,12 +131,19 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         // Tunjangan subsection
         addSubsectionTitle(layout, "Tunjangan")
         val bpjspAmount = slip.bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
-        addIncomeItem(layout, "BPJS.P", bpjspAmount)
+        if (bpjspAmount > 0) {
+            addIncomeItem(layout, "BPJS.P (Tunjangan)", bpjspAmount)
+        }
         addIncomeItem(layout, "Transport", slip.transport)
         addIncomeItem(layout, "Kesehatan", slip.kesehatan)
         addIncomeItem(layout, "Keluarga", slip.keluarga)
         addIncomeItem(layout, "Jabatan", slip.jabatan)
-        addIncomeItem(layout, "Asuransi", slip.asuransi)
+        if (slip.asuransi > 0) {
+            addIncomeItem(layout, "Asuransi", slip.asuransi)
+        }
+        
+        // Total Pendapatan
+        addSubTotalSection(layout, "Total Pendapatan", slip.getTotalIncome())
     }
 
     private fun buildDeductionLayout(slip: SalarySlipData) {
@@ -144,25 +153,48 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         // Title
         addSectionTitle(layout, "Potongan")
 
-        // Deduction items
-        addDeductionItem(layout, "Jamsostek", slip.jamsostek)
+        // Deduction items - only show if amount > 0
+        if (slip.jamsostek > 0) {
+            addDeductionItem(layout, "Jamsostek", slip.jamsostek)
+        }
         
         val bpjspAmount = slip.bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
-        addDeductionItem(layout, "BPJS.P", bpjspAmount)
+        if (bpjspAmount > 0) {
+            addDeductionItem(layout, "BPJS.P (Potongan)", bpjspAmount)
+        }
         
-        addDeductionItem(layout, "Koperasi", slip.koperasi)
-        addDeductionItem(layout, "Klaim", slip.klaim)
+        if (slip.koperasi > 0) {
+            addDeductionItem(layout, "Koperasi", slip.koperasi)
+        }
+        if (slip.klaim > 0) {
+            addDeductionItem(layout, "Klaim", slip.klaim)
+        }
         
         val bpjskAmount = slip.bpjsk?.replace(".", "")?.toIntOrNull() ?: 0
-        addDeductionItem(layout, "BPJS.K", bpjskAmount)
+        if (bpjskAmount > 0) {
+            addDeductionItem(layout, "BPJS.K", bpjskAmount)
+        }
         
-        addDeductionItem(layout, "PPh21", slip.pph21)
-        addDeductionItem(layout, "Asuransi", slip.asuransi)
-        addDeductionItem(layout, "Absensi", slip.absensi)
-        addDeductionItem(layout, "Iuran Paguyuban", slip.iuranPaguyuban)
-        addDeductionItem(layout, "Lain-Lain", slip.lain)
+        if (slip.pph21 > 0) {
+            addDeductionItem(layout, "PPh21", slip.pph21)
+        }
+        if (slip.asuransi > 0) {
+            addDeductionItem(layout, "Asuransi", slip.asuransi)
+        }
+        if (slip.absensi > 0) {
+            addDeductionItem(layout, "Absensi", slip.absensi)
+        }
+        if (slip.iuranPaguyuban > 0) {
+            addDeductionItem(layout, "Iuran Paguyuban", slip.iuranPaguyuban)
+        }
+        if (slip.lain > 0) {
+            addDeductionItem(layout, "Lain-Lain", slip.lain)
+        }
 
-        // Total Gaji
+        // Total Potongan
+        addSubTotalSection(layout, "Total Potongan", slip.getTotalDeductions())
+
+        // Total Gaji (Gaji Bersih)
         addTotalSection(layout, slip.getNetSalary())
     }
 
@@ -256,6 +288,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             text = "Total Gaji"
             textSize = 12f
             setTextColor(Color.BLACK)
+            setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
         val valueView = TextView(this).apply {
@@ -267,6 +300,50 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             text = ": ${SalaryDataHelper.formatCurrency(totalSalary)}"
             textSize = 12f
             setTextColor(Color.BLACK)
+            setTypeface(null, android.graphics.Typeface.BOLD)
+        }
+
+        container.addView(labelView)
+        container.addView(valueView)
+        parent.addView(container)
+    }
+    
+    private fun addSubTotalSection(parent: LinearLayout, label: String, amount: Int) {
+        val container = LinearLayout(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            ).apply {
+                topMargin = 16
+                bottomMargin = 8
+            }
+            orientation = LinearLayout.HORIZONTAL
+            setBackgroundColor(ContextCompat.getColor(this@SalarySlipDetailActivity, android.R.color.darker_gray))
+            setPadding(8, 8, 8, 8)
+        }
+
+        val labelView = TextView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                0.6f
+            )
+            text = label
+            textSize = 12f
+            setTextColor(Color.WHITE)
+            setTypeface(null, android.graphics.Typeface.BOLD)
+        }
+
+        val valueView = TextView(this).apply {
+            layoutParams = LinearLayout.LayoutParams(
+                0,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                0.4f
+            )
+            text = ": ${SalaryDataHelper.formatCurrency(amount)}"
+            textSize = 12f
+            setTextColor(Color.WHITE)
+            setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
         container.addView(labelView)

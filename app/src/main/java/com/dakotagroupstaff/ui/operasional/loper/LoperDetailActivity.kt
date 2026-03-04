@@ -37,8 +37,10 @@ import com.dakotagroupstaff.databinding.DialogSignatureBinding
 import com.dakotagroupstaff.utils.ImageCompressor
 import com.dakotagroupstaff.utils.ViewModelFactory
 import com.dakotagroupstaff.util.ErrorMessageHelper
+import com.dakotagroupstaff.util.SecurityChecker
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -50,6 +52,7 @@ import java.io.IOException
 import java.net.URLEncoder
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.system.exitProcess
 
 class LoperDetailActivity : AppCompatActivity() {
 
@@ -520,6 +523,12 @@ class LoperDetailActivity : AppCompatActivity() {
 
         fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
             if (location != null) {
+                // CRITICAL SECURITY CHECK: Detect Fake GPS
+                if (SecurityChecker.isMockLocation(location)) {
+                    showFakeGpsDialog()
+                    return@addOnSuccessListener
+                }
+                
                 photoLatitude = location.latitude
                 photoLongitude = location.longitude
                 
@@ -958,5 +967,20 @@ class LoperDetailActivity : AppCompatActivity() {
     companion object {
         const val EXTRA_DELIVERY_ITEM = "extra_delivery_item"
         const val EXTRA_IS_FROM_SENT_TAB = "extra_is_from_sent_tab"
+    }
+    
+    /**
+     * Show Fake GPS detection dialog and force exit app
+     */
+    private fun showFakeGpsDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("FAKE GPS Terdeteksi")
+            .setMessage("Anda terdeteksi menggunakan FAKE GPS. Silahkan matikan FAKE GPS-nya lalu gunakan aplikasi Dakota Group Staff kembali.")
+            .setCancelable(false)
+            .setPositiveButton("Baik, Saya Mengerti") { _, _ ->
+                finishAffinity()
+                exitProcess(0)
+            }
+            .show()
     }
 }

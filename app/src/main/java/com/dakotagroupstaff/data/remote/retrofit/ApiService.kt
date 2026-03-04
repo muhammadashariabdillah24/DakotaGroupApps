@@ -203,30 +203,32 @@ interface ApiService {
     
     /**
      * Get Letter of Assign (Surat Tugas)
-     * GET /letter-of-assign/tugas?nip=<nip>&pt=<pt>
+     * POST /letter-of-assign/tugas
+     * Changed from GET to POST with body
      */
-    @GET("letter-of-assign/tugas")
+    @POST("letter-of-assign/tugas")
     suspend fun getLetterOfAssign(
-        @Query("nip") nip: String,
-        @Query("pt") pt: String
+        @Body request: com.dakotagroupstaff.data.remote.response.GetLetterOfAssignRequest
     ): LetterOfAssignResponse
     
     /**
      * Check/Update GPS Location
      * POST /letter-of-assign/check-location
+     * Requires JWT authentication
      */
     @POST("letter-of-assign/check-location")
     suspend fun checkLocation(
-        @Body request: CheckLocationRequest
+        @Body request: com.dakotagroupstaff.data.remote.response.CheckLocationRequest
     ): CheckLocationResponse
     
     /**
      * Submit Checkpoint (Check-in at branch)
      * POST /letter-of-assign/checkpoint
+     * Requires JWT authentication
      */
     @POST("letter-of-assign/checkpoint")
     suspend fun submitCheckpoint(
-        @Body request: CheckpointRequest
+        @Body request: com.dakotagroupstaff.data.remote.response.CheckpointRequest
     ): CheckpointResponse
     
     /**
@@ -241,12 +243,13 @@ interface ApiService {
     
     /**
      * Complete Letter of Assign
-     * GET /letter-of-assign/complete?sID=<sID>&pt=<pt>
+     * POST /letter-of-assign/complete
+     * Changed from GET to POST with body
+     * Requires JWT authentication
      */
-    @GET("letter-of-assign/complete")
+    @POST("letter-of-assign/complete")
     suspend fun completeLetterOfAssign(
-        @Query("sID") sID: String,
-        @Query("pt") pt: String
+        @Body request: com.dakotagroupstaff.data.remote.response.CompleteLetterOfAssignRequest
     ): CompleteAssignmentResponse
     
     /**
@@ -255,9 +258,108 @@ interface ApiService {
      */
     @POST("letter-of-assign/muat")
     suspend fun getLoadingData(
-        @Body request: GetMuatRequest
+        @Body request: com.dakotagroupstaff.data.remote.response.GetMuatRequest
     ): LoadingDataResponse
-    
+
+    /**
+     * Get Unloading/Bongkar Data
+     * POST /letter-of-assign/bongkar
+     */
+    @POST("letter-of-assign/bongkar")
+    suspend fun getUnloadingData(
+        @Body request: com.dakotagroupstaff.data.remote.response.GetBongkarRequest
+    ): com.dakotagroupstaff.data.remote.response.UnloadingDataResponse
+
+    /**
+     * Get Loading Detail
+     * POST /letter-of-assign/muat-detail
+     */
+    @POST("letter-of-assign/muat-detail")
+    suspend fun getLoadingDetail(
+        @Body request: com.dakotagroupstaff.data.remote.response.GetLoadingDetailRequest
+    ): com.dakotagroupstaff.data.remote.response.LoadingDetailResponse
+
+    /**
+     * Get Unloading Detail
+     * POST /letter-of-assign/bongkar-detail
+     */
+    @POST("letter-of-assign/bongkar-detail")
+    suspend fun getUnloadingDetail(
+        @Body request: com.dakotagroupstaff.data.remote.response.GetUnloadingDetailRequest
+    ): com.dakotagroupstaff.data.remote.response.UnloadingDetailResponse
+
+    /**
+     * Get KM Data
+     * POST /letter-of-assign/km
+     */
+    @POST("letter-of-assign/km")
+    suspend fun getKMData(
+        @Body request: com.dakotagroupstaff.data.remote.response.KMRequest
+    ): com.dakotagroupstaff.data.remote.response.KMDataResponse
+
+    /**
+     * Update KM
+     * POST /letter-of-assign/update-km
+     */
+    @POST("letter-of-assign/update-km")
+    suspend fun updateKM(
+        @Body request: com.dakotagroupstaff.data.remote.response.UpdateKMRequest
+    ): com.dakotagroupstaff.data.remote.response.UpdateKMResponse
+
+    /**
+     * Get Alternative Route (Rute Cadangan)
+     * POST /letter-of-assign/alternative-route
+     */
+    @POST("letter-of-assign/alternative-route")
+    suspend fun getAlternativeRoute(
+        @Body request: com.dakotagroupstaff.data.remote.response.GetAlternativeRouteRequest
+    ): com.dakotagroupstaff.data.remote.response.AlternativeRouteResponse
+
+    /**
+     * Lock Loading (Muat)
+     * POST /letter-of-assign/lock-loading
+     */
+    @POST("letter-of-assign/lock-loading")
+    suspend fun lockLoading(
+        @Body request: com.dakotagroupstaff.data.remote.response.LockLoadingRequest
+    ): com.dakotagroupstaff.data.remote.response.LockLoadingResponse
+
+    /**
+     * Unlock Loading (Muat)
+     * POST /letter-of-assign/unlock-loading
+     */
+    @POST("letter-of-assign/unlock-loading")
+    suspend fun unlockLoading(
+        @Body request: com.dakotagroupstaff.data.remote.response.UnlockLoadingRequest
+    ): com.dakotagroupstaff.data.remote.response.LockLoadingResponse
+
+    /**
+     * Lock Unloading (Bongkar)
+     * POST /letter-of-assign/lock-unloading
+     */
+    @POST("letter-of-assign/lock-unloading")
+    suspend fun lockUnloading(
+        @Body request: com.dakotagroupstaff.data.remote.response.LockUnloadingRequest
+    ): com.dakotagroupstaff.data.remote.response.LockUnloadingResponse
+
+    /**
+     * Get Less Items (Barang Kurang)
+     * POST /letter-of-assign/less-items
+     */
+    @POST("letter-of-assign/less-items")
+    suspend fun getLessItems(
+        @Body request: com.dakotagroupstaff.data.remote.response.GetLessItemsRequest
+    ): com.dakotagroupstaff.data.remote.response.LessItemsResponse
+
+    /**
+     * Upload Photo for Checkpoint
+     * POST /letter-of-assign/upload-photo
+     */
+    @POST("letter-of-assign/upload-photo")
+    suspend fun uploadCheckpointPhoto(
+        @Body request: com.dakotagroupstaff.data.remote.response.LetterOfAssignUploadPhotoRequest
+    ): com.dakotagroupstaff.data.remote.response.LetterOfAssignUploadPhotoResponse
+
     // ==================== LETTER OF ASSIGNMENT (SURAT TUGAS) ====================
     
     /**
@@ -487,49 +589,4 @@ data class RejectionRequest(
     val leaveId: String,
     @SerializedName("activeStatus")
     val activeStatus: String  // "Y" or "N"
-)
-
-// Letter of Assign Request Models (PT DBS and PT DLB only)
-
-data class CheckLocationRequest(
-    @SerializedName("sID")
-    val sID: String,
-    @SerializedName("lat")
-    val lat: String,
-    @SerializedName("lon")
-    val lon: String,
-    @SerializedName("pt")
-    val pt: String
-)
-
-data class CheckpointRequest(
-    @SerializedName("sID")
-    val sID: String,
-    @SerializedName("agenID")
-    val agenID: String,
-    @SerializedName("tglUpdate")
-    val tglUpdate: String,
-    @SerializedName("km")
-    val km: String,
-    @SerializedName("lat")
-    val lat: String,
-    @SerializedName("lon")
-    val lon: String,
-    @SerializedName("urlpic")
-    val urlpic: String,
-    @SerializedName("nip")
-    val nip: String,
-    @SerializedName("urut")
-    val urut: String,
-    @SerializedName("pt")
-    val pt: String
-)
-
-data class GetMuatRequest(
-    @SerializedName("sID")
-    val sID: String,
-    @SerializedName("agenid")
-    val agenid: String,
-    @SerializedName("pt")
-    val pt: String
 )

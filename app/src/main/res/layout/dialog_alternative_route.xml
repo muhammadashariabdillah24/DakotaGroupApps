@@ -9,39 +9,34 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="QR Code Surat Tugas"
+        android:text="Rute Cadangan"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@color/text_primary"
         android:layout_marginBottom="16dp"/>
     
-    <ImageView
-        android:id="@+id/ivQRCode"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
-        android:layout_gravity="center"
-        android:contentDescription="QR Code"
-        android:scaleType="fitCenter"
-        android:background="@android:color/white"
-        android:padding="8dp"/>
-    
     <TextView
-        android:id="@+id/tvQRContent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text=""
-        android:textSize="12sp"
+        android:text="Pilih cabang tujuan alternatif:"
+        android:textSize="14sp"
         android:textColor="@color/text_secondary"
-        android:gravity="center"
-        android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"/>
     
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btnClose"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAlternativeRoute"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Tutup"
-        android:layout_marginTop="8dp"
+        android:minHeight="100dp"
+        android:maxHeight="300dp"/>
+    
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Batal"
+        android:layout_marginTop="16dp"
+        style="@style/Widget.Material3.Button.OutlinedButton"
         app:cornerRadius="8dp"/>
     
 </LinearLayout>

@@ -36,6 +36,7 @@ class AuthRepository private constructor(
             Log.d("AuthRepository", "DeviceId: $deviceId")
             Log.d("AuthRepository", "SerialNumber: $serialNumber")
             Log.d("AuthRepository", "Email: $email")
+            Log.d("AuthRepository", "Request URL will be: /auth/login?pt=$pt")
             
             val loginRequest = LoginRequest(nip, deviceId, serialNumber, email)
             val response = apiService.login(pt, loginRequest)

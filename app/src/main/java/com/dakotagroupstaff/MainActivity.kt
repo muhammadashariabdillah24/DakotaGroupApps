@@ -14,8 +14,10 @@ import com.dakotagroupstaff.ui.login.LoginActivity
 import com.dakotagroupstaff.ui.login.LoginViewModel
 import com.dakotagroupstaff.ui.main.MainViewModel
 import com.dakotagroupstaff.util.ImageUrlHelper
+import com.dakotagroupstaff.util.SecurityChecker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.system.exitProcess
 
 class MainActivity : AppCompatActivity() {
     
@@ -26,11 +28,33 @@ class MainActivity : AppCompatActivity() {
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        
+        // Additional root check with user-friendly dialog
+        checkRootedDeviceWithDialog()
+        
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
         setupRecentMenus()
         checkSessionAndSetupUI()
+    }
+    
+    /**
+     * Additional root detection with user-friendly dialog
+     * This is a fallback check in case the app somehow bypassed Application-level check
+     */
+    private fun checkRootedDeviceWithDialog() {
+        if (SecurityChecker.isDeviceRooted(this)) {
+            MaterialAlertDialogBuilder(this)
+                .setTitle("Perangkat Terdeteksi Root")
+                .setMessage("Aplikasi Dakota Group Staff tidak dapat digunakan pada perangkat yang telah di-root karena alasan keamanan.")
+                .setCancelable(false)
+                .setPositiveButton("Baik, Saya Mengerti") { _, _ ->
+                    finishAffinity()
+                    exitProcess(0)
+                }
+                .show()
+        }
     }
     
     private fun setupRecentMenus() {

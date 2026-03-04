@@ -82,6 +82,16 @@ object ApiConfig {
         // Custom interceptor to log raw response body for debugging
         val responseInterceptor = Interceptor { chain ->
             val request = chain.request()
+            
+            // Log request details
+            if (BuildConfig.DEBUG) {
+                Log.d("ApiConfig", "=== REQUEST ===")
+                Log.d("ApiConfig", "URL: ${request.url}")
+                Log.d("ApiConfig", "Method: ${request.method}")
+                Log.d("ApiConfig", "Headers: ${request.headers}")
+                Log.d("ApiConfig", "================")
+            }
+            
             val response = chain.proceed(request)
             
             // Log all requests in debug mode

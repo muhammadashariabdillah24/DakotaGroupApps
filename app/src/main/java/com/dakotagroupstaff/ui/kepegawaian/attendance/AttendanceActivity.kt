@@ -16,12 +16,14 @@ import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.databinding.ActivityAttendanceBinding
 import com.dakotagroupstaff.util.ErrorMessageHelper
+import com.dakotagroupstaff.util.SecurityChecker
 import com.google.android.gms.location.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.system.exitProcess
 
 class AttendanceActivity : AppCompatActivity() {
     
@@ -85,6 +87,12 @@ class AttendanceActivity : AppCompatActivity() {
         locationCallback = object : LocationCallback() {
             override fun onLocationResult(result: LocationResult) {
                 result.lastLocation?.let { location ->
+                    // CRITICAL SECURITY CHECK: Detect Fake GPS
+                    if (SecurityChecker.isMockLocation(location)) {
+                        showFakeGpsDialog()
+                        return
+                    }
+                    
                     currentPt?.let { pt ->
                         viewModel.updateUserLocation(
                             location.latitude,
@@ -370,5 +378,20 @@ class AttendanceActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
+    
+    /**
+     * Show Fake GPS detection dialog and force exit app
+     */
+    private fun showFakeGpsDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("FAKE GPS Terdeteksi")
+            .setMessage("Anda terdeteksi menggunakan FAKE GPS. Silahkan matikan FAKE GPS-nya lalu gunakan aplikasi Dakota Group Staff kembali.")
+            .setCancelable(false)
+            .setPositiveButton("Baik, Saya Mengerti") { _, _ ->
+                finishAffinity()
+                exitProcess(0)
+            }
+            .show()
     }
 }

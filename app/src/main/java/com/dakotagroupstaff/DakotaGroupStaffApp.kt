@@ -9,6 +9,7 @@ import com.dakotagroupstaff.di.dataStoreModule
 import com.dakotagroupstaff.di.networkModule
 import com.dakotagroupstaff.di.repositoryModule
 import com.dakotagroupstaff.di.viewModelModule
+import com.dakotagroupstaff.util.SecurityChecker
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -17,6 +18,7 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
+import kotlin.system.exitProcess
 
 class DakotaGroupStaffApp : Application() {
     
@@ -24,6 +26,9 @@ class DakotaGroupStaffApp : Application() {
     
     override fun onCreate() {
         super.onCreate()
+        
+        // CRITICAL SECURITY CHECK: Block rooted devices
+        checkRootedDevice()
         
         // Enable DayNight theme to follow system theme changes dynamically
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
@@ -45,6 +50,22 @@ class DakotaGroupStaffApp : Application() {
         // Clear any stale session data on app startup
         // This ensures clean state after app reinstall
         clearStaleSessionData()
+    }
+    
+    /**
+     * Check if device is rooted and terminate app if detected
+     * This is a security measure to prevent app usage on compromised devices
+     */
+    private fun checkRootedDevice() {
+        if (SecurityChecker.isDeviceRooted(this)) {
+            android.util.Log.e("DakotaGroupStaffApp", "ROOTED DEVICE DETECTED - App will terminate")
+            android.util.Log.e("DakotaGroupStaffApp", SecurityChecker.getRootDetectionDetails(this))
+            
+            // Terminate app immediately - rooted devices are not allowed
+            // Note: We cannot show dialog here as Activity is not yet created
+            // Root check dialog will be shown in MainActivity if app somehow continues
+            exitProcess(0)
+        }
     }
     
     private fun clearStaleSessionData() {
