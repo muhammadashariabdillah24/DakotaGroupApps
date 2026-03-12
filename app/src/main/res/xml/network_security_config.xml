@@ -11,6 +11,6 @@
     
     <!-- For production, use secure connections only -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">dgroupapps-backend-axd3cmbnajcde4eg.indonesiacentral-01.azurewebsites.net</domain>
+        <domain includeSubdomains="true">backendmapp.dakotacargo.co.id</domain>
     </domain-config>
 </network-security-config>
