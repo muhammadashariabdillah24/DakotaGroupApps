@@ -3,7 +3,10 @@ package com.dakotagroupstaff.ui.kepegawaian.attendance
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.location.LocationManager
+import android.provider.Settings
 import android.os.Looper
 import android.view.View
 import android.widget.Toast
@@ -37,6 +40,7 @@ class AttendanceActivity : AppCompatActivity() {
     private var currentNip: String? = null
     private var currentPt: String? = null
     private var isCheckingIn: Boolean = true // Track if user is checking in or out
+    private var isRefreshingLocation: Boolean = false // Track source of location request
     
     // Location permission launcher
     private val locationPermissionLauncher = registerForActivityResult(
@@ -49,12 +53,17 @@ class AttendanceActivity : AppCompatActivity() {
                 getCurrentLocation()
             }
             else -> {
-                // Permission denied
-                Toast.makeText(
-                    this,
-                    "Izin lokasi diperlukan untuk absensi",
-                    Toast.LENGTH_SHORT
-                ).show()
+                // Permission denied — cek apakah bisa tampilkan rationale lagi
+                val canShowRationale = shouldShowRequestPermissionRationale(
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+                if (canShowRationale) {
+                    // Ditolak sekali tapi belum permanen, tampilkan dialog rationale lagi
+                    showLocationPermissionRationaleDialog()
+                } else {
+                    // Ditolak permanen ("Jangan tanya lagi"), arahkan ke Settings
+                    showLocationPermissionDeniedDialog()
+                }
             }
         }
     }
@@ -210,8 +219,20 @@ class AttendanceActivity : AppCompatActivity() {
         binding.swipeRefreshLayout.setOnRefreshListener {
             currentNip?.let { nip ->
                 currentPt?.let { pt ->
-                    // Force refresh dari API
-                    viewModel.loadAttendanceHistory(pt, nip)
+                    // Periksa izin lokasi terlebih dahulu sebelum refresh
+                    if (ContextCompat.checkSelfPermission(
+                            this,
+                            Manifest.permission.ACCESS_FINE_LOCATION
+                        ) != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        // Belum ada izin lokasi, hentikan refresh spinner dan tampilkan dialog
+                        binding.swipeRefreshLayout.isRefreshing = false
+                        isRefreshingLocation = false
+                        checkLocationPermissionAndGet()
+                    } else {
+                        // Izin sudah ada, refresh history
+                        viewModel.loadAttendanceHistory(pt, nip)
+                    }
                 }
             } ?: run {
                 binding.swipeRefreshLayout.isRefreshing = false
@@ -220,9 +241,24 @@ class AttendanceActivity : AppCompatActivity() {
         
         // Refresh location button
         binding.btnRefreshLocation.setOnClickListener {
-            currentPt?.let { pt ->
+            isRefreshingLocation = true
+            // 1. Cek izin permission lokasi terlebih dahulu
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+                // Izin belum diberikan → tampilkan dialog rationale
                 checkLocationPermissionAndGet()
+                return@setOnClickListener
             }
+            // 2. Izin sudah ada, cek apakah GPS/layanan lokasi perangkat aktif
+            if (!isLocationEnabled()) {
+                showLocationServicesDialog()
+                return@setOnClickListener
+            }
+            // 3. Semua OK → ambil lokasi
+            getCurrentLocation()
         }
         
         // Check in button
@@ -275,15 +311,86 @@ class AttendanceActivity : AppCompatActivity() {
         }
     }
     
+    /**
+     * Memeriksa apakah GPS atau Network Location provider aktif di perangkat.
+     * Berbeda dari permission — ini adalah status tombol lokasi di Settings perangkat.
+     */
+    private fun isLocationEnabled(): Boolean {
+        val locationManager = getSystemService(LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) ||
+                locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+    
+    /**
+     * Dialog yang muncul ketika GPS/layanan lokasi perangkat tidak aktif.
+     * Mengarahkan pengguna ke Settings Lokasi (bukan Settings app).
+     */
+    private fun showLocationServicesDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setIcon(R.drawable.ic_location)
+            .setTitle("Lokasi Perangkat Tidak Aktif")
+            .setMessage(
+                "GPS atau layanan lokasi perangkat Anda sedang tidak aktif.\n\n" +
+                "Fitur absensi memerlukan lokasi aktif untuk:\n" +
+                "• Mendeteksi posisi Anda saat ini\n" +
+                "• Memvalidasi jarak ke kantor/cabang\n\n" +
+                "Aktifkan lokasi perangkat terlebih dahulu."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Aktifkan Lokasi") { dialog, _ ->
+                dialog.dismiss()
+                // Buka halaman pengaturan lokasi perangkat
+                startActivity(Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS))
+            }
+            .setNegativeButton("Nanti Saja") { dialog, _ ->
+                dialog.dismiss()
+                isRefreshingLocation = false
+            }
+            .show()
+    }
+    
     private fun checkLocationPermissionAndGet() {
         when {
             ContextCompat.checkSelfPermission(
                 this,
                 Manifest.permission.ACCESS_FINE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED -> {
-                getCurrentLocation()
+                // Izin sudah ada, cek selanjutnya apakah GPS aktif
+                if (!isLocationEnabled()) {
+                    showLocationServicesDialog()
+                } else {
+                    getCurrentLocation()
+                }
+            }
+            shouldShowRequestPermissionRationale(Manifest.permission.ACCESS_FINE_LOCATION) -> {
+                // Pernah ditolak sebelumnya, tampilkan dialog rationale terlebih dahulu
+                showLocationPermissionRationaleDialog()
             }
             else -> {
+                // Baru pertama kali request atau belum pernah ditolak
+                showLocationPermissionRationaleDialog()
+            }
+        }
+    }
+    
+    /**
+     * Dialog penjelasan mengapa izin lokasi diperlukan.
+     * Ditampilkan sebelum sistem meminta izin, agar pengguna mengerti konteksnya.
+     */
+    private fun showLocationPermissionRationaleDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setIcon(R.drawable.ic_location)
+            .setTitle("Izin Lokasi Diperlukan")
+            .setMessage(
+                "Aplikasi memerlukan akses lokasi Anda untuk:\n\n" +
+                "• Mendeteksi lokasi absensi terdekat\n" +
+                "• Memvalidasi jarak Anda dari kantor/cabang\n" +
+                "• Mencegah penyalahgunaan data absensi\n\n" +
+                "Tanpa izin lokasi, fitur absensi tidak dapat digunakan."
+            )
+            .setCancelable(false)
+            .setPositiveButton("Izinkan") { dialog, _ ->
+                dialog.dismiss()
                 locationPermissionLauncher.launch(
                     arrayOf(
                         Manifest.permission.ACCESS_FINE_LOCATION,
@@ -291,7 +398,41 @@ class AttendanceActivity : AppCompatActivity() {
                     )
                 )
             }
-        }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+                // Jika dibatalkan dari proses refresh, pastikan spinner berhenti
+                isRefreshingLocation = false
+            }
+            .show()
+    }
+    
+    /**
+     * Dialog yang ditampilkan ketika izin lokasi ditolak secara permanen.
+     * Mengarahkan pengguna ke halaman Pengaturan aplikasi.
+     */
+    private fun showLocationPermissionDeniedDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setIcon(R.drawable.ic_location)
+            .setTitle("Izin Lokasi Ditolak")
+            .setMessage(
+                "Anda telah menonaktifkan izin lokasi secara permanen.\n\n" +
+                "Untuk menggunakan fitur absensi, aktifkan kembali izin lokasi melalui:\n" +
+                "Pengaturan → Aplikasi → Dakota Group Staff → Izin → Lokasi"
+            )
+            .setCancelable(false)
+            .setPositiveButton("Buka Pengaturan") { dialog, _ ->
+                dialog.dismiss()
+                // Buka halaman pengaturan izin aplikasi
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                    data = Uri.fromParts("package", packageName, null)
+                }
+                startActivity(intent)
+            }
+            .setNegativeButton("Nanti Saja") { dialog, _ ->
+                dialog.dismiss()
+                isRefreshingLocation = false
+            }
+            .show()
     }
     
     private fun getCurrentLocation() {

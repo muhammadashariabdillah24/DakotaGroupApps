@@ -47,10 +47,10 @@ data class SalarySlipData(
     val insentifPph: Int,
     
     @SerializedName("THR")
-    val thr: String,
+    val thr: Int,
     
     @SerializedName("BPJSP")
-    val bpjsp: String? = null,
+    val bpjsp: Int = 0,
     
     @SerializedName("TRANSPORT")
     val transport: Int,
@@ -77,7 +77,7 @@ data class SalarySlipData(
     val klaim: Int,
     
     @SerializedName("BPJSK")
-    val bpjsk: String? = null,
+    val bpjsk: Int = 0,
     
     @SerializedName("PPH21")
     val pph21: Int,
@@ -171,25 +171,30 @@ data class SalarySlipData(
     
     /**
      * Calculate total income (pendapatan)
+     * Rumus sesuai aplikasi lama (React Native):
+     * income = GAPOK + INSENTIF + THR + INSENTIFPPH + PENGEMBALIANPO
+     *        + BPJSP + TRANSPORT + KESEHATAN + KELUARGA + JABATAN + ASURANSI
      */
     fun getTotalIncome(): Int {
-        val thrAmount = thr.replace(".", "").toIntOrNull() ?: 0
-        val bpjspAmount = bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
-        return gapok + insentif + pengembalianPo + insentifPph + 
-               thrAmount + bpjspAmount + transport + kesehatan + keluarga + jabatan + asuransi
+        return gapok + insentif + thr + insentifPph + pengembalianPo +
+               bpjsp + transport + kesehatan + keluarga + jabatan + asuransi
     }
     
     /**
      * Calculate total deductions (potongan)
+     * Rumus sesuai aplikasi lama (React Native):
+     * incomeDeduction = JAMSOSTEK + BPJSP + KOPERASI + KLAIM + BPJSK
+     *                 + PPH21 + ASURANSI + ABSENSI + IURANPAGUYUBAN + LAIN
+     * Catatan: ASURANSI masuk di kedua sisi (pendapatan & potongan) sehingga nilainya netral.
      */
     fun getTotalDeductions(): Int {
-        val bpjskAmount = bpjsk?.replace(".", "")?.toIntOrNull() ?: 0
-        val bpjspAmount = bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
-        return jamsostek + koperasi + klaim + pph21 + absensi + lain + iuranPaguyuban + bpjskAmount + bpjspAmount
+        return jamsostek + bpjsp + koperasi + klaim + bpjsk +
+               pph21 + asuransi + absensi + iuranPaguyuban + lain
     }
     
     /**
      * Calculate net salary (gaji bersih)
+     * netSalary = getTotalIncome() - getTotalDeductions()
      */
     fun getNetSalary(): Int {
         return getTotalIncome() - getTotalDeductions()

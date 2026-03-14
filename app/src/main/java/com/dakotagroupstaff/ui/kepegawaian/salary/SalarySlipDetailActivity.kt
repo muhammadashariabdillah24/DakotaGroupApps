@@ -116,31 +116,21 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         // Title
         addSectionTitle(layout, "Pendapatan")
 
-        // Income items
+        // Income items — semua ditampilkan meskipun 0, sesuai aplikasi lama
         addIncomeItem(layout, "Gaji Pokok", slip.gapok)
         addIncomeItem(layout, "Insentif", slip.insentif)
-        
-        val thrAmount = slip.thr.replace(".", "").toIntOrNull() ?: 0
-        if (thrAmount > 0) {
-            addIncomeItem(layout, "THR / Bonus", thrAmount)
-        }
-        
+        addIncomeItem(layout, "THR / Bonus", slip.thr)
         addIncomeItem(layout, "Insentif PPH21", slip.insentifPph)
         addIncomeItem(layout, "Pot Pengembalian", slip.pengembalianPo)
 
         // Tunjangan subsection
         addSubsectionTitle(layout, "Tunjangan")
-        val bpjspAmount = slip.bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
-        if (bpjspAmount > 0) {
-            addIncomeItem(layout, "BPJS.P (Tunjangan)", bpjspAmount)
-        }
+        addIncomeItem(layout, "BPJS.P", slip.bpjsp)
         addIncomeItem(layout, "Transport", slip.transport)
         addIncomeItem(layout, "Kesehatan", slip.kesehatan)
         addIncomeItem(layout, "Keluarga", slip.keluarga)
         addIncomeItem(layout, "Jabatan", slip.jabatan)
-        if (slip.asuransi > 0) {
-            addIncomeItem(layout, "Asuransi", slip.asuransi)
-        }
+        addIncomeItem(layout, "Asuransi", slip.asuransi)
         
         // Total Pendapatan
         addSubTotalSection(layout, "Total Pendapatan", slip.getTotalIncome())
@@ -153,43 +143,17 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         // Title
         addSectionTitle(layout, "Potongan")
 
-        // Deduction items - only show if amount > 0
-        if (slip.jamsostek > 0) {
-            addDeductionItem(layout, "Jamsostek", slip.jamsostek)
-        }
-        
-        val bpjspAmount = slip.bpjsp?.replace(".", "")?.toIntOrNull() ?: 0
-        if (bpjspAmount > 0) {
-            addDeductionItem(layout, "BPJS.P (Potongan)", bpjspAmount)
-        }
-        
-        if (slip.koperasi > 0) {
-            addDeductionItem(layout, "Koperasi", slip.koperasi)
-        }
-        if (slip.klaim > 0) {
-            addDeductionItem(layout, "Klaim", slip.klaim)
-        }
-        
-        val bpjskAmount = slip.bpjsk?.replace(".", "")?.toIntOrNull() ?: 0
-        if (bpjskAmount > 0) {
-            addDeductionItem(layout, "BPJS.K", bpjskAmount)
-        }
-        
-        if (slip.pph21 > 0) {
-            addDeductionItem(layout, "PPh21", slip.pph21)
-        }
-        if (slip.asuransi > 0) {
-            addDeductionItem(layout, "Asuransi", slip.asuransi)
-        }
-        if (slip.absensi > 0) {
-            addDeductionItem(layout, "Absensi", slip.absensi)
-        }
-        if (slip.iuranPaguyuban > 0) {
-            addDeductionItem(layout, "Iuran Paguyuban", slip.iuranPaguyuban)
-        }
-        if (slip.lain > 0) {
-            addDeductionItem(layout, "Lain-Lain", slip.lain)
-        }
+        // Deduction items — semua ditampilkan meskipun 0, sesuai aplikasi lama
+        addDeductionItem(layout, "Jamsostek", slip.jamsostek)
+        addDeductionItem(layout, "BPJS.P", slip.bpjsp)
+        addDeductionItem(layout, "Koperasi", slip.koperasi)
+        addDeductionItem(layout, "Klaim", slip.klaim)
+        addDeductionItem(layout, "BPJS.K", slip.bpjsk)
+        addDeductionItem(layout, "PPh21", slip.pph21)
+        addDeductionItem(layout, "Asuransi", slip.asuransi)
+        addDeductionItem(layout, "Absensi", slip.absensi)
+        addDeductionItem(layout, "Iuran Paguyuban", slip.iuranPaguyuban)
+        addDeductionItem(layout, "Lain-Lain", slip.lain)
 
         // Total Potongan
         addSubTotalSection(layout, "Total Potongan", slip.getTotalDeductions())
