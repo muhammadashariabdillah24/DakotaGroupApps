@@ -52,6 +52,24 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         private const val PERMISSION_REQUEST_CODE = 100
         private const val TAG = "SalarySlipDetail"
     }
+    
+    private val colorOnSurface by lazy {
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorOnSurface, typedValue, true)
+        typedValue.data
+    }
+
+    private val colorBackground by lazy {
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(android.R.attr.colorBackground, typedValue, true)
+        typedValue.data
+    }
+    
+    private val colorSurfaceVariant by lazy {
+        val typedValue = android.util.TypedValue()
+        theme.resolveAttribute(com.google.android.material.R.attr.colorSurfaceVariant, typedValue, true)
+        typedValue.data
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -166,7 +184,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         val textView = TextView(this).apply {
             text = title
             textSize = 12f
-            setTextColor(Color.BLACK)
+            setTextColor(colorOnSurface)
             setPadding(0, 0, 0, 12)
         }
         parent.addView(textView)
@@ -176,7 +194,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
         val textView = TextView(this).apply {
             text = title
             textSize = 10f
-            setTextColor(Color.BLACK)
+            setTextColor(colorOnSurface)
             setPadding(0, 8, 0, 8)
         }
         parent.addView(textView)
@@ -209,7 +227,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             )
             text = label
             textSize = 12f
-            setTextColor(Color.BLACK)
+            setTextColor(colorOnSurface)
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
@@ -221,7 +239,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             )
             text = ": ${SalaryDataHelper.formatCurrency(amount)}"
             textSize = 12f
-            setTextColor(Color.BLACK)
+            setTextColor(colorOnSurface)
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
@@ -239,7 +257,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
                 topMargin = 8
             }
             orientation = LinearLayout.HORIZONTAL
-            setBackgroundColor(ContextCompat.getColor(this@SalarySlipDetailActivity, R.color.gray))
+            setBackgroundColor(colorSurfaceVariant)
             setPadding(8, 8, 8, 8)
         }
 
@@ -251,7 +269,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             )
             text = "Total Gaji"
             textSize = 12f
-            setTextColor(Color.BLACK)
+            setTextColor(colorOnSurface)
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
@@ -263,7 +281,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             )
             text = ": ${SalaryDataHelper.formatCurrency(totalSalary)}"
             textSize = 12f
-            setTextColor(Color.BLACK)
+            setTextColor(colorOnSurface)
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
@@ -282,7 +300,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
                 bottomMargin = 8
             }
             orientation = LinearLayout.HORIZONTAL
-            setBackgroundColor(ContextCompat.getColor(this@SalarySlipDetailActivity, android.R.color.darker_gray))
+            setBackgroundColor(colorSurfaceVariant)
             setPadding(8, 8, 8, 8)
         }
 
@@ -294,7 +312,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             )
             text = label
             textSize = 12f
-            setTextColor(Color.WHITE)
+            setTextColor(colorOnSurface)
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
@@ -306,7 +324,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             )
             text = ": ${SalaryDataHelper.formatCurrency(amount)}"
             textSize = 12f
-            setTextColor(Color.WHITE)
+            setTextColor(colorOnSurface)
             setTypeface(null, android.graphics.Typeface.BOLD)
         }
 
@@ -513,7 +531,7 @@ class SalarySlipDetailActivity : AppCompatActivity() {
             Bitmap.Config.ARGB_8888
         )
         val canvas = Canvas(bitmap)
-        canvas.drawColor(Color.WHITE)
+        canvas.drawColor(colorBackground)
         content.draw(canvas)
         
         return bitmap
