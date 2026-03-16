@@ -6,6 +6,7 @@ import com.dakotagroupstaff.data.remote.response.AttendanceHistoryData
 import com.dakotagroupstaff.data.remote.response.CheckLocationResponse
 import com.dakotagroupstaff.data.remote.response.CheckpointResponse
 import com.dakotagroupstaff.data.remote.response.CompleteAssignmentResponse
+import com.dakotagroupstaff.data.remote.response.DeviceValidationResponse
 import com.dakotagroupstaff.data.remote.response.EmployeeBioData
 import com.dakotagroupstaff.data.remote.response.EmployeeBioRequest
 import com.dakotagroupstaff.data.remote.response.LeaveBalanceData
@@ -37,6 +38,16 @@ interface ApiService {
         @Query("pt") pt: String,
         @Body loginRequest: LoginRequest
     ): ApiResponse<List<LoginData>>
+    
+    /**
+     * Validate Device — check IMEI and SIM Card ID against database
+     * POST /auth/validate-device?pt=<pt>
+     */
+    @POST("auth/validate-device")
+    suspend fun validateDevice(
+        @Query("pt") pt: String,
+        @Body request: ValidateDeviceRequest
+    ): DeviceValidationResponse
     
     /**
      * Refresh Access Token
@@ -589,4 +600,13 @@ data class RejectionRequest(
     val leaveId: String,
     @SerializedName("activeStatus")
     val activeStatus: String  // "Y" or "N"
+)
+
+data class ValidateDeviceRequest(
+    @SerializedName("nip")
+    val nip: String,
+    @SerializedName("imei")
+    val imei: String,
+    @SerializedName("simId")
+    val simId: String
 )

@@ -26,9 +26,7 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
         return authRepository.getSession().asLiveData()
     }
 
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logout()
-        }
+    suspend fun logout() {
+        authRepository.logout()
     }
 }

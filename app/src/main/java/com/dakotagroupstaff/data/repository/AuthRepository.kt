@@ -7,10 +7,12 @@ import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.model.UserSession
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.data.remote.response.ApiResponse
+import com.dakotagroupstaff.data.remote.response.DeviceValidationResponse
 import com.dakotagroupstaff.data.remote.response.LoginData
 import com.dakotagroupstaff.data.remote.retrofit.ApiService
 import com.dakotagroupstaff.data.remote.retrofit.LoginRequest
 import com.dakotagroupstaff.data.remote.retrofit.LogoutRequest
+import com.dakotagroupstaff.data.remote.retrofit.ValidateDeviceRequest
 import com.google.gson.Gson
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -111,14 +113,13 @@ class AuthRepository private constructor(
         return userPreferences.getSession()
     }
 
-    fun logout(): LiveData<Result<Boolean>> = liveData {
-        emit(Result.Loading)
+    suspend fun logout() {
         try {
             val refreshToken = userPreferences.getRefreshToken().first()
             val nip = userPreferences.getNip().first()
             val pt = userPreferences.getPt().first()
             
-            if (refreshToken.isNotEmpty() && nip.isNotEmpty()) {
+            if (refreshToken.isNotEmpty() && nip.isNotEmpty() && pt.isNotEmpty()) {
                 try {
                     // Call logout API to revoke refresh token
                     val logoutRequest = LogoutRequest(refreshToken, nip)
@@ -134,17 +135,69 @@ class AuthRepository private constructor(
             // Clear local session regardless of API call result
             userPreferences.clearAccessToken()
             userPreferences.logout()
+            userPreferences.clearScannedBttIds() // Clear operasional data
             
-            emit(Result.Success(true))
         } catch (e: Exception) {
             Log.e("AuthRepository", "Logout error", e)
             // Still clear local session even if exception occurs
             userPreferences.logout()
-            emit(Result.Success(true))
+        }
+    }
+
+    /**
+     * Validate device IMEI and SIM Card ID against database.
+     * Called periodically (e.g. in onResume) to detect login from another device.
+     * @return DeviceValidationResponse with valid = true/false
+     */
+    suspend fun validateDevice(): DeviceValidationResponse {
+        return try {
+            val session = userPreferences.getSession().first()
+            val nip = session.nip
+            val imei = session.imei
+            val simId = session.simId
+            val pt = session.pt
+
+            if (nip.isEmpty() || imei.isEmpty() || simId.isEmpty()) {
+                // Not logged in — skip validation
+                return DeviceValidationResponse(success = true, valid = true)
+            }
+
+            val request = ValidateDeviceRequest(nip = nip, imei = imei, simId = simId)
+            apiService.validateDevice(pt, request)
+        } catch (e: HttpException) {
+            if (e.code() == 403) {
+                // 403 means device mismatch — parse body
+                val errorBody = e.response()?.errorBody()?.string()
+                try {
+                    Gson().fromJson(errorBody, DeviceValidationResponse::class.java)
+                        ?: DeviceValidationResponse(
+                            success = false,
+                            valid = false,
+                            reason = "device_mismatch",
+                            message = "Akun anda akan logout dari perangkat ini karena telah login diperangkat lain!"
+                        )
+                } catch (_: Exception) {
+                    DeviceValidationResponse(
+                        success = false,
+                        valid = false,
+                        reason = "device_mismatch",
+                        message = "Akun anda akan logout dari perangkat ini karena telah login diperangkat lain!"
+                    )
+                }
+            } else {
+                // Other HTTP error — treat as valid to avoid false positives
+                Log.w("AuthRepository", "validateDevice HTTP error ${e.code()}, skipping")
+                DeviceValidationResponse(success = true, valid = true)
+            }
+        } catch (e: Exception) {
+            // Network error — treat as valid to avoid false positives when offline
+            Log.w("AuthRepository", "validateDevice network error, skipping: ${e.message}")
+            DeviceValidationResponse(success = true, valid = true)
         }
     }
 
     companion object {
+
         @Volatile
         private var instance: AuthRepository? = null
 
