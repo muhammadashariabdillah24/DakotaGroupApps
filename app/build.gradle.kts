@@ -32,24 +32,6 @@ android {
         buildConfigField("String", "BASE_URL", "\"$baseUrl\"")
     }
 
-    signingConfigs {
-        create("release") {
-            val localProps = Properties()
-            val localPropsFile = rootProject.file("local.properties")
-            if (localPropsFile.exists()) {
-                localPropsFile.inputStream().use { localProps.load(it) }
-            }
-            
-            val storeFilePath = localProps.getProperty("RELEASE_STORE_FILE")
-            if (storeFilePath != null) {
-                storeFile = file(storeFilePath)
-                storePassword = localProps.getProperty("RELEASE_STORE_PASSWORD")
-                keyAlias = localProps.getProperty("RELEASE_KEY_ALIAS")
-                keyPassword = localProps.getProperty("RELEASE_KEY_PASSWORD")
-            }
-        }
-    }
-
     buildTypes {
         release {
             isMinifyEnabled = true
@@ -57,7 +39,6 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.findByName("release")
         }
         debug {
             isMinifyEnabled = false
@@ -73,21 +54,6 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
-    }
-    
-    lint {
-        abortOnError = true
-        checkReleaseBuilds = true
-        // Treat warnings as non-fatal for release builds
-        warningsAsErrors = false
-        // Ignore non-critical warnings for Play Store
-        disable += setOf(
-            "Deprecation",
-            "DefaultLocale",
-            "GradleDependency",
-            "AndroidGradlePluginVersion",
-            "UseAppTint"
-        )
     }
 }
 
@@ -126,6 +92,7 @@ dependencies {
     
     // Security
     implementation(libs.androidx.security.crypto)
+    implementation("com.scottyab:rootbeer-lib:0.1.0")
     
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
@@ -162,9 +129,6 @@ dependencies {
     
     // WorkManager for background processing
     implementation(libs.androidx.work.runtime.ktx)
-    
-    // Root Detection
-    implementation(libs.rootbeer.lib)
     
     // Testing
     testImplementation(libs.junit)

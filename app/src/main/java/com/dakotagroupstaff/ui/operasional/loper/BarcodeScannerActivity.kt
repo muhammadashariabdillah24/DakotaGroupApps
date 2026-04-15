@@ -222,6 +222,11 @@ class BarcodeScannerActivity : AppCompatActivity() {
             binding.barcodeScanner.setTorchOn()
             updateFlashIcon()
         }
+
+        // Input Manual button
+        binding.btnInputManual.setOnClickListener {
+            showManualInputDialog()
+        }
     }
 
     private fun updateFlashIcon() {
@@ -231,6 +236,40 @@ class BarcodeScannerActivity : AppCompatActivity() {
             R.drawable.ic_flash_off
         }
         binding.btnFlash.setImageResource(iconRes)
+    }
+
+    private fun showManualInputDialog() {
+        val input = android.widget.EditText(this)
+        input.hint = "Masukkan nomor barcode koli"
+        input.inputType = android.text.InputType.TYPE_CLASS_TEXT
+        
+        val container = android.widget.FrameLayout(this)
+        val params = android.widget.FrameLayout.LayoutParams(
+            android.widget.FrameLayout.LayoutParams.MATCH_PARENT,
+            android.widget.FrameLayout.LayoutParams.WRAP_CONTENT
+        )
+        params.setMargins(48, 24, 48, 24)
+        input.layoutParams = params
+        container.addView(input)
+
+        AlertDialog.Builder(this)
+            .setTitle("Input manual")
+            .setMessage("Masukkan nomor barcode koli secara manual:")
+            .setView(container)
+            .setPositiveButton("Proses") { dialog, _ ->
+                val barcode = input.text.toString().trim()
+                if (barcode.isNotEmpty()) {
+                    isScanning = false // Pause continuous scan
+                    onBarcodeScanned(barcode, isManualInput = true)
+                } else {
+                    Toast.makeText(this, "Nomor koli tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                }
+                dialog.dismiss()
+            }
+            .setNegativeButton("Batal") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun checkCameraPermission() {
@@ -252,7 +291,7 @@ class BarcodeScannerActivity : AppCompatActivity() {
             override fun barcodeResult(result: BarcodeResult) {
                 if (isScanning && result.text != null) {
                     isScanning = false
-                    onBarcodeScanned(result.text)
+                    onBarcodeScanned(result.text, isManualInput = false)
                 }
             }
 
@@ -263,7 +302,7 @@ class BarcodeScannerActivity : AppCompatActivity() {
         binding.barcodeScanner.resume()
     }
 
-    private fun onBarcodeScanned(barcode: String) {
+    private fun onBarcodeScanned(barcode: String, isManualInput: Boolean = false) {
         // Validate barcode with API using Flow
         lifecycleScope.launch {
             viewModel.checkBarcode(barcode).collect { result ->
@@ -284,6 +323,13 @@ class BarcodeScannerActivity : AppCompatActivity() {
                                 lifecycleScope.launch {
                                     val prefs = UserPreferences.getInstance(dataStore)
                                     val currentBtt = prefs.getCurrentBttNumber()
+                                    val activeBtt = if (currentBtt.isNotEmpty()) currentBtt else expectedBttNo
+                                    
+                                    if (isManualInput && activeBtt.isNotEmpty() && activeBtt != scannedBttNumber) {
+                                        showError("Peringatan: Nomor koli BTT tersebut tidak termasuk pada BTT ini ($activeBtt)!")
+                                        isScanning = true
+                                        return@launch
+                                    }
                                     
                                     when {
                                         currentBtt.isEmpty() -> {

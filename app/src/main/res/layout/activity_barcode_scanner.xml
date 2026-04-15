@@ -58,6 +58,32 @@
         android:padding="16dp"
         android:gravity="center">
         
+        <!-- Status Text -->
+        <TextView
+            android:id="@+id/tv_scan_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Arahkan kamera ke barcode"
+            android:textColor="@android:color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:background="#80000000"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:elevation="4dp"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Simpan Button -->
+        <Button
+            android:id="@+id/btn_simpan"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Simpan"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp" />
+
         <!-- Counter Display -->
         <TextView
             android:id="@+id/tv_btt_counter"
@@ -72,31 +98,16 @@
             android:visibility="gone"
             android:elevation="4dp"
             android:layout_marginBottom="12dp" />
-        
-        <!-- Simpan Button -->
+
+        <!-- Input Manual Button -->
         <Button
-            android:id="@+id/btn_simpan"
+            android:id="@+id/btn_input_manual"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Simpan"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:layout_marginBottom="12dp" />
-        
-        <!-- Status Text -->
-        <TextView
-            android:id="@+id/tv_scan_status"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Arahkan kamera ke barcode"
+            android:text="Input Nomor Koli Manual"
             android:textColor="@android:color/white"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="#80000000"
-            android:paddingHorizontal="24dp"
-            android:paddingVertical="12dp"
-            android:elevation="4dp" />
+            app:strokeColor="@android:color/white" />
     </LinearLayout>
 
 </FrameLayout>
