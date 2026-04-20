@@ -1,11 +1,11 @@
-package com.dakotagroupstaff.ui.operasional.assignment
+﻿package com.dakotagroupstaff.ui.operasional.assignment
 
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Bundle
 import android.view.MenuItem
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.data.Result
@@ -26,7 +26,7 @@ import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AssignmentActivity : AppCompatActivity() {
+class AssignmentActivity : BaseActivity() {
     
     private lateinit var binding: ActivityAssignmentBinding
     private val viewModel: AssignmentViewModel by viewModel()

@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.operasional.loper
+﻿package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -21,7 +21,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.exifinterface.media.ExifInterface
@@ -54,7 +54,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.system.exitProcess
 
-class LoperDetailActivity : AppCompatActivity() {
+class LoperDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLoperDetailBinding
     private var deliveryItem: DeliveryItem? = null

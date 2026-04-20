@@ -1,7 +1,7 @@
-package com.dakotagroupstaff.ui.operasional
+﻿package com.dakotagroupstaff.ui.operasional
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.fragment.app.Fragment
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.databinding.ActivityQuickAccessBinding
@@ -16,7 +16,7 @@ import com.dakotagroupstaff.ui.operasional.loper.LoperFragment
  * - Loper (Delivery)
  * - Absensi (Attendance)
  */
-class QuickAccessActivity : AppCompatActivity() {
+class QuickAccessActivity : BaseActivity() {
 
     private lateinit var binding: ActivityQuickAccessBinding
 

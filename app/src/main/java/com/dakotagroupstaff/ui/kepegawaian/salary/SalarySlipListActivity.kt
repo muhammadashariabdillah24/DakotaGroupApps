@@ -1,11 +1,11 @@
-package com.dakotagroupstaff.ui.kepegawaian.salary
+﻿package com.dakotagroupstaff.ui.kepegawaian.salary
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.data.Result
@@ -28,7 +28,7 @@ import java.util.Calendar
  * - Pull to refresh
  * - Navigate to detail screen
  */
-class SalarySlipListActivity : AppCompatActivity() {
+class SalarySlipListActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySalarySlipListBinding
     private lateinit var viewModel: SalaryViewModel

@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.settings
+﻿package com.dakotagroupstaff.ui.settings
 
 import android.app.usage.NetworkStats
 import android.app.usage.NetworkStatsManager
@@ -6,13 +6,13 @@ import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.telephony.TelephonyManager
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.databinding.ActivityDataUsageBinding
 import java.text.SimpleDateFormat
 import java.util.*
 
-class DataUsageActivity : AppCompatActivity() {
+class DataUsageActivity : BaseActivity() {
 
     private lateinit var binding: ActivityDataUsageBinding
 

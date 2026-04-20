@@ -1,9 +1,9 @@
-package com.dakotagroupstaff.ui.kepegawaian
+﻿package com.dakotagroupstaff.ui.kepegawaian
 
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.databinding.ActivityKepegawaianMenuBinding
 import com.dakotagroupstaff.ui.kepegawaian.approval.ApprovalActivity
@@ -13,7 +13,7 @@ import com.dakotagroupstaff.ui.kepegawaian.salary.SalarySlipListActivity
 import com.dakotagroupstaff.ui.main.MainViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class KepegawaianMenuActivity : AppCompatActivity() {
+class KepegawaianMenuActivity : BaseActivity() {
     
     private lateinit var binding: ActivityKepegawaianMenuBinding
     private val mainViewModel: MainViewModel by viewModel()

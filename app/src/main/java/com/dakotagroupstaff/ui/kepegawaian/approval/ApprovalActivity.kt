@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.kepegawaian.approval
+﻿package com.dakotagroupstaff.ui.kepegawaian.approval
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,7 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.data.Result
@@ -18,7 +18,7 @@ import com.dakotagroupstaff.util.ErrorMessageHelper
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class ApprovalActivity : AppCompatActivity() {
+class ApprovalActivity : BaseActivity() {
     
     private lateinit var binding: ActivityApprovalBinding
     private lateinit var userPreferences: UserPreferences

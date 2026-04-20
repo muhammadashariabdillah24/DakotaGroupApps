@@ -1,8 +1,8 @@
-package com.dakotagroupstaff.ui.kepegawaian.attendance
+﻿package com.dakotagroupstaff.ui.kepegawaian.attendance
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,7 +16,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class AttendanceHistoryActivity : AppCompatActivity() {
+class AttendanceHistoryActivity : BaseActivity() {
     
     private lateinit var binding: ActivityAttendanceHistoryBinding
     private val viewModel: AttendanceViewModel by viewModel()

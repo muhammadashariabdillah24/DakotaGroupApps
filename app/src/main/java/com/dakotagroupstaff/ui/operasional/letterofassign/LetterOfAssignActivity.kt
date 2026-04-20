@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.operasional.letterofassign
+﻿package com.dakotagroupstaff.ui.operasional.letterofassign
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -8,7 +8,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -39,7 +39,7 @@ import kotlin.system.exitProcess
  * - KM update functionality
  * - Next point information
  */
-class LetterOfAssignActivity : AppCompatActivity() {
+class LetterOfAssignActivity : BaseActivity() {
     
     companion object {
         private const val BARCODE_SCAN_REQUEST = 1001

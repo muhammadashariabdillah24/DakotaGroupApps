@@ -1,8 +1,8 @@
-package com.dakotagroupstaff.ui.settings
+﻿package com.dakotagroupstaff.ui.settings
 
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dakotagroupstaff.BuildConfig
@@ -17,7 +17,7 @@ import com.dakotagroupstaff.util.ImageUrlHelper
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class AccountInfoActivity : AppCompatActivity() {
+class AccountInfoActivity : BaseActivity() {
 
     private lateinit var binding: ActivityAccountInfoBinding
     private val loginViewModel: LoginViewModel by viewModel()

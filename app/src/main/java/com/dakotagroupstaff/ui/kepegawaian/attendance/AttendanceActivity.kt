@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.kepegawaian.attendance
+﻿package com.dakotagroupstaff.ui.kepegawaian.attendance
 
 import android.Manifest
 import android.content.Intent
@@ -11,7 +11,7 @@ import android.os.Looper
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.R
@@ -28,7 +28,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.system.exitProcess
 
-class AttendanceActivity : AppCompatActivity() {
+class AttendanceActivity : BaseActivity() {
     
     private lateinit var binding: ActivityAttendanceBinding
     private val viewModel: AttendanceViewModel by viewModel()

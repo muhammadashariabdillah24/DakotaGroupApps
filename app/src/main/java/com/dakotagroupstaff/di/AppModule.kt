@@ -1,13 +1,14 @@
 package com.dakotagroupstaff.di
 
 import androidx.room.Room
-import com.dakotagroupstaff.data.local.pref.SessionManager
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.data.local.preferences.dataStore
 import com.dakotagroupstaff.data.local.room.AppDatabase
 import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.data.repository.AuthRepository
 import com.dakotagroupstaff.ui.login.LoginViewModel
+import com.dakotagroupstaff.utils.NetworkMonitor
+import com.dakotagroupstaff.utils.SessionManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -18,7 +19,7 @@ import org.koin.dsl.module
  */
 
 val networkModule = module {
-    single { ApiConfig.getApiService(userPreferences = get()) }
+    single { ApiConfig.getApiService(userPreferences = get(), sessionManager = get()) }
 }
 
 val databaseModule = module {
@@ -37,7 +38,12 @@ val databaseModule = module {
 val dataStoreModule = module {
     single { androidContext().dataStore }
     single { UserPreferences.getInstance(get()) }
-    single { SessionManager(androidContext()) }
+    // Old SessionManager: synchronous DataStore wrapper used by existing Activities
+    single { com.dakotagroupstaff.data.local.pref.SessionManager(androidContext()) }
+    // New SessionManager: global event bus for session expiry events
+    single { SessionManager() }
+    // NetworkMonitor: real-time internet connectivity watcher
+    single { NetworkMonitor(androidContext()) }
 }
 
 val repositoryModule = module {

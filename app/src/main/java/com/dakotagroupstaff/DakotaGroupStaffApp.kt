@@ -10,6 +10,8 @@ import com.dakotagroupstaff.di.networkModule
 import com.dakotagroupstaff.di.repositoryModule
 import com.dakotagroupstaff.di.viewModelModule
 import com.dakotagroupstaff.util.SecurityChecker
+import com.dakotagroupstaff.utils.NetworkMonitor
+import org.koin.core.context.GlobalContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -43,9 +45,13 @@ class DakotaGroupStaffApp : Application() {
                     dataStoreModule,
                     repositoryModule,
                     viewModelModule
-                )
+                )j
             )
         }
+
+        // Start network monitoring once for the entire app lifetime
+        // NetworkMonitor is a Koin singleton — monitoring persists across all Activities
+        GlobalContext.get().get<NetworkMonitor>().startMonitoring()
         
         // Clear any stale session data on app startup
         // This ensures clean state after app reinstall

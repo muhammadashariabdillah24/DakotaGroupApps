@@ -1,12 +1,12 @@
-package com.dakotagroupstaff.ui.settings
+﻿package com.dakotagroupstaff.ui.settings
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.databinding.ActivityHelpCenterBinding
 
-class HelpCenterActivity : AppCompatActivity() {
+class HelpCenterActivity : BaseActivity() {
 
     private lateinit var binding: ActivityHelpCenterBinding
     private lateinit var adapter: HelpGuideAdapter

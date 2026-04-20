@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.kepegawaian.salary
+﻿package com.dakotagroupstaff.ui.kepegawaian.salary
 
 import android.Manifest
 import android.content.ContentValues
@@ -20,7 +20,7 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.dakotagroupstaff.R
@@ -42,7 +42,7 @@ import java.util.*
  * - Export to PDF
  * - Save to Downloads folder
  */
-class SalarySlipDetailActivity : AppCompatActivity() {
+class SalarySlipDetailActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySalarySlipDetailBinding
     private var salarySlip: SalarySlipData? = null

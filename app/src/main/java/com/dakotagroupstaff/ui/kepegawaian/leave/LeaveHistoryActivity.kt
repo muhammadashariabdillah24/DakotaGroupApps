@@ -1,10 +1,10 @@
-package com.dakotagroupstaff.ui.kepegawaian.leave
+﻿package com.dakotagroupstaff.ui.kepegawaian.leave
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.entity.LeaveDetailsEntity
@@ -15,7 +15,7 @@ import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.util.Calendar
 
-class LeaveHistoryActivity : AppCompatActivity() {
+class LeaveHistoryActivity : BaseActivity() {
     
     private lateinit var binding: ActivityLeaveHistoryBinding
     private val viewModel: LeaveViewModel by viewModel()

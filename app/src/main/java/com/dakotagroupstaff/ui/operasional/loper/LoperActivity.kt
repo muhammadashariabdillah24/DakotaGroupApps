@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.operasional.loper
+﻿package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -6,7 +6,7 @@ import android.os.Build
 import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.content.ContextCompat
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
 import com.dakotagroupstaff.data.local.preferences.dataStore
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
 
-class LoperActivity : AppCompatActivity() {
+class LoperActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLoperBinding
     private lateinit var deliveryAdapter: DeliveryAdapter

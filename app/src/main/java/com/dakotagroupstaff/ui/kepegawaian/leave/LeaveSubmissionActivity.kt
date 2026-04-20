@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.kepegawaian.leave
+﻿package com.dakotagroupstaff.ui.kepegawaian.leave
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -7,7 +7,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.remote.response.LeaveType
 import com.dakotagroupstaff.databinding.ActivityLeaveSubmissionBinding
@@ -18,7 +18,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-class LeaveSubmissionActivity : AppCompatActivity() {
+class LeaveSubmissionActivity : BaseActivity() {
     
     private lateinit var binding: ActivityLeaveSubmissionBinding
     private val viewModel: LeaveViewModel by viewModel()

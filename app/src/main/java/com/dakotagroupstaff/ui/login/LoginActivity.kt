@@ -1,12 +1,9 @@
 package com.dakotagroupstaff.ui.login
 
-import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.telephony.TelephonyManager
+import android.provider.Settings
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
@@ -14,8 +11,8 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
+import com.dakotagroupstaff.ui.base.BaseActivity
+import java.security.MessageDigest
 import com.bumptech.glide.Glide
 import com.dakotagroupstaff.BuildConfig
 import com.dakotagroupstaff.R
@@ -32,7 +29,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class LoginActivity : AppCompatActivity() {
+class LoginActivity : BaseActivity() {
 
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModel()
@@ -45,15 +42,6 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var googleSignInClient: GoogleSignInClient
     private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
 
-    private val requestPermissionLauncher = registerForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted: Boolean ->
-        if (isGranted) {
-            getDeviceInfo()
-        } else {
-            showPermissionDeniedDialog()
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,7 +52,7 @@ class LoginActivity : AppCompatActivity() {
         loadAppLogo()
         setupPTDropdown()
         setupNipTextWatcher()
-        checkPermission()
+        getDeviceInfo()
     }
     
     private fun setupGoogleSignIn() {
@@ -166,52 +154,35 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    private fun checkPermission() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                Manifest.permission.READ_PHONE_STATE
-            ) == PackageManager.PERMISSION_GRANTED
-        ) {
-            getDeviceInfo()
-        } else {
-            requestPermissionLauncher.launch(Manifest.permission.READ_PHONE_STATE)
-        }
-    }
-
     @SuppressLint("HardwareIds")
     private fun getDeviceInfo() {
-        try {
-            val telephonyManager = getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
-            
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.READ_PHONE_STATE
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                try {
-                    @Suppress("MissingPermission")
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-                        deviceId = telephonyManager.imei ?: "UNKNOWN_IMEI_${System.currentTimeMillis()}"
-                    } else {
-                        @Suppress("DEPRECATION", "MissingPermission")
-                        deviceId = telephonyManager.deviceId ?: "UNKNOWN_IMEI_${System.currentTimeMillis()}"
-                    }
-                    @Suppress("MissingPermission")
-                    serialNumber = telephonyManager.simSerialNumber ?: "UNKNOWN_SIM_${System.currentTimeMillis()}"
-                } catch (e: SecurityException) {
-                    deviceId = "UNKNOWN_IMEI_${System.currentTimeMillis()}"
-                    serialNumber = "UNKNOWN_SIM_${System.currentTimeMillis()}"
-                }
-            } else {
-                // Fallback jika permission tidak diberikan
-                deviceId = "UNKNOWN_IMEI_${System.currentTimeMillis()}"
-                serialNumber = "UNKNOWN_SIM_${System.currentTimeMillis()}"
-            }
+        // ANDROID_ID: unik per perangkat, stabil, tidak butuh permission apapun.
+        // Berubah hanya saat factory reset — yang merupakan perilaku yang diinginkan
+        // karena berarti admin perlu re-registrasi perangkat tersebut.
+        val androidId = Settings.Secure.getString(
+            contentResolver,
+            Settings.Secure.ANDROID_ID
+        ) ?: ""
+
+        deviceId = androidId.ifEmpty {
+            // Fallback sangat jarang terjadi, hanya pada emulator atau perangkat rusak
+            "UNKNOWN_DEVICE_${android.os.Build.MANUFACTURER}_${android.os.Build.MODEL}"
+                .replace(" ", "_")
+        }
+
+        // serialNumber = SHA-256 hash dari ANDROID_ID
+        // Deterministik: selalu menghasilkan nilai yang sama untuk ID yang sama
+        serialNumber = sha256(deviceId)
+    }
+
+    private fun sha256(input: String): String {
+        return try {
+            MessageDigest.getInstance("SHA-256")
+                .digest(input.toByteArray(Charsets.UTF_8))
+                .joinToString("") { "%02x".format(it) }
         } catch (e: Exception) {
-            // Fallback untuk device yang tidak support atau error
-            deviceId = "UNKNOWN_IMEI_${System.currentTimeMillis()}"
-            serialNumber = "UNKNOWN_SIM_${System.currentTimeMillis()}"
-            e.printStackTrace()
+            // Fallback: gunakan input itu sendiri jika MessageDigest tidak tersedia
+            input
         }
     }
 
@@ -269,16 +240,7 @@ class LoginActivity : AppCompatActivity() {
             .show()
     }
 
-    private fun showPermissionDeniedDialog() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Permission Required")
-            .setMessage("Aplikasi memerlukan permission READ_PHONE_STATE untuk mendapatkan IMEI dan SIM ID perangkat Anda. Tanpa permission ini, aplikasi akan menggunakan ID fallback.")
-            .setPositiveButton("OK") { dialog, _ ->
-                getDeviceInfo() // Use fallback
-                dialog.dismiss()
-            }
-            .show()
-    }
+
     
     private fun loadAppLogo() {
         // Construct app logo URL using ImageUrlHelper

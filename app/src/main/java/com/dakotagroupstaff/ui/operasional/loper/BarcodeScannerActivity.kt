@@ -1,4 +1,4 @@
-package com.dakotagroupstaff.ui.operasional.loper
+﻿package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
 import android.app.Activity
@@ -17,7 +17,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.R
@@ -41,7 +41,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-class BarcodeScannerActivity : AppCompatActivity() {
+class BarcodeScannerActivity : BaseActivity() {
 
     companion object {
         private const val TAG = "BarcodeScannerActivity"

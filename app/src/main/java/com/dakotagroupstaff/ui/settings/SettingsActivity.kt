@@ -1,11 +1,11 @@
-package com.dakotagroupstaff.ui.settings
+﻿package com.dakotagroupstaff.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.databinding.ActivitySettingsBinding
 
-class SettingsActivity : AppCompatActivity() {
+class SettingsActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySettingsBinding
 

@@ -1,11 +1,11 @@
-package com.dakotagroupstaff.ui.kepegawaian.approval
+﻿package com.dakotagroupstaff.ui.kepegawaian.approval
 
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-class ApprovalDetailActivity : AppCompatActivity() {
+class ApprovalDetailActivity : BaseActivity() {
     
     private lateinit var binding: ActivityApprovalDetailBinding
     private lateinit var userPreferences: UserPreferences

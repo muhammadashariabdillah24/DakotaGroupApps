@@ -4,12 +4,11 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dakotagroupstaff.data.repository.AuthRepository
 import com.dakotagroupstaff.databinding.ActivityMainBinding
 import com.dakotagroupstaff.ui.adapter.RecentMenuAdapter
+import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.ui.dialog.PhotoViewerDialog
 import com.dakotagroupstaff.ui.kepegawaian.KepegawaianMenuActivity
 import com.dakotagroupstaff.ui.login.LoginActivity
@@ -18,12 +17,13 @@ import com.dakotagroupstaff.ui.main.MainViewModel
 import com.dakotagroupstaff.util.ImageUrlHelper
 import com.dakotagroupstaff.util.SecurityChecker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.system.exitProcess
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : BaseActivity() {
     
     private lateinit var binding: ActivityMainBinding
     private val loginViewModel: LoginViewModel by viewModel()
@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        
+
         setupRecentMenus()
         checkSessionAndSetupUI()
     }
@@ -337,7 +337,7 @@ class MainActivity : AppCompatActivity() {
         // Gunakan loginViewModel.logout() yang sudah menangani clear DataStore + revoke refresh token
         lifecycleScope.launch {
             loginViewModel.logout()
-            navigateToLogin()
+            navigateToLogin()  // navigateToLogin() ada di BaseActivity
         }
     }
 
@@ -354,12 +354,5 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this@MainActivity, "Logout berhasil", Toast.LENGTH_SHORT).show()
             navigateToLogin()
         }
-    }
-    
-    private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
-        finish()
     }
 }

@@ -1,9 +1,9 @@
-package com.dakotagroupstaff.ui.operasional
+﻿package com.dakotagroupstaff.ui.operasional
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
+import com.dakotagroupstaff.ui.base.BaseActivity
 import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
-class OperasionalMenuActivity : AppCompatActivity() {
+class OperasionalMenuActivity : BaseActivity() {
     
     private lateinit var binding: ActivityOperasionalMenuBinding
     private val mainViewModel: MainViewModel by viewModel()

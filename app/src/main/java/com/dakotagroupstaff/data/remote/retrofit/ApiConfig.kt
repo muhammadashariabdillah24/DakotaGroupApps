@@ -13,6 +13,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.flow.first
+import com.dakotagroupstaff.utils.SessionManager
 
 /**
  * API Configuration with Security Features
@@ -43,7 +44,10 @@ object ApiConfig {
      * - Proper timeout configuration
      * - Automatic JSON serialization/deserialization
      */
-    fun getApiService(userPreferences: com.dakotagroupstaff.data.local.preferences.UserPreferences? = null): ApiService {
+    fun getApiService(
+        userPreferences: com.dakotagroupstaff.data.local.preferences.UserPreferences? = null,
+        sessionManager: SessionManager? = null
+    ): ApiService {
         // Create separate ApiService for token refresh (no authenticator to avoid loops)
         val refreshApiService = if (userPreferences != null) {
             createRefreshApiService()
@@ -132,7 +136,7 @@ object ApiConfig {
         
         // Add TokenAuthenticator for auto-refresh on 401 (if userPreferences provided)
         if (userPreferences != null && refreshApiService != null) {
-            clientBuilder.authenticator(TokenAuthenticator(userPreferences, refreshApiService))
+            clientBuilder.authenticator(TokenAuthenticator(userPreferences, refreshApiService, sessionManager))
         }
         
         val client = clientBuilder.build()
