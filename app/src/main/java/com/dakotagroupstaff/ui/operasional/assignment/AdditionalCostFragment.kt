@@ -76,7 +76,8 @@ class AdditionalCostFragment : Fragment() {
                     binding.progressBar.isVisible = false
                     binding.swipeRefresh.isRefreshing = false
                     showEmptyState()
-                    Toast.makeText(context, result.message, Toast.LENGTH_SHORT).show()
+                    (requireActivity() as? com.dakotagroupstaff.ui.base.BaseActivity)
+                        ?.showErrorDialog(result.message, title = "Gagal Memuat Data")
                 }
             }
         }

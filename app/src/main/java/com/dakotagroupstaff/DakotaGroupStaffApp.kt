@@ -45,7 +45,7 @@ class DakotaGroupStaffApp : Application() {
                     dataStoreModule,
                     repositoryModule,
                     viewModelModule
-                )j
+                )
             )
         }
 

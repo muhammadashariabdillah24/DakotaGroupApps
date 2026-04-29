@@ -78,10 +78,44 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
         }
     }
 
-    suspend fun logout() {
+    /**
+     * Soft logout: hanya hapus token dan status login.
+     * Data operasional (BTT, koli, dll) dan cache TETAP tersimpan.
+     * Dipanggil saat user menekan tombol "Logout" di halaman Pengaturan.
+     */
+    suspend fun clearSessionOnly() {
+        dataStore.edit { preferences ->
+            preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
+            preferences.remove(TOKEN_EXPIRY_KEY)
+            preferences.remove(IS_LOGGED_IN_KEY)
+            // NIP, IMEI, SIM_ID, NAMA, PT, dll SENGAJA tidak dihapus
+            // agar bisa dipakai untuk perbandingan identitas saat login berikutnya
+        }
+    }
+
+    /**
+     * Hard logout: hapus SEMUA data preferences.
+     * Dipanggil saat login dengan identitas berbeda (NIP / IMEI / SerialNumber beda).
+     */
+    suspend fun clearAllData() {
         dataStore.edit { preferences ->
             preferences.clear()
         }
+    }
+
+    /**
+     * Ambil identitas tersimpan (NIP, IMEI, SerialNumber) untuk dibandingkan
+     * dengan data login yang baru masuk.
+     * @return Triple(nip, imei, simId) — kosong semua jika belum pernah login
+     */
+    suspend fun getSavedIdentity(): Triple<String, String, String> {
+        val prefs = dataStore.data.first()
+        return Triple(
+            prefs[NIP_KEY] ?: "",
+            prefs[IMEI_KEY] ?: "",
+            prefs[SIM_ID_KEY] ?: ""
+        )
     }
     
     fun getNip(): Flow<String> {

@@ -62,16 +62,51 @@ object ApiConfig {
             HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.NONE)
         }
         
-        // Authorization header interceptor - inject JWT token
+        // Authorization header interceptor - inject JWT token + proactive refresh
         val authInterceptor = Interceptor { chain ->
             val token = if (userPreferences != null) {
                 runBlocking {
+                    // === PROACTIVE TOKEN REFRESH ===
+                    // Cek apakah token akan expired dalam 5 menit ke depan.
+                    // Jika ya, coba refresh SEBELUM mengirim request, sehingga server
+                    // tidak pernah menerima token yang sudah expired.
+                    val isExpiringSoon = userPreferences.isTokenExpiringSoon().first()
+                    if (isExpiringSoon && refreshApiService != null) {
+                        Log.d("ApiConfig", "Token akan segera expired, mencoba proactive refresh...")
+                        try {
+                            val refreshToken = userPreferences.getRefreshToken().first()
+                            val nip = userPreferences.getNip().first()
+                            val imei = userPreferences.getImei().first()
+                            val pt = userPreferences.getPt().first()
+
+                            if (refreshToken.isNotEmpty() && nip.isNotEmpty()) {
+                                val refreshRequest = com.dakotagroupstaff.data.remote.retrofit.RefreshTokenRequest(
+                                    refreshToken = refreshToken,
+                                    nip = nip,
+                                    deviceId = imei
+                                )
+                                val refreshResponse = refreshApiService.refreshAccessToken(pt, refreshRequest)
+                                if (refreshResponse.success && refreshResponse.data != null) {
+                                    userPreferences.saveAccessToken(refreshResponse.data.accessToken)
+                                    userPreferences.saveTokenExpiry(refreshResponse.data.expiresIn)
+                                    Log.d("ApiConfig", "✅ Proactive token refresh berhasil")
+                                } else {
+                                    Log.w("ApiConfig", "Proactive refresh ditolak server, melanjutkan dengan token lama")
+                                }
+                            }
+                        } catch (e: Exception) {
+                            // Jangan blokir request jika proactive refresh gagal (misal: offline)
+                            // TokenAuthenticator akan menangani 401 secara reaktif jika terjadi
+                            Log.w("ApiConfig", "Proactive refresh gagal (mungkin offline): ${e.message}")
+                        }
+                    }
+                    // Ambil token terbaru (mungkin sudah di-refresh di atas)
                     userPreferences.getAccessToken().first()
                 }
             } else {
                 ""
             }
-            
+
             val request = if (token.isNotEmpty()) {
                 chain.request().newBuilder()
                     .addHeader("Authorization", "Bearer $token")
@@ -79,7 +114,7 @@ object ApiConfig {
             } else {
                 chain.request()
             }
-            
+
             chain.proceed(request)
         }
         

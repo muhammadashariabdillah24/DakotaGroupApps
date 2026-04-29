@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.kepegawaian.salary
+package com.dakotagroupstaff.ui.kepegawaian.salary
 
 import android.content.Intent
 import android.os.Bundle
@@ -88,8 +88,8 @@ class SalarySlipListActivity : BaseActivity() {
                     processData()
                 }
                 is Result.Error -> {
-                    binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, ErrorMessageHelper.getSalaryListLoadError(), Toast.LENGTH_LONG).show()
+                    showLoading(false)
+                    showErrorDialog(ErrorMessageHelper.getSalaryListLoadError(), title = "Gagal Memuat Slip Gaji")
                 }
             }
         }
@@ -215,6 +215,6 @@ class SalarySlipListActivity : BaseActivity() {
     }
 
     private fun showError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+        showErrorDialog(message, title = "Gagal Memuat Data")
     }
 }

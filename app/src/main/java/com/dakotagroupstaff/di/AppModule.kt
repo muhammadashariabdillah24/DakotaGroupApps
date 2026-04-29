@@ -47,7 +47,7 @@ val dataStoreModule = module {
 }
 
 val repositoryModule = module {
-    single { AuthRepository.getInstance(get(), get()) }
+    single { AuthRepository.getInstance(get(), get(), get()) }
     single { 
         com.dakotagroupstaff.data.repository.AttendanceRepository.getInstance(
             get(), get(), get()

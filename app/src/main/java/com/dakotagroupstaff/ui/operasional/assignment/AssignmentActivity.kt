@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.operasional.assignment
+package com.dakotagroupstaff.ui.operasional.assignment
 
 import android.graphics.Bitmap
 import android.graphics.Color
@@ -118,7 +118,7 @@ class AssignmentActivity : BaseActivity() {
                     viewModel.resetSaveResult()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this, ErrorMessageHelper.getAssignmentCostSaveError(), Toast.LENGTH_SHORT).show()
+                    showErrorDialog(ErrorMessageHelper.getAssignmentCostSaveError(), title = "Gagal Menyimpan")
                     viewModel.resetSaveResult()
                 }
             }

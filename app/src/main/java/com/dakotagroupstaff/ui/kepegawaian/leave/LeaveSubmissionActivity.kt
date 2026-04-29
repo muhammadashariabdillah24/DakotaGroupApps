@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.kepegawaian.leave
+package com.dakotagroupstaff.ui.kepegawaian.leave
 
 import android.app.DatePickerDialog
 import android.os.Bundle
@@ -112,7 +112,7 @@ class LeaveSubmissionActivity : BaseActivity() {
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
                     binding.btnSubmit.isEnabled = true
-                    Toast.makeText(this, ErrorMessageHelper.getLeaveSubmitError(), Toast.LENGTH_LONG).show()
+                    showErrorDialog(ErrorMessageHelper.getLeaveSubmitError(), title = "Gagal Mengajukan")
                 }
                 null -> {
                     // Reset state - no action needed
@@ -130,7 +130,7 @@ class LeaveSubmissionActivity : BaseActivity() {
                     updateSupervisorUI()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this, "Gagal memuat daftar atasan: ${result.message}", Toast.LENGTH_SHORT).show()
+                    showErrorDialog("Gagal memuat daftar atasan: ${result.message}", title = "Gagal Memuat Data")
                 }
                 else -> {}
             }

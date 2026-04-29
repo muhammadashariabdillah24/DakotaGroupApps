@@ -217,7 +217,7 @@ class LoginActivity : BaseActivity() {
                 }
                 is Result.Error -> {
                     showLoading(false)
-                    showErrorDialog(result.message)
+                    showErrorDialog(result.message, title = getString(R.string.login_failed))
                 }
             }
         }
@@ -230,18 +230,7 @@ class LoginActivity : BaseActivity() {
         binding.actvPt.isEnabled = !isLoading
     }
 
-    private fun showErrorDialog(message: String) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.login_failed))
-            .setMessage(message)
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
 
-
-    
     private fun loadAppLogo() {
         // Construct app logo URL using ImageUrlHelper
         val logoUrl = ImageUrlHelper.constructLogoUrl()

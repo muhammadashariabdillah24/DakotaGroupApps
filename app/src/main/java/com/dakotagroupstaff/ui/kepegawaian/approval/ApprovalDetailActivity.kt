@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.kepegawaian.approval
+package com.dakotagroupstaff.ui.kepegawaian.approval
 
 import android.os.Bundle
 import android.view.View
@@ -174,7 +174,7 @@ class ApprovalDetailActivity : BaseActivity() {
                 }
                 is Result.Error -> {
                     showLoading(false)
-                    Toast.makeText(this, ErrorMessageHelper.getApprovalSubmitError(), Toast.LENGTH_LONG).show()
+                    showErrorDialog(ErrorMessageHelper.getApprovalSubmitError(), title = "Gagal Menyetujui")
                 }
             }
         }
@@ -193,7 +193,7 @@ class ApprovalDetailActivity : BaseActivity() {
                 }
                 is Result.Error -> {
                     showLoading(false)
-                    Toast.makeText(this, ErrorMessageHelper.getApprovalSubmitError(), Toast.LENGTH_LONG).show()
+                    showErrorDialog(ErrorMessageHelper.getApprovalSubmitError(), title = "Gagal Menolak")
                 }
             }
         }

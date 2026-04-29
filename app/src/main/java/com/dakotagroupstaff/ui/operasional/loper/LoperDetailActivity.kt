@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.operasional.loper
+package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -837,11 +837,7 @@ class LoperDetailActivity : BaseActivity() {
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    Toast.makeText(
-                        this@LoperDetailActivity,
-                        "Gagal menyimpan data: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showErrorDialog("Gagal menyimpan data: ${e.message}", title = "Gagal Menyimpan")
                 }
             }
         }
@@ -941,11 +937,12 @@ class LoperDetailActivity : BaseActivity() {
                         }
                         is Result.Error -> {
                             withContext(Dispatchers.Main) {
-                                Toast.makeText(
-                                    this@LoperDetailActivity,
+                                binding.progressBar.visibility = View.GONE
+                                binding.btnSave.isEnabled = true
+                                showErrorDialog(
                                     ErrorMessageHelper.getDeliverySubmitError(),
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                    title = "Gagal Mengirim Data"
+                                )
                             }
                         }
                     }
@@ -954,11 +951,7 @@ class LoperDetailActivity : BaseActivity() {
                 withContext(Dispatchers.Main) {
                     binding.progressBar.visibility = View.GONE
                     binding.btnSave.isEnabled = true
-                    Toast.makeText(
-                        this@LoperDetailActivity,
-                        "Error: ${e.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    showErrorDialog("Terjadi kesalahan: ${e.message}", title = "Gagal Mengirim")
                 }
             }
         }

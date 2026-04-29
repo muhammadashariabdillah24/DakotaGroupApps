@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.kepegawaian.approval
+package com.dakotagroupstaff.ui.kepegawaian.approval
 
 import android.content.Intent
 import android.os.Bundle
@@ -121,7 +121,7 @@ class ApprovalActivity : BaseActivity() {
                 }
                 is Result.Error -> {
                     binding.swipeRefresh.isRefreshing = false
-                    Toast.makeText(this, ErrorMessageHelper.getApprovalListLoadError(), Toast.LENGTH_SHORT).show()
+                    showErrorDialog(ErrorMessageHelper.getApprovalListLoadError(), title = "Gagal Memuat Data")
                     displayEmptyState()
                 }
             }
@@ -212,9 +212,7 @@ class ApprovalActivity : BaseActivity() {
     }
     
     private fun showError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
-        
-        // Show access denied screen on error
+        showErrorDialog(message, title = "Terjadi Kesalahan")
         showAccessDenied()
     }
     

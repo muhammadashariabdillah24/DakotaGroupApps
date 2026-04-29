@@ -185,6 +185,108 @@ abstract class BaseActivity : AppCompatActivity() {
         finish()
     }
 
+    // ─── Shared Error / Success Dialogs ──────────────────────────────────────
+    //
+    // Semua subclass Activity dapat memanggil fungsi-fungsi ini tanpa perlu
+    // mendefinisikan ulang. Ini menghilangkan duplikasi kode di setiap fitur.
+
+    /**
+     * Menampilkan dialog error standar dengan tombol "OK".
+     * Gunakan untuk error dari API (Result.Error) yang perlu dibaca user.
+     *
+     * @param message Pesan error yang akan ditampilkan
+     * @param title Judul dialog (default: "Error")
+     * @param onDismiss Callback opsional saat dialog ditutup
+     */
+    fun showErrorDialog(
+        message: String,
+        title: String = "Terjadi Kesalahan",
+        onDismiss: (() -> Unit)? = null
+    ) {
+        if (isFinishing || isDestroyed) return
+        runOnUiThread {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                    onDismiss?.invoke()
+                }
+                .show()
+        }
+    }
+
+    /**
+     * Menampilkan dialog sukses standar dengan tombol "OK".
+     * Gunakan untuk konfirmasi aksi yang berhasil dan butuh perhatian user.
+     *
+     * @param message Pesan sukses yang akan ditampilkan
+     * @param title Judul dialog (default: "Berhasil")
+     * @param onDismiss Callback opsional saat dialog ditutup
+     */
+    fun showSuccessDialog(
+        message: String,
+        title: String = "Berhasil",
+        onDismiss: (() -> Unit)? = null
+    ) {
+        if (isFinishing || isDestroyed) return
+        runOnUiThread {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                    onDismiss?.invoke()
+                }
+                .show()
+        }
+    }
+
+    /**
+     * Menampilkan dialog informasi umum.
+     *
+     * @param message Pesan yang akan ditampilkan
+     * @param title Judul dialog
+     * @param onDismiss Callback opsional saat dialog ditutup
+     */
+    fun showInfoDialog(
+        message: String,
+        title: String = "Informasi",
+        onDismiss: (() -> Unit)? = null
+    ) {
+        if (isFinishing || isDestroyed) return
+        runOnUiThread {
+            MaterialAlertDialogBuilder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton("OK") { dialog, _ ->
+                    dialog.dismiss()
+                    onDismiss?.invoke()
+                }
+                .show()
+        }
+    }
+
+    /**
+     * Menampilkan Toast singkat.
+     * Gunakan untuk feedback ringan yang tidak kritis (sukses, info singkat).
+     *
+     * @param message Pesan Toast
+     */
+    fun showToast(message: String) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_SHORT).show()
+    }
+
+    /**
+     * Menampilkan Toast panjang.
+     * Gunakan untuk pesan yang butuh waktu lebih lama untuk dibaca.
+     *
+     * @param message Pesan Toast
+     */
+    fun showLongToast(message: String) {
+        android.widget.Toast.makeText(this, message, android.widget.Toast.LENGTH_LONG).show()
+    }
+
     // ─── Settings Navigation ─────────────────────────────────────────────────
 
     /**

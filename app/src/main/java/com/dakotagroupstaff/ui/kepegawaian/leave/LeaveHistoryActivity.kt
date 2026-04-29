@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.kepegawaian.leave
+package com.dakotagroupstaff.ui.kepegawaian.leave
 
 import android.os.Bundle
 import android.view.View
@@ -88,7 +88,8 @@ class LeaveHistoryActivity : BaseActivity() {
                 }
                 is Result.Error -> {
                     binding.swipeRefresh.isRefreshing = false
-                    Toast.makeText(this, ErrorMessageHelper.getLeaveBalanceLoadError(), Toast.LENGTH_SHORT).show()
+                    binding.progressBar.visibility = View.GONE
+                    showErrorDialog(ErrorMessageHelper.getLeaveBalanceLoadError(), title = "Gagal Memuat Data")
                 }
             }
         }

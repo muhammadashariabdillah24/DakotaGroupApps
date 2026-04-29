@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.kepegawaian.attendance
+package com.dakotagroupstaff.ui.kepegawaian.attendance
 
 import android.Manifest
 import android.content.Intent
@@ -205,10 +205,10 @@ class AttendanceActivity : BaseActivity() {
             }
         }
         
-        // Observe error messages
+        // Observe error messages — gunakan dialog agar user tidak melewatkan pesan error
         viewModel.errorMessage.observe(this) { error ->
             error?.let {
-                Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                showErrorDialog(it)
                 viewModel.clearError()
             }
         }
@@ -506,16 +506,7 @@ class AttendanceActivity : BaseActivity() {
             .show()
     }
     
-    private fun showErrorDialog(message: String) {
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Error")
-            .setMessage(message)
-            .setPositiveButton("OK") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
-    
+
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)

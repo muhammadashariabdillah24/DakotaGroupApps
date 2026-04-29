@@ -6,6 +6,7 @@ import androidx.lifecycle.liveData
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.model.UserSession
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
+import com.dakotagroupstaff.data.local.room.AppDatabase
 import com.dakotagroupstaff.data.remote.response.ApiResponse
 import com.dakotagroupstaff.data.remote.response.DeviceValidationResponse
 import com.dakotagroupstaff.data.remote.response.LoginData
@@ -20,7 +21,8 @@ import retrofit2.HttpException
 
 class AuthRepository private constructor(
     private val apiService: ApiService,
-    private val userPreferences: UserPreferences
+    private val userPreferences: UserPreferences,
+    private val appDatabase: AppDatabase
 ) {
 
     fun login(
@@ -52,8 +54,31 @@ class AuthRepository private constructor(
             
             if (response.success && !response.data.isNullOrEmpty()) {
                 val loginData = response.data.first()
-                
-                // Save session to DataStore
+
+                // ─── Cek Identitas: Bandingkan NIP/IMEI/SerialNumber ────────────────────
+                // Ambil identitas yang sebelumnya tersimpan
+                val (savedNip, savedImei, savedSimId) = userPreferences.getSavedIdentity()
+
+                val isFirstLogin = savedNip.isEmpty() // Belum pernah login sebelumnya
+                val isSameIdentity = savedNip == loginData.nip
+                    && savedImei == deviceId
+                    && savedSimId == serialNumber
+
+                if (!isFirstLogin && !isSameIdentity) {
+                    // Identitas berbeda → hapus SEMUA data lokal (DataStore + Room DB)
+                    Log.w("AuthRepository", "=== IDENTITAS BERBEDA — HAPUS DATA LOKAL ===")
+                    Log.w("AuthRepository", "Saved NIP: $savedNip | New NIP: ${loginData.nip}")
+                    Log.w("AuthRepository", "Saved IMEI: $savedImei | New IMEI: $deviceId")
+                    Log.w("AuthRepository", "Saved SIM: $savedSimId | New SIM: $serialNumber")
+                    Log.w("AuthRepository", "=============================================")
+                    userPreferences.clearAllData()
+                    appDatabase.clearAllTables()
+                } else {
+                    Log.d("AuthRepository", if (isFirstLogin) "Login pertama kali — data lokal dipertahankan" else "Identitas sama — data lokal dipertahankan")
+                }
+                // ────────────────────────────────────────────────────────────────────────
+
+                // Simpan session baru
                 val userSession = UserSession(
                     nip = loginData.nip,
                     nama = loginData.nama,
@@ -69,16 +94,16 @@ class AuthRepository private constructor(
                     taskDetail = loginData.taskDetail ?: "",
                     taskId = loginData.taskId ?: ""
                 )
-                
+
                 userPreferences.saveSession(userSession)
-                
-                // Save JWT access token
+
+                // Simpan JWT access token
                 userPreferences.saveAccessToken(loginData.accessToken)
-                
-                // Save refresh token and token expiry
+
+                // Simpan refresh token dan token expiry
                 userPreferences.saveRefreshToken(loginData.refreshToken)
                 userPreferences.saveTokenExpiry(loginData.expiresIn)
-                
+
                 emit(Result.Success(loginData))
             } else {
                 emit(Result.Error(response.getResponseMessage()))
@@ -132,15 +157,15 @@ class AuthRepository private constructor(
                 }
             }
             
-            // Clear local session regardless of API call result
-            userPreferences.clearAccessToken()
-            userPreferences.logout()
-            userPreferences.clearScannedBttIds() // Clear operasional data
+            // Hanya hapus token & status login, data operasional lokal TETAP tersimpan
+            // agar jika user login kembali dengan identitas sama, data tidak hilang
+            userPreferences.clearSessionOnly()
+            Log.d("AuthRepository", "Logout selesai — session token dihapus, data lokal dipertahankan")
             
         } catch (e: Exception) {
             Log.e("AuthRepository", "Logout error", e)
-            // Still clear local session even if exception occurs
-            userPreferences.logout()
+            // Tetap hapus session meski exception
+            userPreferences.clearSessionOnly()
         }
     }
 
@@ -203,10 +228,11 @@ class AuthRepository private constructor(
 
         fun getInstance(
             apiService: ApiService,
-            userPreferences: UserPreferences
+            userPreferences: UserPreferences,
+            appDatabase: AppDatabase
         ): AuthRepository =
             instance ?: synchronized(this) {
-                instance ?: AuthRepository(apiService, userPreferences)
+                instance ?: AuthRepository(apiService, userPreferences, appDatabase)
             }.also { instance = it }
     }
 }

@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.operasional.letterofassign
+package com.dakotagroupstaff.ui.operasional.letterofassign
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -283,7 +283,7 @@ class LetterOfAssignActivity : BaseActivity() {
                 }
                 is Result.Error -> {
                     binding.progressBar.visibility = View.GONE
-                    Toast.makeText(this, "Error: ${result.message}", Toast.LENGTH_SHORT).show()
+                    showErrorDialog("Gagal memuat surat tugas: ${result.message}", title = "Gagal Memuat Data")
                 }
             }
         }
@@ -295,7 +295,7 @@ class LetterOfAssignActivity : BaseActivity() {
                     reloadData()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this, "Check-in gagal: ${result.message}", Toast.LENGTH_SHORT).show()
+                    showErrorDialog("Check-in gagal: ${result.message}", title = "Check-in Gagal")
                 }
                 is Result.Loading -> {
                     // Show loading if needed
@@ -383,7 +383,7 @@ class LetterOfAssignActivity : BaseActivity() {
                                     submitCheckpointWithPhoto(checkpoint, photoUrl)
                                 }
                                 is Result.Error -> {
-                                    Toast.makeText(this, "Gagal upload foto: ${result.message}", Toast.LENGTH_SHORT).show()
+                                    showErrorDialog("Gagal upload foto: ${result.message}", title = "Gagal Upload")
                                 }
                                 else -> {}
                             }
@@ -634,7 +634,7 @@ class LetterOfAssignActivity : BaseActivity() {
                     dialog.show()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this, "Error: ${result.message}", Toast.LENGTH_SHORT).show()
+                    showErrorDialog("Gagal memuat rute cadangan: ${result.message}", title = "Gagal Memuat Rute")
                 }
             }
         }
@@ -685,7 +685,7 @@ class LetterOfAssignActivity : BaseActivity() {
                     dialog.show()
                 }
                 is Result.Error -> {
-                    Toast.makeText(this, "Error: ${result.message}", Toast.LENGTH_SHORT).show()
+                    showErrorDialog("Gagal memuat barang kurang: ${result.message}", title = "Gagal Memuat Data")
                 }
             }
         }
