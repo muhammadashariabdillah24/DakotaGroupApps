@@ -5,21 +5,16 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import com.bumptech.glide.Glide
-import com.dakotagroupstaff.data.repository.AuthRepository
 import com.dakotagroupstaff.databinding.ActivityMainBinding
 import com.dakotagroupstaff.ui.adapter.RecentMenuAdapter
 import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.ui.dialog.PhotoViewerDialog
 import com.dakotagroupstaff.ui.kepegawaian.KepegawaianMenuActivity
-import com.dakotagroupstaff.ui.login.LoginActivity
 import com.dakotagroupstaff.ui.login.LoginViewModel
 import com.dakotagroupstaff.ui.main.MainViewModel
 import com.dakotagroupstaff.util.ImageUrlHelper
 import com.dakotagroupstaff.util.SecurityChecker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.system.exitProcess
 
@@ -28,9 +23,7 @@ class MainActivity : BaseActivity() {
     private lateinit var binding: ActivityMainBinding
     private val loginViewModel: LoginViewModel by viewModel()
     private val mainViewModel: MainViewModel by viewModel()
-    private val authRepository: AuthRepository by inject()
     private lateinit var recentMenuAdapter: RecentMenuAdapter
-    private var isForcedLogoutDialogShowing = false
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,31 +38,7 @@ class MainActivity : BaseActivity() {
         checkSessionAndSetupUI()
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Cek validitas perangkat setiap kali halaman kembali ke foreground
-        checkDeviceValidity()
-    }
 
-    /**
-     * Periksa apakah perangkat saat ini masih cocok dengan yang terdaftar di database.
-     * Jika tidak cocok (login di perangkat lain), tampilkan dialog force logout.
-     */
-    private fun checkDeviceValidity() {
-        lifecycleScope.launch {
-            try {
-                val result = authRepository.validateDevice()
-                if (!result.valid && !isForcedLogoutDialogShowing) {
-                    isForcedLogoutDialogShowing = true
-                    showForcedLogoutDialog()
-                }
-            } catch (e: Exception) {
-                // Gagal cek — abaikan agar tidak mengganggu saat offline
-                android.util.Log.w("MainActivity", "Device validation failed, skipping: ${e.message}")
-            }
-        }
-    }
-    
     /**
      * Additional root detection with user-friendly dialog
      * This is a fallback check in case the app somehow bypassed Application-level check
@@ -288,71 +257,6 @@ class MainActivity : BaseActivity() {
                 val dialog = PhotoViewerDialog(this, photoUrl)
                 dialog.show()
             }
-        }
-    }
-    
-    private fun showLogoutDialog() {
-        MaterialAlertDialogBuilder(this)
-            .setTitle(getString(R.string.logout))
-            .setMessage("Apakah Anda yakin ingin logout?")
-            .setPositiveButton("Ya") { _, _ ->
-                performLogout()
-            }
-            .setNegativeButton("Tidak") { dialog, _ ->
-                dialog.dismiss()
-            }
-            .show()
-    }
-
-    /**
-     * Dialog force logout — tampil ketika akun terdeteksi login di perangkat lain.
-     * Tidak bisa dibatalkan (setCancelable = false), dan harus menekan 'Oke'.
-     */
-    private fun showForcedLogoutDialog() {
-        if (isFinishing || isDestroyed) return
-        MaterialAlertDialogBuilder(this)
-            .setTitle("Peringatan")
-            .setMessage("Akun anda akan logout dari perangkat ini karena telah login diperangkat lain!")
-            .setCancelable(false)
-            .setPositiveButton("Oke") { _, _ ->
-                performForcedLogout()
-            }
-            .show()
-    }
-
-    /**
-     * Hapus semua sesi lokal dan arahkan ke halaman login.
-     * Dipanggil saat force logout karena login di perangkat lain.
-     */
-    private fun performForcedLogout() {
-        isForcedLogoutDialogShowing = false
-        
-        // Sign out dari Google jika login menggunakan Google
-        val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(
-            com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN
-        ).build()
-        val googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this, gso)
-        googleSignInClient.signOut()
-        
-        // Gunakan loginViewModel.logout() yang sudah menangani clear DataStore + revoke refresh token
-        lifecycleScope.launch {
-            loginViewModel.logout()
-            navigateToLogin()  // navigateToLogin() ada di BaseActivity
-        }
-    }
-
-    private fun performLogout() {
-        // Sign out dari Google jika login menggunakan Google
-        val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(
-            com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN
-        ).build()
-        val googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this, gso)
-        googleSignInClient.signOut()
-        
-        lifecycleScope.launch {
-            loginViewModel.logout()
-            Toast.makeText(this@MainActivity, "Logout berhasil", Toast.LENGTH_SHORT).show()
-            navigateToLogin()
         }
     }
 }

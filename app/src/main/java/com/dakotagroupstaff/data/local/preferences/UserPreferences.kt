@@ -193,16 +193,11 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     }
     
     /**
-     * Check if token is expiring soon (within 5 minutes)
+     * Token tidak pernah expired (Opsi B) — selalu kembalikan false.
+     * Proactive refresh tidak akan pernah dipicu.
      */
     fun isTokenExpiringSoon(): Flow<Boolean> {
-        return dataStore.data.map { preferences ->
-            val expiryStr = preferences[TOKEN_EXPIRY_KEY] ?: return@map true
-            val expiryTime = expiryStr.toLongOrNull() ?: return@map true
-            val now = System.currentTimeMillis()
-            val fiveMinutes = 5 * 60 * 1000L
-            (expiryTime - now) < fiveMinutes
-        }
+        return kotlinx.coroutines.flow.flowOf(false)
     }
     
     /**

@@ -8,7 +8,6 @@ import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.data.repository.AuthRepository
 import com.dakotagroupstaff.ui.login.LoginViewModel
 import com.dakotagroupstaff.utils.NetworkMonitor
-import com.dakotagroupstaff.utils.SessionManager
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -19,7 +18,7 @@ import org.koin.dsl.module
  */
 
 val networkModule = module {
-    single { ApiConfig.getApiService(userPreferences = get(), sessionManager = get()) }
+    single { ApiConfig.getApiService(userPreferences = get()) }
 }
 
 val databaseModule = module {
@@ -40,8 +39,6 @@ val dataStoreModule = module {
     single { UserPreferences.getInstance(get()) }
     // Old SessionManager: synchronous DataStore wrapper used by existing Activities
     single { com.dakotagroupstaff.data.local.pref.SessionManager(androidContext()) }
-    // New SessionManager: global event bus for session expiry events
-    single { SessionManager() }
     // NetworkMonitor: real-time internet connectivity watcher
     single { NetworkMonitor(androidContext()) }
 }

@@ -11,7 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.dakotagroupstaff.ui.login.LoginActivity
 import com.dakotagroupstaff.utils.NetworkMonitor
-import com.dakotagroupstaff.utils.SessionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -19,17 +18,12 @@ import org.koin.android.ext.android.inject
 /**
  * BaseActivity — Base class for ALL activities in the app.
  *
- * Provides three automatic features:
+ * Provides two automatic features:
  * 1. **No-Internet Dialog**: Monitors network connectivity via [NetworkMonitor].
  *    When internet is lost, shows a non-cancellable dialog forcing the user to
  *    re-enable Wi-Fi or Mobile Data. Auto-dismisses when internet is restored.
  *
- * 2. **Session Expiry Handling**: Observes [SessionManager.sessionExpiredEvent].
- *    When the refresh token is definitively invalid (emitted by [TokenAuthenticator]),
- *    shows a non-cancellable dialog and redirects to [LoginActivity].
- *    This works from ANY Activity — not just MainActivity.
- *
- * 3. **Safe to extend**: All subclasses just extend BaseActivity instead of
+ * 2. **Safe to extend**: All subclasses just extend BaseActivity instead of
  *    AppCompatActivity. No extra setup needed.
  *
  * Usage:
@@ -40,26 +34,19 @@ import org.koin.android.ext.android.inject
 abstract class BaseActivity : AppCompatActivity() {
 
     private val networkMonitor: NetworkMonitor by inject()
-    private val sessionManager: SessionManager by inject()
 
     // Holds the currently displayed "no internet" dialog — null when not showing
     private var noInternetDialog: AlertDialog? = null
 
-    // Holds the currently displayed "session expired" dialog — prevent stacking
-    private var sessionExpiredDialog: AlertDialog? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         observeNetworkConnectivity()
-        observeSessionExpiry()
     }
 
     override fun onDestroy() {
         // Dismiss dialogs to prevent WindowLeakedException
         noInternetDialog?.dismiss()
         noInternetDialog = null
-        sessionExpiredDialog?.dismiss()
-        sessionExpiredDialog = null
         super.onDestroy()
     }
 
@@ -128,50 +115,6 @@ abstract class BaseActivity : AppCompatActivity() {
             Log.d("BaseActivity", "No-internet dialog dismissed — internet restored")
         }
         noInternetDialog = null
-    }
-
-    // ─── Session Expiry ───────────────────────────────────────────────────────
-
-    /**
-     * Observes the global [SessionManager.sessionExpiredEvent].
-     * Triggered by [TokenAuthenticator] when refresh token is definitively invalid.
-     * Works from ANY Activity since this is in BaseActivity.
-     *
-     * Uses [repeatOnLifecycle] with STARTED state so the collector is active
-     * only when the Activity is visible, avoiding leaks.
-     */
-    private fun observeSessionExpiry() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                sessionManager.sessionExpiredEvent.collect { reason ->
-                    Log.w("BaseActivity", "[${javaClass.simpleName}] Session expired: $reason")
-                    showSessionExpiredDialog(reason)
-                }
-            }
-        }
-    }
-
-    /**
-     * Shows a non-cancellable dialog informing the user their session has ended.
-     * Prevents duplicate dialogs from stacking.
-     * On confirmation, redirects to [LoginActivity] and clears the back stack.
-     */
-    private fun showSessionExpiredDialog(message: String) {
-        if (isFinishing || isDestroyed) return
-        if (sessionExpiredDialog?.isShowing == true) return  // Already showing — skip duplicate
-
-        runOnUiThread {
-            sessionExpiredDialog = MaterialAlertDialogBuilder(this)
-                .setTitle("Sesi Berakhir")
-                .setMessage(message)
-                .setCancelable(false)
-                .setPositiveButton("Login Kembali") { _, _ ->
-                    sessionExpiredDialog = null
-                    navigateToLogin()
-                }
-                .create()
-                .also { it.show() }
-        }
     }
 
     /**
