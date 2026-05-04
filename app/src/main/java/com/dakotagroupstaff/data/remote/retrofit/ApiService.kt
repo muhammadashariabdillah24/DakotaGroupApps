@@ -48,6 +48,18 @@ interface ApiService {
         @Query("pt") pt: String,
         @Body request: ValidateDeviceRequest
     ): DeviceValidationResponse
+
+    /**
+     * Check Device — polling untuk deteksi login di perangkat lain
+     * POST /auth/check-device?pt=<pt>
+     * Tidak memerlukan JWT — dipanggil tiap 3 menit
+     * Return: { valid: true } jika NIP+IMEI+SimId cocok, { valid: false } jika tidak
+     */
+    @POST("auth/check-device")
+    suspend fun checkDevice(
+        @Query("pt") pt: String,
+        @Body request: CheckDeviceRequest
+    ): CheckDeviceResponse
     
     /**
      * Refresh Access Token
@@ -609,4 +621,20 @@ data class ValidateDeviceRequest(
     val imei: String,
     @SerializedName("simId")
     val simId: String
+)
+
+data class CheckDeviceRequest(
+    @SerializedName("nip")
+    val nip: String,
+    @SerializedName("imei")
+    val imei: String,
+    @SerializedName("simId")
+    val simId: String
+)
+
+data class CheckDeviceResponse(
+    @SerializedName("success")
+    val success: Boolean = false,
+    @SerializedName("valid")
+    val valid: Boolean = false
 )

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Icon Peringatan -->
+    <ImageView
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="16dp"
+        android:src="@drawable/ic_warning"
+        app:tint="?attr/colorError" />
+
+    <!-- Judul -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="12dp"
+        android:gravity="center"
+        android:text="Peringatan Keamanan"
+        android:textColor="?attr/colorError"
+        android:textSize="18sp"
+        android:textStyle="bold" />
+
+    <!-- Pesan utama -->
+    <TextView
+        android:id="@+id/tv_force_logout_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:gravity="center"
+        android:lineSpacingMultiplier="1.4"
+        android:text="NIP anda telah login di perangkat lain!\n\nNIP pada perangkat ini akan logout secara otomatis."
+        android:textColor="?attr/colorOnSurface"
+        android:textSize="14sp" />
+
+    <!-- Countdown -->
+    <TextView
+        android:id="@+id/tv_countdown"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:gravity="center"
+        android:text="(7)"
+        android:textColor="?attr/colorError"
+        android:textSize="22sp"
+        android:textStyle="bold" />
+
+    <!-- Tombol Keluar -->
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_keluar"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Keluar Sekarang"
+        android:textAllCaps="false"
+        app:backgroundTint="?attr/colorError" />
+
+</LinearLayout>

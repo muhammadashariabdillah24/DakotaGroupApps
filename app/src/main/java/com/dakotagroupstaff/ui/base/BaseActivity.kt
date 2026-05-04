@@ -9,6 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.dakotagroupstaff.data.local.preferences.UserPreferences
+import com.dakotagroupstaff.data.remote.retrofit.ApiService
 import com.dakotagroupstaff.ui.login.LoginActivity
 import com.dakotagroupstaff.utils.NetworkMonitor
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -34,19 +36,51 @@ import org.koin.android.ext.android.inject
 abstract class BaseActivity : AppCompatActivity() {
 
     private val networkMonitor: NetworkMonitor by inject()
+    private val apiService: ApiService by inject()
+    private val userPreferences: UserPreferences by inject()
 
     // Holds the currently displayed "no internet" dialog — null when not showing
     private var noInternetDialog: AlertDialog? = null
+
+    /**
+     * Manager polling check-device tiap 3 menit.
+     * Start di onResume (hanya jika user login), stop di onStop.
+     */
+    private val deviceCheckManager: DeviceCheckManager by lazy {
+        DeviceCheckManager(
+            context = this,
+            apiService = apiService,
+            userPreferences = userPreferences,
+            onForceLogout = {
+                Log.w("BaseActivity", "Force logout dipicu oleh DeviceCheckManager")
+                navigateToLogin()
+            }
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         observeNetworkConnectivity()
     }
 
+    override fun onResume() {
+        super.onResume()
+        // Mulai polling cek perangkat (hanya aktif saat user sudah login)
+        // DeviceCheckManager sendiri yang skip jika belum login
+        deviceCheckManager.start()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        // Hentikan polling saat activity tidak di foreground
+        deviceCheckManager.stop()
+    }
+
     override fun onDestroy() {
         // Dismiss dialogs to prevent WindowLeakedException
         noInternetDialog?.dismiss()
         noInternetDialog = null
+        deviceCheckManager.destroy()
         super.onDestroy()
     }
 
