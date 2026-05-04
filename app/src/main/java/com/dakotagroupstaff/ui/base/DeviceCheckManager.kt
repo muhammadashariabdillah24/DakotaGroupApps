@@ -15,18 +15,21 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.first
+import kotlin.random.Random
 
 /**
  * DeviceCheckManager — Polling tiap 3 menit untuk mendeteksi apakah NIP ini
  * masih terdaftar di perangkat ini (HRD_M_Karyawan: Kry_Imei1 + Kry_SimcardID1).
  *
+ * DESAIN: Scope yang digunakan adalah scope EKSTERNAL (lifecycleScope dari Activity),
+ * bukan scope internal. Ini memastikan:
+ * - Polling berjalan selama Activity hidup
+ * - Polling otomatis berhenti saat Activity destroy
+ * - Tidak ada memory leak
+ *
  * Jika server mengembalikan { valid: false }:
  *   → Tampilkan dialog peringatan dengan countdown 7 detik
  *   → Setelah countdown (atau klik Keluar) → clear semua data lokal → ke LoginActivity
- *
- * Usage (di BaseActivity):
- *   deviceCheckManager.start()   // di onResume atau saat user login
- *   deviceCheckManager.stop()    // di onPause / onDestroy / saat user logout
  */
 class DeviceCheckManager(
     private val context: Context,
@@ -37,52 +40,55 @@ class DeviceCheckManager(
 
     companion object {
         private const val TAG = "DeviceCheckManager"
-        private const val POLL_INTERVAL_MS = 3 * 60 * 1000L  // 3 menit (base)
-        private const val JITTER_MS = 30 * 1000L              // ±30 detik jitter
+        private const val POLL_INTERVAL_MS = 1 * 60 * 1000L  // 1 menit
+        private const val JITTER_MS = 10 * 1000L              // ±10 detik jitter
         private const val COUNTDOWN_SECONDS = 7L
     }
 
-    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private var pollingJob: Job? = null
     private var activeDialog: AlertDialog? = null
     private var countDownTimer: CountDownTimer? = null
 
     /**
      * Mulai polling. Hanya berjalan jika user sedang login.
-     * Panggil dari BaseActivity.onResume() atau setelah login berhasil.
+     * Panggil dari BaseActivity dengan lifecycleScope agar terikat lifecycle Activity.
+     * @param scope CoroutineScope dari Activity (lifecycleScope)
      */
-    fun start() {
+    fun start(scope: CoroutineScope) {
         if (pollingJob?.isActive == true) return  // Sudah berjalan
 
-        pollingJob = scope.launch {
+        pollingJob = scope.launch(Dispatchers.IO) {
+            // Cek pertama dilakukan segera tanpa delay (saat app dibuka)
+            checkDevice()
+
+            // Kemudian polling dengan interval 3 menit + jitter
             while (isActive) {
-                checkDevice()
-                // Tambah jitter acak ±30 detik agar request tidak serentak dari semua device
-                val jitter = ((-JITTER_MS)..(JITTER_MS)).random()
+                val jitter = Random.nextLong(-JITTER_MS, JITTER_MS)
                 delay(POLL_INTERVAL_MS + jitter)
+                checkDevice()
             }
         }
-        Log.d(TAG, "Device check polling dimulai (interval: 3 menit)")
+        Log.d(TAG, "Device check polling dimulai (interval: ~3 menit)")
     }
 
     /**
      * Hentikan polling.
-     * Panggil dari BaseActivity.onStop() atau saat user logout.
+     * Dipanggil otomatis saat lifecycleScope di-cancel (Activity destroy).
+     * Bisa juga dipanggil manual saat logout.
      */
     fun stop() {
         pollingJob?.cancel()
         pollingJob = null
         countDownTimer?.cancel()
-        dismissDialog()
         Log.d(TAG, "Device check polling dihentikan")
     }
 
     /**
-     * Bersihkan semua resource.
+     * Bersihkan semua resource — dismiss dialog jika masih tampil.
      * Panggil dari BaseActivity.onDestroy().
      */
     fun destroy() {
-        scope.cancel()
+        stop()
         countDownTimer?.cancel()
         dismissDialog()
     }
@@ -105,7 +111,7 @@ class DeviceCheckManager(
             val simId = session.simId
 
             if (imei.isBlank() || simId.isBlank()) {
-                Log.w(TAG, "Skip — IMEI atau SimId kosong")
+                Log.w(TAG, "Skip — IMEI atau SimId kosong di session")
                 return
             }
 
@@ -117,19 +123,24 @@ class DeviceCheckManager(
             )
 
             if (!response.valid) {
-                Log.w(TAG, "Perangkat tidak valid! NIP=$nip mungkin sudah login di perangkat lain.")
+                Log.w(TAG, "⚠️ Perangkat TIDAK valid! NIP=$nip sudah login di perangkat lain.")
+                // Hentikan polling — tidak perlu cek lagi, dialog akan tampil
+                pollingJob?.cancel()
+                pollingJob = null
+
                 withContext(Dispatchers.Main) {
                     showForceLogoutDialog()
                 }
             } else {
-                Log.d(TAG, "Perangkat valid ✓")
+                Log.d(TAG, "✓ Perangkat valid: NIP=$nip")
             }
 
         } catch (e: CancellationException) {
             // Job dibatalkan — normal, tidak perlu log error
+            throw e
         } catch (e: Exception) {
             // Error jaringan atau server → skip, jangan kick user saat offline
-            Log.w(TAG, "Gagal cek perangkat (skip): ${e.message}")
+            Log.w(TAG, "Gagal cek perangkat (skip, mungkin offline): ${e.message}")
         }
     }
 
@@ -137,17 +148,12 @@ class DeviceCheckManager(
         val activity = context as? Activity ?: return
         if (activity.isFinishing || activity.isDestroyed) return
 
-        // Hentikan polling — dialog sudah tampil, tidak perlu cek lagi
-        pollingJob?.cancel()
-        pollingJob = null
-
         // Dismiss dialog lama jika ada
         dismissDialog()
 
         val dialogView = LayoutInflater.from(context)
             .inflate(R.layout.dialog_force_logout, null)
 
-        val tvMessage = dialogView.findViewById<TextView>(R.id.tv_force_logout_message)
         val tvCountdown = dialogView.findViewById<TextView>(R.id.tv_countdown)
         val btnKeluar = dialogView.findViewById<MaterialButton>(R.id.btn_keluar)
 
@@ -159,12 +165,16 @@ class DeviceCheckManager(
         btnKeluar.setOnClickListener {
             countDownTimer?.cancel()
             activeDialog?.dismiss()
-            scope.launch { performForceLogout() }
+            activeDialog = null
+            // Jalankan force logout di coroutine baru
+            CoroutineScope(Dispatchers.IO).launch {
+                performForceLogout()
+            }
         }
 
         activeDialog?.show()
 
-        // Countdown 7 detik
+        // Countdown 7 detik — update UI di Main thread
         countDownTimer = object : CountDownTimer(COUNTDOWN_SECONDS * 1000, 1000) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000) + 1
@@ -173,7 +183,10 @@ class DeviceCheckManager(
 
             override fun onFinish() {
                 activeDialog?.dismiss()
-                scope.launch { performForceLogout() }
+                activeDialog = null
+                CoroutineScope(Dispatchers.IO).launch {
+                    performForceLogout()
+                }
             }
         }.start()
     }
@@ -181,15 +194,10 @@ class DeviceCheckManager(
     private suspend fun performForceLogout() {
         try {
             Log.d(TAG, "Force logout: menghapus semua data lokal")
-
-            // Hapus semua data lokal (DataStore + Room DB via clearAllData)
             userPreferences.clearAllData()
-
-            withContext(Dispatchers.Main) {
-                onForceLogout()
-            }
         } catch (e: Exception) {
-            Log.e(TAG, "Error saat force logout: ${e.message}")
+            Log.e(TAG, "Error saat clearAllData: ${e.message}")
+        } finally {
             withContext(Dispatchers.Main) {
                 onForceLogout()
             }

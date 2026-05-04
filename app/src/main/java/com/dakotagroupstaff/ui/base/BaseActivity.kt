@@ -61,19 +61,13 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         observeNetworkConnectivity()
+        // Mulai polling deteksi perangkat lain — terikat ke lifecycleScope Activity
+        // (otomatis berhenti saat Activity destroy, tidak perlu stop() manual)
+        deviceCheckManager.start(lifecycleScope)
     }
 
     override fun onResume() {
         super.onResume()
-        // Mulai polling cek perangkat (hanya aktif saat user sudah login)
-        // DeviceCheckManager sendiri yang skip jika belum login
-        deviceCheckManager.start()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        // Hentikan polling saat activity tidak di foreground
-        deviceCheckManager.stop()
     }
 
     override fun onDestroy() {
