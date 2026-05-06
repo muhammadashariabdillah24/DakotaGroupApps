@@ -140,32 +140,41 @@ class AuthRepository private constructor(
 
     suspend fun logout() {
         try {
-            val refreshToken = userPreferences.getRefreshToken().first()
             val nip = userPreferences.getNip().first()
-            val pt = userPreferences.getPt().first()
-            
-            if (refreshToken.isNotEmpty() && nip.isNotEmpty() && pt.isNotEmpty()) {
+            val pt  = userPreferences.getPt().first()
+
+            if (nip.isNotEmpty() && pt.isNotEmpty()) {
                 try {
-                    // Call logout API to revoke refresh token
-                    val logoutRequest = LogoutRequest(refreshToken, nip)
-                    val response = apiService.logout(pt, logoutRequest)
-                    
-                    Log.d("AuthRepository", "Logout API response: ${response.message}")
+                    // Beritahu server bahwa user logout (server tidak perlu melakukan apa-apa
+                    // karena tidak ada refresh token yang perlu di-revoke)
+                    val logoutRequest = LogoutRequest("", nip)
+                    apiService.logout(pt, logoutRequest)
                 } catch (e: Exception) {
-                    // Log but don't fail - still clear local session
-                    Log.e("AuthRepository", "Error calling logout API", e)
+                    Log.w("AuthRepository", "Logout API error (ignored): ${e.message}")
                 }
             }
-            
-            // Hanya hapus token & status login, data operasional lokal TETAP tersimpan
-            // agar jika user login kembali dengan identitas sama, data tidak hilang
+
+            // Hapus token & status login, data operasional lokal TETAP tersimpan
             userPreferences.clearSessionOnly()
-            Log.d("AuthRepository", "Logout selesai — session token dihapus, data lokal dipertahankan")
-            
+            Log.d("AuthRepository", "Logout selesai")
+
         } catch (e: Exception) {
             Log.e("AuthRepository", "Logout error", e)
-            // Tetap hapus session meski exception
             userPreferences.clearSessionOnly()
+        }
+    }
+
+    /**
+     * Hapus SEMUA data lokal (token + session + Room DB).
+     * Dipanggil saat force logout karena NIP login di perangkat lain.
+     */
+    suspend fun clearAllData() {
+        try {
+            userPreferences.clearAllData()
+            appDatabase.clearAllTables()
+            Log.d("AuthRepository", "clearAllData: semua data lokal dihapus")
+        } catch (e: Exception) {
+            Log.e("AuthRepository", "clearAllData error", e)
         }
     }
 

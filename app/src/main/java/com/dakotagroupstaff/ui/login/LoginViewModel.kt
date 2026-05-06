@@ -3,12 +3,12 @@ package com.dakotagroupstaff.ui.login
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.asLiveData
-import androidx.lifecycle.viewModelScope
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.model.UserSession
 import com.dakotagroupstaff.data.remote.response.LoginData
 import com.dakotagroupstaff.data.repository.AuthRepository
 import kotlinx.coroutines.launch
+import androidx.lifecycle.viewModelScope
 
 class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
@@ -28,5 +28,13 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
     suspend fun logout() {
         authRepository.logout()
+    }
+
+    /**
+     * Hapus SEMUA data lokal — dipanggil saat force logout
+     * (NIP sudah login di perangkat lain)
+     */
+    suspend fun clearAllData() {
+        authRepository.clearAllData()
     }
 }

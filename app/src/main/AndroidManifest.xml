@@ -29,14 +29,20 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.DakotaGroupStaff"
         android:networkSecurityConfig="@xml/network_security_config">
+        <!-- CheckerActivity: halaman booting pertama (launcher) -->
         <activity
-            android:name=".MainActivity"
-            android:exported="true">
+            android:name=".ui.checker.CheckerActivity"
+            android:exported="true"
+            android:theme="@style/Theme.DakotaGroupStaff">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
         
         <activity
             android:name=".ui.login.LoginActivity"
