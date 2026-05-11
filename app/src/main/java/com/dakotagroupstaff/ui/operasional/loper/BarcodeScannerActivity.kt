@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.operasional.loper
+package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
 import android.app.Activity

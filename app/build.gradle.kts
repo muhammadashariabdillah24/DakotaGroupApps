@@ -55,6 +55,16 @@ android {
         viewBinding = true
         buildConfig = true
     }
+
+    // lint {
+    //     // Disable lintVitalAnalyzeRelease — it causes Windows file-lock errors
+    //     // on lint-cache JARs when another process (e.g. Android Studio) is open.
+    //     // Run `./gradlew lint` manually if you need a full lint report.
+    //     checkReleaseBuilds = false
+
+    //     // Do not abort the build on lint warnings / deprecation notices
+    //     abortOnError = false
+    // }
 }
 
 dependencies {

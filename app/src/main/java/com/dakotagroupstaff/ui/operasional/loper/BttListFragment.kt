@@ -137,8 +137,8 @@ class BttListFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        // Observe API delivery list only for tabs that use it (PENDING, OVERDUE)
-        if (tabType != BttTabType.SENT) {
+        // Observe API delivery list only for PENDING tab
+        if (tabType == BttTabType.PENDING) {
             viewModel.deliveryList.observe(viewLifecycleOwner) { result ->
                 when (result) {
                     is com.dakotagroupstaff.data.Result.Loading -> {
@@ -146,16 +146,8 @@ class BttListFragment : Fragment() {
                     }
                     is com.dakotagroupstaff.data.Result.Success -> {
                         val deliveryData = result.data.data.orEmpty()
-                        when (tabType) {
-                            BttTabType.PENDING -> {
-                                lifecycleScope.launch {
-                                    showPendingDeliveries(deliveryData)
-                                }
-                            }
-                            BttTabType.SENT -> {
-                                // No-op: SENT tab uses local Room data only
-                            }
-                            BttTabType.OVERDUE -> showOverdueDeliveries(deliveryData)
+                        lifecycleScope.launch {
+                            showPendingDeliveries(deliveryData)
                         }
                     }
                     is com.dakotagroupstaff.data.Result.Error -> {
@@ -165,7 +157,7 @@ class BttListFragment : Fragment() {
                 }
             }
         }
-        
+
         // Observe sent deliveries from local storage for SENT tab
         if (tabType == BttTabType.SENT) {
             viewModel.sentDeliveries.observe(viewLifecycleOwner) { sentList ->
@@ -173,6 +165,7 @@ class BttListFragment : Fragment() {
             }
         }
     }
+
 
     private fun showLoading() {
         // Use default SwipeRefreshLayout loading indicator
@@ -243,14 +236,6 @@ class BttListFragment : Fragment() {
         }
     }
     
-    private fun showOverdueDeliveries(data: List<DeliveryItem>) {
-        binding.swipeRefresh.isRefreshing = false
-
-        // TODO: Implement overdue logic based on SLA/due date
-        // For now, show empty
-        binding.layoutEmptyState.isVisible = true
-        binding.rvDeliveryList.isVisible = false
-    }
 
     
     

@@ -110,21 +110,17 @@ class AssignmentRepository(
         emit(Result.Loading)
         
         try {
-            val response = apiService.getLetterOfAssignment(
+            // Gunakan endpoint baru assignment/detail yang langsung query by sID
+            // tanpa filter AktifYN/CompleteYN — bisa fetch surat tugas apapun
+            val response = apiService.getAssignmentDetail(
                 pt = pt,
-                request = LetterOfAssignRequest(nip)
+                request = AssignmentDetailRequest(sID = sID)
             )
             
             if (response.success && response.data?.isNotEmpty() == true) {
-                // Find the specific assignment by sID
-                val assignment = response.data.find { it.sID == sID }
-                if (assignment != null) {
-                    emit(Result.Success(assignment))
-                } else {
-                    emit(Result.Error("Assignment with ID $sID not found"))
-                }
+                emit(Result.Success(response.data[0]))
             } else {
-                emit(Result.Error(response.message ?: "Failed to get assignment"))
+                emit(Result.Error(response.message ?: "Assignment with ID $sID not found"))
             }
         } catch (e: Exception) {
             emit(Result.Error(e.message ?: "Failed to get assignment"))

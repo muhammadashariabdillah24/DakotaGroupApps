@@ -416,6 +416,16 @@ interface ApiService {
     ): ApiResponse<com.dakotagroupstaff.data.remote.response.UpdateLocationData>
     
     /**
+     * Get Assignment Detail by sID
+     * POST /assignment/detail?pt=<pt>
+     */
+    @POST("assignment/detail")
+    suspend fun getAssignmentDetail(
+        @Query("pt") pt: String,
+        @Body request: com.dakotagroupstaff.data.remote.response.AssignmentDetailRequest
+    ): ApiResponse<List<com.dakotagroupstaff.data.remote.response.LetterOfAssignmentData>>
+    
+    /**
      * Get Operational Cost Items (Master Data)
      * GET /operational-cost/items?pt=<pt>
      */

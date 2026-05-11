@@ -288,7 +288,18 @@ data class ApprovalStatusData(
  */
 data class LetterOfAssignRequest(
     @SerializedName("nip")
-    val nip: String
+    val nip: String,
+    
+    @SerializedName("sID")
+    val sID: String? = null  // Opsional: jika diisi, fetch detail surat tugas spesifik by ID
+)
+
+/**
+ * Request model for getting assignment detail by sID
+ */
+data class AssignmentDetailRequest(
+    @SerializedName("sID")
+    val sID: String
 )
 
 /**

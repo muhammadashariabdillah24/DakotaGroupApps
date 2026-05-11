@@ -1,4 +1,4 @@
-﻿package com.dakotagroupstaff.ui.operasional.loper
+package com.dakotagroupstaff.ui.operasional.loper
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -80,8 +80,7 @@ class LoperActivity : BaseActivity() {
             override fun createFragment(position: Int): Fragment {
                 return when (position) {
                     0 -> BttListFragment.newInstance(BttTabType.PENDING)
-                    1 -> BttListFragment.newInstance(BttTabType.SENT)
-                    else -> BttListFragment.newInstance(BttTabType.OVERDUE)
+                    else -> BttListFragment.newInstance(BttTabType.SENT)
                 }
             }
         }
@@ -91,11 +90,11 @@ class LoperActivity : BaseActivity() {
         TabLayoutMediator(binding.tabLayoutBtt, binding.viewPagerBtt) { tab, position ->
             tab.text = when (position) {
                 0 -> "Daftar BTT Tertunda"
-                1 -> "Daftar BTT Terkirim"
-                else -> "Daftar BTT Melebihi Tengat Waktu"
+                else -> "Daftar BTT Terkirim"
             }
         }.attach()
     }
+
 
 
 
