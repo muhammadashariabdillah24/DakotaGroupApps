@@ -142,4 +142,14 @@
 
     </androidx.core.widget.NestedScrollView>
 
+    <TextView
+        android:id="@+id/tv_app_version"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|center_horizontal"
+        android:layout_marginBottom="30dp"
+        android:text="TestAppVersion-1"
+        android:textColor="#9E9E9E"
+        android:textSize="12sp" />
+
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

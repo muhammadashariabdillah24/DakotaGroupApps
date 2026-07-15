@@ -122,41 +122,55 @@ class AttendanceViewModel(
         pt: String,
         nip: String,
         schedule: String,
+        wfhKodeCabang: String? = null,
         deviceId: String? = null,
         serialNumber: String? = null
     ) {
         val location = _userLocation.value
         val nearest = _nearestAgent.value
-        
-        // Comprehensive validation before submission
+
+        // Semua tipe absen butuh lokasi GPS — GPS menangkap koordinat user yang nyata
         if (location == null) {
-            _errorMessage.value = "Lokasi tidak tersedia. Mohon aktifkan GPS"
+            _errorMessage.value = "Lokasi tidak tersedia. Mohon aktifkan GPS dan tunggu hingga sinyal ditemukan"
             _submitResult.value = Result.Error("Lokasi GPS tidak tersedia")
             return
         }
-        
-        if (nearest == null) {
-            _errorMessage.value = "Lokasi cabang/agen tidak ditemukan"
-            _submitResult.value = Result.Error("Data lokasi cabang tidak tersedia")
-            return
+
+        val kodeCabang: String
+
+        // Check if it's a WFH schedule
+        if (schedule == "HM" || schedule == "HK") {
+            // WFH: butuh agen/cabang dipilih, tapi TIDAK perlu dalam jangkauan fisik
+            // Koordinat GPS user yang nyata tetap dikirim ke server
+            if (wfhKodeCabang.isNullOrBlank()) {
+                _errorMessage.value = "Silakan pilih agen/cabang terlebih dahulu untuk WFH"
+                _submitResult.value = Result.Error("Agen/cabang belum dipilih")
+                return
+            }
+            kodeCabang = wfhKodeCabang
+        } else {
+            // WFO: butuh GPS aktif DAN berada dalam jangkauan cabang
+            if (nearest == null) {
+                _errorMessage.value = "Lokasi cabang/agen tidak ditemukan"
+                _submitResult.value = Result.Error("Data lokasi cabang tidak tersedia")
+                return
+            }
+            
+            val (agent, distance) = nearest
+            val rangeMeters = agent.range.toDoubleOrNull() ?: 30.0
+            
+            if (distance > rangeMeters) {
+                _errorMessage.value = "Anda berada di luar jangkauan cabang/agen (${distance.toInt()}m dari ${agent.namaAgen})"
+                return
+            }
+            
+            if (agent.md5Code.isBlank()) {
+                _errorMessage.value = "Kode cabang tidak valid. Data lokasi perlu diperbarui"
+                _submitResult.value = Result.Error("Kode cabang tidak valid")
+                return
+            }
+            kodeCabang = agent.md5Code
         }
-        
-        val (agent, distance) = nearest
-        val rangeMeters = agent.range.toDoubleOrNull() ?: 30.0
-        
-        if (distance > rangeMeters) {
-            _errorMessage.value = "Anda berada di luar jangkauan cabang/agen (${distance.toInt()}m dari ${agent.namaAgen})"
-            return
-        }
-        
-        // Get MD5 code from agent (CRITICAL: Backend validates against Agen_md5)
-        // Check if MD5 code is blank before proceeding
-        if (agent.md5Code.isBlank()) {
-            _errorMessage.value = "Kode cabang tidak valid. Data lokasi perlu diperbarui"
-            _submitResult.value = Result.Error("Kode cabang tidak valid")
-            return
-        }
-        val kodeCabang = agent.md5Code
         
         viewModelScope.launch {
             attendanceRepository.submitAttendance(

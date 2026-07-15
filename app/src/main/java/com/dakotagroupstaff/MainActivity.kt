@@ -12,6 +12,7 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
+import com.google.gson.Gson
 import com.dakotagroupstaff.databinding.ActivityMainBinding
 import com.dakotagroupstaff.ui.adapter.RecentMenuAdapter
 import com.dakotagroupstaff.ui.base.BaseActivity
@@ -28,6 +29,9 @@ import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import kotlin.system.exitProcess
+import com.dakotagroupstaff.data.local.preferences.dataStore
+import com.dakotagroupstaff.data.remote.response.EmployeeBioRequest
+import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 
 class MainActivity : BaseActivity() {
 
@@ -242,6 +246,26 @@ class MainActivity : BaseActivity() {
         binding.btnLihatSuratTugas.visibility = if (taskCode > 0) View.VISIBLE else View.GONE
 
         setupClickListeners(session)
+        fetchAndSaveEmployeeBio(session.pt, session.nip)
+    }
+
+    private fun fetchAndSaveEmployeeBio(pt: String, nip: String) {
+        lifecycleScope.launch {
+            try {
+                val apiService = ApiConfig.getApiService(userPreferences = userPreferences)
+                val response = apiService.getEmployeeBio(pt, EmployeeBioRequest(nip))
+                val data = response.data?.firstOrNull()
+                if (data != null) {
+                    val jabCode = data.jabCode?.trim() ?: ""
+                    val jabNama = data.jabNama?.trim() ?: ""
+                    userPreferences.updateJabatan(jabCode, jabNama)
+                    userPreferences.saveBioData(Gson().toJson(data))
+                    Log.d("MainActivity", "Saved jabatan: $jabCode - $jabNama & bio data")
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "Failed to fetch bio: ${e.message}")
+            }
+        }
     }
 
     private fun loadProfilePhoto(nip: String, pt: String) {

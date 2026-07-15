@@ -13,32 +13,38 @@ data class EmployeeBioRequest(
 
 data class EmployeeBioData(
     @SerializedName("NIP")
-    val nip: String,
+    val nip: String?,
 
     @SerializedName("Nama")
-    val nama: String,
+    val nama: String?,
+
+    @SerializedName("JabCode")
+    val jabCode: String?,
+
+    @SerializedName("JabNama")
+    val jabNama: String?,
 
     @SerializedName("BPJS")
-    val bpjs: String,
+    val bpjs: String?,
 
     @SerializedName("JAMSOSTEK")
-    val jamsostek: String,
+    val jamsostek: String?,
 
     @SerializedName("STATUS SOSIAL")
-    val statusSosial: String,
+    val statusSosial: String?,
 
     @SerializedName("NPWP")
-    val npwp: String,
+    val npwp: String?,
 
     @SerializedName("SHIFT")
-    val shift: String,
+    val shift: String?,
 
     @SerializedName("MASUK")
-    val masuk: String,
+    val masuk: String?,
 
     @SerializedName("KELUAR")
-    val keluar: String,
+    val keluar: String?,
 
     @SerializedName("StatusPegawai")
-    val statusPegawai: String
+    val statusPegawai: String?
 )

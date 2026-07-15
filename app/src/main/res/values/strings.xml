@@ -44,12 +44,16 @@
     <string name="data_usage">Penggunaan Data</string>
     <string name="help_center">Pusat Bantuan</string>
     <string name="work_area">Area Kerja</string>
+    <string name="jabatan_label">Jabatan</string>
     <string name="bpjs_kesehatan">BPJS Kesehatan</string>
     <string name="jamsostek_label">Jamsostek</string>
     <string name="npwp_label">NPWP</string>
     <string name="social_status">Status Sosial</string>
     <string name="working_hours">Jam Kerja</string>
     <string name="employment_status">Status Pegawai</string>
+    <string name="phone_number_1">Nomor Telepon 1 (SIM 1)</string>
+    <string name="phone_number_2">Nomor Telepon 2 (SIM 2)</string>
+    <string name="phone_number_copied">Nomor telepon berhasil disalin</string>
     <string name="expand_collapse_icon">Expand/Collapse Icon</string>
 
     <string name="attendance_title">Absensi</string>

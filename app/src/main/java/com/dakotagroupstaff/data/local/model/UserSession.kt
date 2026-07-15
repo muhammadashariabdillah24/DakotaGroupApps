@@ -17,5 +17,7 @@ data class UserSession(
     val areaKerja: String = "",
     val taskCode: String = "",
     val taskDetail: String = "",
-    val taskId: String = ""
+    val taskId: String = "",
+    val jabCode: String = "",
+    val jabNama: String = ""
 )

@@ -146,10 +146,30 @@ class LeaveViewModel(
     }
     
     /**
-     * Select leave type
+     * Select leave type.
+     * Jika jenis dipilih adalah CUTI dan tanggal mulai yang sudah dipilih
+     * tidak memenuhi syarat H+7, maka tanggal mulai & akhir akan di-reset.
      */
     fun selectLeaveType(leaveType: LeaveType) {
         _selectedLeaveType.value = leaveType
+
+        // Jika user pilih Cuti, cek apakah startDate sudah memenuhi syarat H+7
+        if (leaveType == LeaveType.CUTI) {
+            val minDate = Calendar.getInstance().apply {
+                add(Calendar.DAY_OF_YEAR, 7)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+
+            val currentStart = _startDate.value
+            if (currentStart != null && currentStart.before(minDate)) {
+                // Tanggal mulai yang dipilih tidak valid, reset
+                _startDate.value = null
+                _endDate.value = null
+            }
+        }
     }
     
     /**
@@ -202,12 +222,26 @@ class LeaveViewModel(
     }
     
     /**
-     * Get minimum date for date picker based on leave type
+     * Get minimum date for date picker based on leave type.
+     * - CUTI: minimal H+7 dari hari ini (contoh: hari ini 15 Juli → minimal 22 Juli)
+     * - IZIN: mulai hari ini
+     * - Lainnya (Sakit, dll): tidak ada batasan minimum
      */
     fun getMinimumDate(): Date {
         return when (_selectedLeaveType.value) {
-            LeaveType.CUTI, LeaveType.IZIN -> Date() // Today onwards
-            else -> Date(0) // Any date for sick leave, etc.
+            LeaveType.CUTI -> {
+                // Cuti harus diajukan minimal 7 hari sebelumnya
+                val calendar = Calendar.getInstance()
+                calendar.add(Calendar.DAY_OF_YEAR, 7)
+                // Reset jam ke awal hari agar tanggal ke-7 terhitung penuh
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                calendar.time
+            }
+            LeaveType.IZIN -> Date() // Hari ini
+            else -> Date(0) // Tidak ada batasan (untuk Sakit, dll.)
         }
     }
     

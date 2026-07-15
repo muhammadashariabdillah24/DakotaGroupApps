@@ -17,11 +17,15 @@ import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
+import com.dakotagroupstaff.data.local.preferences.dataStore
+import com.dakotagroupstaff.data.remote.response.EmployeeBioRequest
+import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.databinding.ActivityAttendanceBinding
 import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.dakotagroupstaff.util.SecurityChecker
 import com.google.android.gms.location.*
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.dakotagroupstaff.data.local.entity.AgentLocationEntity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
@@ -30,6 +34,17 @@ import kotlin.system.exitProcess
 
 class AttendanceActivity : BaseActivity() {
     
+    // Kode jabatan yang TIDAK diizinkan menggunakan fitur WFH
+    private val WFH_EXCLUDED_JAB_CODES = setOf(
+        "0030", "0031", "0039", "0040", "0036", "0024", "0019",
+        "0015", "0016", "0014", "0011", "0010", "0009", "0004",
+        "0001", "0028", "0027",
+        // Format tanpa leading zero (fallback)
+        "30", "31", "39", "40", "36", "24", "19",
+        "15", "16", "14", "11", "10", "9", "4",
+        "1", "28", "27"
+    )
+
     private lateinit var binding: ActivityAttendanceBinding
     private val viewModel: AttendanceViewModel by viewModel()
     private val userPreferences: UserPreferences by inject()
@@ -41,6 +56,7 @@ class AttendanceActivity : BaseActivity() {
     private var currentPt: String? = null
     private var isCheckingIn: Boolean = true // Track if user is checking in or out
     private var isRefreshingLocation: Boolean = false // Track source of location request
+    private var selectedWfhAgent: AgentLocationEntity? = null // Store selected agent for WFH
     
     // Location permission launcher
     private val locationPermissionLauncher = registerForActivityResult(
@@ -141,7 +157,7 @@ class AttendanceActivity : BaseActivity() {
             binding.layoutLocationInfo.visibility = if (isChecking) View.GONE else View.VISIBLE
         }
         
-        // Observe nearest agent
+        // Observe nearest agent (WFO only)
         viewModel.nearestAgent.observe(this) { result ->
             result?.let { (agent, distance) ->
                 binding.tvNearestAgent.text = agent.namaAgen
@@ -157,7 +173,7 @@ class AttendanceActivity : BaseActivity() {
                     )
                     binding.tvRangeStatus.text = "✓ Anda berada dalam jangkauan"
                     
-                    // Enable attendance buttons
+                    // Enable WFO attendance buttons only
                     binding.btnCheckIn.isEnabled = true
                     binding.btnCheckOut.isEnabled = true
                 } else {
@@ -166,10 +182,26 @@ class AttendanceActivity : BaseActivity() {
                     )
                     binding.tvRangeStatus.text = "✗ Anda berada di luar jangkauan (max ${rangeMeters.toInt()}m)"
                     
-                    // Disable attendance buttons
+                    // Disable WFO attendance buttons only — WFH tidak terpengaruh jarak
                     binding.btnCheckIn.isEnabled = false
                     binding.btnCheckOut.isEnabled = false
                 }
+                
+                // WFH buttons state is independent of GPS range — only depends on agent selection
+                updateWfhButtonsState()
+            }
+        }
+
+        // Observe user location — update GPS coordinates display in real-time
+        viewModel.userLocation.observe(this) { location ->
+            location?.let { (lat, lon) ->
+                val latStr = String.format("%.6f", lat)
+                val lonStr = String.format("%.6f", lon)
+                binding.tvGpsCoordinates.text = "Lat: $latStr  |  Lon: $lonStr"
+                // Refresh WFH button state (GPS is now available)
+                updateWfhButtonsState()
+            } ?: run {
+                binding.tvGpsCoordinates.text = "Menunggu sinyal GPS..."
             }
         }
         
@@ -261,20 +293,48 @@ class AttendanceActivity : BaseActivity() {
             getCurrentLocation()
         }
         
-        // Check in button
+        // Select Agent WFH button
+        binding.btnSelectAgentWfh.setOnClickListener {
+            showSelectAgentDialog()
+        }
+
+        // Check in button (WFO)
         binding.btnCheckIn.setOnClickListener {
             isCheckingIn = true
-            showAttendanceConfirmation("Masuk") {
-
+            showAttendanceConfirmation("Masuk", isWfh = false) {
                 submitAttendance("M")
             }
         }
         
-        // Check out button
+        // Check out button (WFO)
         binding.btnCheckOut.setOnClickListener {
             isCheckingIn = false
-            showAttendanceConfirmation("Pulang") {
+            showAttendanceConfirmation("Pulang", isWfh = false) {
                 submitAttendance("K")
+            }
+        }
+        
+        // Check in button (WFH)
+        binding.btnCheckInWfh.setOnClickListener {
+            if (selectedWfhAgent == null) {
+                Toast.makeText(this, "Silakan pilih agen/cabang terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            isCheckingIn = true
+            showAttendanceConfirmation("Masuk (WFH)", isWfh = true) {
+                submitAttendance("HM", selectedWfhAgent?.md5Code)
+            }
+        }
+        
+        // Check out button (WFH)
+        binding.btnCheckOutWfh.setOnClickListener {
+            if (selectedWfhAgent == null) {
+                Toast.makeText(this, "Silakan pilih agen/cabang terlebih dahulu", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+            isCheckingIn = false
+            showAttendanceConfirmation("Keluar (WFH)", isWfh = true) {
+                submitAttendance("HK", selectedWfhAgent?.md5Code)
             }
         }
         
@@ -290,11 +350,24 @@ class AttendanceActivity : BaseActivity() {
     }
     
     private fun loadUserSession() {
+        // Observasi session secara terus-menerus agar jika MainActivity baru selesai fetch bio,
+        // halaman Absensi bisa langsung merespon dan menyembunyikan WFH.
+        lifecycleScope.launch {
+            userPreferences.getSession().collect { session ->
+                currentNip = session.nip
+                currentPt = session.pt
+                
+                // Check jabatan and control WFH section visibility
+                val jabCodeClean = session.jabCode.trim()
+                val isExcluded = WFH_EXCLUDED_JAB_CODES.contains(jabCodeClean) || 
+                                 WFH_EXCLUDED_JAB_CODES.contains(jabCodeClean.padStart(4, '0'))
+                                 
+                binding.layoutWfhSection.visibility = if (isExcluded || jabCodeClean.isBlank()) View.GONE else View.VISIBLE
+            }
+        }
+        
         lifecycleScope.launch {
             val session = userPreferences.getSession().first()
-            
-            currentNip = session.nip
-            currentPt = session.pt
             
             // Load agent locations
             currentPt?.let { pt ->
@@ -475,7 +548,7 @@ class AttendanceActivity : BaseActivity() {
         }, 15000) // 15 seconds timeout
     }
     
-    private fun submitAttendance(schedule: String) {
+    private fun submitAttendance(schedule: String, wfhKodeCabang: String? = null) {
         lifecycleScope.launch {
             val session = userPreferences.getSession().first()
             
@@ -483,19 +556,29 @@ class AttendanceActivity : BaseActivity() {
                 pt = session.pt,
                 nip = session.nip,
                 schedule = schedule,
+                wfhKodeCabang = wfhKodeCabang,
                 deviceId = session.imei,
                 serialNumber = session.simId
             )
         }
     }
     
-    private fun showAttendanceConfirmation(type: String, onConfirm: () -> Unit) {
-        val agentName = viewModel.nearestAgent.value?.first?.namaAgen ?: "Unknown"
-        val distance = viewModel.nearestAgent.value?.second?.toInt() ?: 0
+    private fun showAttendanceConfirmation(type: String, isWfh: Boolean = false, onConfirm: () -> Unit) {
+        val agentName: String
+        val distanceText: String
+        
+        if (isWfh) {
+            agentName = selectedWfhAgent?.namaAgen ?: "Unknown"
+            distanceText = "Mode: Work From Home"
+        } else {
+            agentName = viewModel.nearestAgent.value?.first?.namaAgen ?: "Unknown"
+            val distance = viewModel.nearestAgent.value?.second?.toInt() ?: 0
+            distanceText = "Jarak: ${distance}m"
+        }
         
         MaterialAlertDialogBuilder(this)
             .setTitle("Konfirmasi Absen $type")
-            .setMessage("Anda akan absen $type di:\n\n$agentName\nJarak: ${distance}m\n\nLanjutkan?")
+            .setMessage("Anda akan absen $type di:\n\n$agentName\n$distanceText\n\nLanjutkan?")
             .setPositiveButton("Ya") { dialog, _ ->
                 onConfirm()
                 dialog.dismiss()
@@ -506,12 +589,76 @@ class AttendanceActivity : BaseActivity() {
             .show()
     }
     
+    private fun showSelectAgentDialog() {
+        val dialog = com.google.android.material.bottomsheet.BottomSheetDialog(this)
+        val dialogView = layoutInflater.inflate(R.layout.dialog_select_agent, null)
+        dialog.setContentView(dialogView)
+
+        val btnClose = dialogView.findViewById<android.widget.ImageButton>(R.id.btnClose)
+        val etSearch = dialogView.findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etSearch)
+        val rvAgents = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.rvAgents)
+        val tvEmpty = dialogView.findViewById<android.widget.TextView>(R.id.tvEmpty)
+
+        val agentAdapter = AgentAdapter { selectedAgent ->
+            selectedWfhAgent = selectedAgent
+            binding.btnSelectAgentWfh.text = selectedAgent.namaAgen
+            // Update WFH button state after agent is selected
+            updateWfhButtonsState()
+            dialog.dismiss()
+        }
+
+        rvAgents.layoutManager = androidx.recyclerview.widget.LinearLayoutManager(this)
+        rvAgents.adapter = agentAdapter
+
+        // Populate adapter
+        viewModel.agentLocations.value?.let { result ->
+            if (result is Result.Success) {
+                agentAdapter.submitFullList(result.data)
+                if (result.data.isEmpty()) {
+                    tvEmpty.visibility = View.VISIBLE
+                    rvAgents.visibility = View.GONE
+                } else {
+                    tvEmpty.visibility = View.GONE
+                    rvAgents.visibility = View.VISIBLE
+                }
+            }
+        }
+
+        // Search feature
+        etSearch.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                agentAdapter.filter(s.toString())
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+
+        btnClose.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+    }
+
+    /**
+     * Update WFH button states independently of GPS range.
+     * WFH buttons are enabled only when:
+     * 1. An agent/branch has been selected
+     * 2. GPS location is available (to capture user's real coordinates)
+     */
+    private fun updateWfhButtonsState() {
+        val isAgentSelected = selectedWfhAgent != null
+        val isLocationAvailable = viewModel.userLocation.value != null
+        val canSubmitWfh = isAgentSelected && isLocationAvailable
+        binding.btnCheckInWfh.isEnabled = canSubmitWfh
+        binding.btnCheckOutWfh.isEnabled = canSubmitWfh
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
-    
+
     /**
      * Show Fake GPS detection dialog and force exit app
      */

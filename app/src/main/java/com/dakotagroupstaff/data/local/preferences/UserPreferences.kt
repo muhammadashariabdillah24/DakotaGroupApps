@@ -34,6 +34,9 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
     private val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
     private val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     private val TOKEN_EXPIRY_KEY = stringPreferencesKey("token_expiry")
+    private val JAB_CODE_KEY = stringPreferencesKey("jab_code")
+    private val JAB_NAMA_KEY = stringPreferencesKey("jab_nama")
+    private val BIO_DATA_KEY = stringPreferencesKey("bio_data_json")
     
     // Barcode scanner BTT collection
     private val SCANNED_BTT_IDS = stringSetPreferencesKey("scanned_btt_ids")
@@ -55,7 +58,9 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
                 areaKerja = preferences[AREA_KERJA_KEY] ?: "",
                 taskCode = preferences[TASK_CODE_KEY] ?: "",
                 taskDetail = preferences[TASK_DETAIL_KEY] ?: "",
-                taskId = preferences[TASK_ID_KEY] ?: ""
+                taskId = preferences[TASK_ID_KEY] ?: "",
+                jabCode = preferences[JAB_CODE_KEY] ?: "",
+                jabNama = preferences[JAB_NAMA_KEY] ?: ""
             )
         }
     }
@@ -75,6 +80,27 @@ class UserPreferences private constructor(private val dataStore: DataStore<Prefe
             preferences[TASK_CODE_KEY] = userSession.taskCode
             preferences[TASK_DETAIL_KEY] = userSession.taskDetail
             preferences[TASK_ID_KEY] = userSession.taskId
+            preferences[JAB_CODE_KEY] = userSession.jabCode
+            preferences[JAB_NAMA_KEY] = userSession.jabNama
+        }
+    }
+
+    suspend fun updateJabatan(jabCode: String, jabNama: String) {
+        dataStore.edit { preferences ->
+            preferences[JAB_CODE_KEY] = jabCode
+            preferences[JAB_NAMA_KEY] = jabNama
+        }
+    }
+
+    suspend fun saveBioData(bioJson: String) {
+        dataStore.edit { preferences ->
+            preferences[BIO_DATA_KEY] = bioJson
+        }
+    }
+
+    fun getBioData(): Flow<String> {
+        return dataStore.data.map { preferences ->
+            preferences[BIO_DATA_KEY] ?: ""
         }
     }
 
