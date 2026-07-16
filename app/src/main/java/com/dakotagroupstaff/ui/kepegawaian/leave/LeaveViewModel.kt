@@ -147,14 +147,14 @@ class LeaveViewModel(
     
     /**
      * Select leave type.
-     * Jika jenis dipilih adalah CUTI dan tanggal mulai yang sudah dipilih
+     * Jika jenis dipilih adalah CUTI atau CUTI_BERSAMA dan tanggal mulai yang sudah dipilih
      * tidak memenuhi syarat H+7, maka tanggal mulai & akhir akan di-reset.
      */
     fun selectLeaveType(leaveType: LeaveType) {
         _selectedLeaveType.value = leaveType
 
-        // Jika user pilih Cuti, cek apakah startDate sudah memenuhi syarat H+7
-        if (leaveType == LeaveType.CUTI) {
+        // Jika user pilih Cuti atau Cuti Bersama, cek apakah startDate sudah memenuhi syarat H+7
+        if (leaveType == LeaveType.CUTI || leaveType == LeaveType.CUTI_BERSAMA) {
             val minDate = Calendar.getInstance().apply {
                 add(Calendar.DAY_OF_YEAR, 7)
                 set(Calendar.HOUR_OF_DAY, 0)
@@ -224,13 +224,14 @@ class LeaveViewModel(
     /**
      * Get minimum date for date picker based on leave type.
      * - CUTI: minimal H+7 dari hari ini (contoh: hari ini 15 Juli → minimal 22 Juli)
+     * - CUTI_BERSAMA: minimal H+7 dari hari ini (sama dengan Cuti)
      * - IZIN: mulai hari ini
      * - Lainnya (Sakit, dll): tidak ada batasan minimum
      */
     fun getMinimumDate(): Date {
         return when (_selectedLeaveType.value) {
-            LeaveType.CUTI -> {
-                // Cuti harus diajukan minimal 7 hari sebelumnya
+            LeaveType.CUTI, LeaveType.CUTI_BERSAMA -> {
+                // Cuti & Cuti Bersama harus diajukan minimal 7 hari sebelumnya
                 val calendar = Calendar.getInstance()
                 calendar.add(Calendar.DAY_OF_YEAR, 7)
                 // Reset jam ke awal hari agar tanggal ke-7 terhitung penuh

@@ -17,9 +17,6 @@ import androidx.lifecycle.lifecycleScope
 import com.dakotagroupstaff.R
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.local.preferences.UserPreferences
-import com.dakotagroupstaff.data.local.preferences.dataStore
-import com.dakotagroupstaff.data.remote.response.EmployeeBioRequest
-import com.dakotagroupstaff.data.remote.retrofit.ApiConfig
 import com.dakotagroupstaff.databinding.ActivityAttendanceBinding
 import com.dakotagroupstaff.util.ErrorMessageHelper
 import com.dakotagroupstaff.util.SecurityChecker
@@ -350,36 +347,30 @@ class AttendanceActivity : BaseActivity() {
     }
     
     private fun loadUserSession() {
-        // Observasi session secara terus-menerus agar jika MainActivity baru selesai fetch bio,
-        // halaman Absensi bisa langsung merespon dan menyembunyikan WFH.
+        var isFirstEmission = true
         lifecycleScope.launch {
             userPreferences.getSession().collect { session ->
                 currentNip = session.nip
                 currentPt = session.pt
-                
-                // Check jabatan and control WFH section visibility
+
+                // Kontrol visibilitas WFH berdasarkan kode jabatan
                 val jabCodeClean = session.jabCode.trim()
-                val isExcluded = WFH_EXCLUDED_JAB_CODES.contains(jabCodeClean) || 
+                val isExcluded = WFH_EXCLUDED_JAB_CODES.contains(jabCodeClean) ||
                                  WFH_EXCLUDED_JAB_CODES.contains(jabCodeClean.padStart(4, '0'))
-                                 
-                binding.layoutWfhSection.visibility = if (isExcluded || jabCodeClean.isBlank()) View.GONE else View.VISIBLE
-            }
-        }
-        
-        lifecycleScope.launch {
-            val session = userPreferences.getSession().first()
-            
-            // Load agent locations
-            currentPt?.let { pt ->
-                viewModel.loadAgentLocations(pt)
-                
-                // **Load attendance history dari cache saat masuk halaman**
-                currentNip?.let { nip ->
+
+                // WFH disembunyikan jika jabCode termasuk dalam daftar yang dikecualikan.
+                // Jika jabCode masih kosong (bio belum di-fetch), WFH ditampilkan sementara.
+                binding.layoutWfhSection.visibility = if (isExcluded) View.GONE else View.VISIBLE
+
+                // Inisialisasi one-time: hanya dijalankan pada emisi pertama
+                if (isFirstEmission) {
+                    isFirstEmission = false
+                    val pt = session.pt
+                    val nip = session.nip
+                    viewModel.loadAgentLocations(pt)
                     viewModel.loadAttendanceHistory(pt, nip)
+                    checkLocationPermissionAndGet()
                 }
-                
-                // Get current location
-                checkLocationPermissionAndGet()
             }
         }
     }

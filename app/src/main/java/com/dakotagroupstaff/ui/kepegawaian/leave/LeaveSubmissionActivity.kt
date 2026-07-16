@@ -1,6 +1,7 @@
 package com.dakotagroupstaff.ui.kepegawaian.leave
 
 import android.app.DatePickerDialog
+import android.app.Dialog
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -11,6 +12,7 @@ import com.dakotagroupstaff.ui.base.BaseActivity
 import com.dakotagroupstaff.data.Result
 import com.dakotagroupstaff.data.remote.response.LeaveType
 import com.dakotagroupstaff.databinding.ActivityLeaveSubmissionBinding
+import com.dakotagroupstaff.databinding.DialogLeaveInfoBinding
 import com.dakotagroupstaff.data.local.pref.SessionManager
 import com.dakotagroupstaff.util.ErrorMessageHelper
 import org.koin.android.ext.android.inject
@@ -43,6 +45,7 @@ class LeaveSubmissionActivity : BaseActivity() {
         setupListeners()
         
         loadEmployeeData()
+        showLeaveInfoModal()
     }
     
     private fun setupToolbar() {
@@ -336,5 +339,29 @@ class LeaveSubmissionActivity : BaseActivity() {
     override fun onSupportNavigateUp(): Boolean {
         finish()
         return true
+    }
+
+    private fun showLeaveInfoModal() {
+        val dialog = Dialog(this)
+        val dialogBinding = DialogLeaveInfoBinding.inflate(layoutInflater)
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.apply {
+            setBackgroundDrawableResource(android.R.color.transparent)
+            setLayout(
+                (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        }
+        dialog.setCancelable(false)
+
+        dialogBinding.btnCloseDialog.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialogBinding.btnDialogOk.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 }
