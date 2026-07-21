@@ -480,7 +480,7 @@ data class KMDataResponse(
 )
 
 data class KMData(
-    @SerializedName("KM")
+    @SerializedName("km")
     val km: String = "0"
 )
 

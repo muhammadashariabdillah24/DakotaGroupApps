@@ -186,30 +186,56 @@ class LetterOfAssignActivity : BaseActivity() {
     }
     
     private fun showUpdateKMDialog() {
-        val kendID = currentKendID ?: run {
-            Toast.makeText(this, "Data kendaraan tidak tersedia", Toast.LENGTH_SHORT).show()
+        // Get current active letter of assign data
+        val assignData = (viewModel.letterOfAssign.value as? Result.Success)?.data
+        if (assignData.isNullOrEmpty()) {
+            Toast.makeText(this, "Data surat tugas belum tersedia", Toast.LENGTH_SHORT).show()
             return
         }
-        
+
+        // Find the last checked-in checkpoint to determine agenID and urut for update
+        // lastcekin contains the urut of the most recently checked-in point
+        val firstItem = assignData[0]
+        val lastCekinUrut = firstItem.lastCekin.toIntOrNull() ?: 0
+
+        // Find the checkpoint with urut == lastCekin (the one that was last checked in)
+        val activeCheckpoint = if (lastCekinUrut > 0) {
+            assignData.find { it.trUrut.toIntOrNull() == lastCekinUrut }
+        } else {
+            // If no check-in yet, use the first checkpoint
+            assignData.firstOrNull()
+        }
+
+        if (activeCheckpoint == null) {
+            Toast.makeText(this, "Tidak ada checkpoint aktif untuk update KM", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val targetAgenId = activeCheckpoint.trKdCabang
+        val targetUrut = activeCheckpoint.trUrut
+
         // Create input dialog
         val input = android.widget.EditText(this)
-        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER
+        input.inputType = android.text.InputType.TYPE_CLASS_NUMBER or android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL
         input.hint = "Masukkan KM saat ini"
-        
+
         MaterialAlertDialogBuilder(this)
             .setTitle("Update Kilometer")
-            .setMessage("Masukkan pembacaan kilometer kendaraan saat ini")
+            .setMessage("Update KM untuk checkpoint: ${activeCheckpoint.trCabang}\n(Urut: $targetUrut)")
             .setView(input)
             .setPositiveButton("Update") { _, _ ->
-                val km = input.text.toString()
-                if (km.isNotEmpty()) {
-                    val sID = viewModel.currentSID.value ?: ""
-                    val agenId = currentAgenID ?: ""
-                    // Update KM through ViewModel
-                    viewModel.updateKM(agenId, "1", "1", km)
-                    Toast.makeText(this, "KM diupdate: $km", Toast.LENGTH_SHORT).show()
+                val km = input.text.toString().trim()
+                if (km.isNotEmpty() && km.toDoubleOrNull() != null) {
+                    viewModel.updateKM(targetAgenId, targetUrut, activeCheckpoint.trStatus, km)
+                    Toast.makeText(this, "KM diupdate: $km km", Toast.LENGTH_SHORT).show()
+                    // Refresh KM display after update
+                    currentKendID?.let { kendID ->
+                        android.os.Handler(android.os.Looper.getMainLooper()).postDelayed({
+                            viewModel.getKMData(kendID)
+                        }, 1000)
+                    }
                 } else {
-                    Toast.makeText(this, "KM tidak boleh kosong", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "KM tidak valid, masukkan angka", Toast.LENGTH_SHORT).show()
                 }
             }
             .setNegativeButton("Batal", null)
